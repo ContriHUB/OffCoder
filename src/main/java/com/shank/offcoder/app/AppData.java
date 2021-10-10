@@ -56,12 +56,7 @@ public class AppData {
         return _instance;
     }
 
-    public void writeData(String key, String value) {
-        mData.put(key, value);
-        writeFile(new File(getDataFolder(), APP_DATA_FILE));
-    }
-
-    public void writeData(String key, boolean value) {
+    public <T> void writeData(String key, T value) {
         mData.put(key, value);
         writeFile(new File(getDataFolder(), APP_DATA_FILE));
     }

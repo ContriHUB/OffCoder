@@ -2,3 +2,4 @@
 /.idea/
 /build
 /libs/client/network_client.*
+/data
