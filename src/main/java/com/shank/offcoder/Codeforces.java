@@ -64,6 +64,7 @@ public class Codeforces {
 
     private static String getCsrf(String body) {
         int index = body.indexOf("csrf='");
+        if (index == -1) return "";
         int end = body.indexOf("'", index + 7);
         return body.substring(index + 6, end);
     }

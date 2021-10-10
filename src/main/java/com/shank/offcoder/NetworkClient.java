@@ -14,11 +14,13 @@
 
 package com.shank.offcoder;
 
+import com.shank.offcoder.app.Coroutine;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
-import com.sun.jna.NativeLibrary;
 import com.sun.jna.Structure;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,16 +43,28 @@ public class NetworkClient {
         return goStr;
     }
 
+    public static boolean isNetworkConnected() {
+        return new Coroutine<Boolean>().runAsync(() -> {
+            try {
+                new URL("https://www.google.com").openConnection().connect();
+                return true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }, false);
+    }
+
     public static void InitClient() {
         get().InitClient();
     }
 
     public static String ReqGet(String URL) {
-        return get().ReqGet(getGoString(URL));
+        return new Coroutine<String>().runAsync(() -> get().ReqGet(getGoString(URL)), "");
     }
 
     public static String ReqPost(String URL, String urlParams) {
-        return get().ReqPost(getGoString(URL), getGoString(urlParams));
+        return new Coroutine<String>().runAsync(() -> get().ReqPost(getGoString(URL), getGoString(urlParams)), "");
     }
 
     public interface NativeNetworkClient extends Library {
