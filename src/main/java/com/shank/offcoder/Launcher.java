@@ -20,35 +20,22 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Scanner;
 
 public class Launcher extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 800, 500);
+        Scene scene = new Scene(fxmlLoader.load(), 800, 400);
         stage.setTitle("OffCoder");
         stage.setScene(scene);
+        stage.setMinWidth(800);
+        stage.setMinHeight(400);
         stage.show();
     }
 
-    private static Scanner input = new Scanner(System.in);
-
     public static void main(String[] args) {
-//        launch();
         NetworkClient.InitClient();
-
-        System.out.print("Enter handle: ");
-        String handle = input.nextLine();
-
-        System.out.print("Enter password: ");
-        String password = input.nextLine();
-
-        try {
-            Codeforces.login(handle, password);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        launch();
     }
 }

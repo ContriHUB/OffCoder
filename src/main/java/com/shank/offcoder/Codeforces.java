@@ -25,8 +25,7 @@ public class Codeforces {
     private static final String HOST = "https://codeforces.com";
     private static final String CHAR_DAT = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-    public static void login(String handle, String password) {
-        // API Key: 59da14a9f3844d44baa9d77a1e241b4459afd133
+    public static String login(String handle, String password) {
         String url = HOST + "/enter";
         String body = NetworkClient.ReqGet(url);
 
@@ -47,11 +46,13 @@ public class Codeforces {
             String reqPost = NetworkClient.ReqPost(url, urlValues), mHandle;
             if (!(mHandle = findHandle(reqPost)).isEmpty()) {
                 System.out.println("Welcome " + mHandle + "!");
+                return mHandle;
             } else {
-                System.out.println("Login Failed");
+                return "Login Failed";
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return "Error";
         }
     }
 
@@ -61,13 +62,13 @@ public class Codeforces {
         return ftaa.toString();
     }
 
-    public static String getCsrf(String body) {
+    private static String getCsrf(String body) {
         int index = body.indexOf("csrf='");
         int end = body.indexOf("'", index + 7);
         return body.substring(index + 6, end);
     }
 
-    public static String findHandle(String body) {
+    private static String findHandle(String body) {
         int index = body.indexOf("handle = ");
         if (index == -1) return "";
         int end = body.indexOf("\"", index + 10);

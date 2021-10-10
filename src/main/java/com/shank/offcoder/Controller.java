@@ -16,14 +16,45 @@ package com.shank.offcoder;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import javafx.scene.layout.AnchorPane;
 
 public class Controller {
 
-    @FXML
-    private Label welcomeText;
+    private boolean mLoginStarted = false;
 
     @FXML
-    protected void onHelloButtonClick() {
-        welcomeText.setText("Welcome to JavaFX Application!");
+    private TextField handleField;
+
+    @FXML
+    private PasswordField passwordField;
+
+    @FXML
+    private AnchorPane welcomePane;
+
+    @FXML
+    private Label userWelcome;
+
+    @FXML
+    protected void loginUser() {
+        if (mLoginStarted) return;
+        mLoginStarted = true;
+
+        String handle = handleField.getText(), password = passwordField.getText();
+        if (!handle.isEmpty() && !password.isEmpty()) {
+            System.out.println("Handle: " + handleField.getText());
+            System.out.println("Got Password");
+
+            String ret = Codeforces.login(handle, password);
+            if (ret.equals("Login Failed") || ret.equals("Error")) {
+                handleField.setText("");
+                passwordField.setText("");
+            } else {
+                welcomePane.toFront();
+                userWelcome.setText("Welcome " + ret + " !");
+            }
+        }
+        mLoginStarted = false;
     }
 }
