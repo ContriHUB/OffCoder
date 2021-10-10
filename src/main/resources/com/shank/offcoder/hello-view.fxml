@@ -16,7 +16,8 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.*?>
+
 <AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="800.0"
             prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.2"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.Controller">
@@ -58,19 +59,22 @@
                                             AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="12.0"
                                             AnchorPane.topAnchor="14.0">
                                     <children>
+                                        <TextField fx:id="handleField" layoutX="93.0" layoutY="79.0" maxWidth="350.0"
+                                                   prefHeight="34.0" prefWidth="302.0" promptText="Handle"
+                                                   AnchorPane.bottomAnchor="260.0" AnchorPane.leftAnchor="93.0"
+                                                   AnchorPane.rightAnchor="92.0"/>
                                         <PasswordField fx:id="passwordField" layoutX="93.0" layoutY="131.0"
                                                        maxHeight="34.0" maxWidth="350.0" minHeight="34.0"
                                                        minWidth="302.0" prefHeight="34.0" prefWidth="302.0"
                                                        promptText="Password" AnchorPane.bottomAnchor="208.0"
                                                        AnchorPane.leftAnchor="93.0" AnchorPane.rightAnchor="92.0"/>
-                                        <Button layoutX="183.0" layoutY="212.0" mnemonicParsing="false"
+                                        <CheckBox fx:id="rememberCheck" layoutX="194.0" layoutY="199.0"
+                                                  mnemonicParsing="false" text="Remember me"
+                                                  AnchorPane.bottomAnchor="157.0" AnchorPane.leftAnchor="194.0"/>
+                                        <Button layoutX="184.0" layoutY="254.0" mnemonicParsing="false"
                                                 onAction="#loginUser" prefHeight="37.0" prefWidth="121.0" text="Login"
-                                                AnchorPane.bottomAnchor="124.0" AnchorPane.leftAnchor="183.0"
-                                                AnchorPane.rightAnchor="183.0"/>
-                                        <TextField fx:id="handleField" layoutX="93.0" layoutY="79.0" maxWidth="350.0"
-                                                   prefHeight="34.0" prefWidth="302.0" promptText="Handle"
-                                                   AnchorPane.bottomAnchor="260.0" AnchorPane.leftAnchor="93.0"
-                                                   AnchorPane.rightAnchor="92.0"/>
+                                                AnchorPane.bottomAnchor="82.0" AnchorPane.leftAnchor="184.0"
+                                                AnchorPane.rightAnchor="182.0"/>
                                     </children>
                                 </AnchorPane>
                             </children>

@@ -11,6 +11,7 @@ module com.shank.offcoder {
     requires org.apache.httpcomponents.httpcore;
 
     requires com.sun.jna;
+    requires org.json;
 
     opens com.shank.offcoder to javafx.fxml;
     exports com.shank.offcoder;
