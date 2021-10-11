@@ -14,6 +14,8 @@
 
 package com.shank.offcoder;
 
+import com.shank.offcoder.app.AppData;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -28,7 +30,10 @@ public class Codeforces {
     private static final String HOST = "https://codeforces.com";
     private static final String CHAR_DAT = "abcdefghijklmnopqrstuvwxyz0123456789";
 
-    // --------- LOGIN SPECIFIC CODE --------- //
+    // UID needed for logout
+    private static String LOG_OUT_UID = AppData.NULL_STR;
+
+    // --------- LOGIN/LOGOUT SPECIFIC CODE --------- //
 
     /**
      * Function to log in on codeforces
@@ -56,6 +61,7 @@ public class Codeforces {
                 .collect(Collectors.joining("&", url + "?", ""));
         try {
             String reqPost = NetworkClient.ReqPost(url, urlValues), mHandle;
+            LOG_OUT_UID = findLogOutUID(reqPost);
             if (!(mHandle = findHandle(reqPost)).isEmpty()) {
                 System.out.println("Welcome " + mHandle + "!");
                 return mHandle;
@@ -66,6 +72,15 @@ public class Codeforces {
             e.printStackTrace();
             return "Error";
         }
+    }
+
+    /**
+     * Function to log out from codeforces
+     */
+    public static boolean logout() {
+        if (LOG_OUT_UID.equals(AppData.NULL_STR)) return false;
+        String body = NetworkClient.ReqGet(HOST + "/" + LOG_OUT_UID + "/logout");
+        return !body.isEmpty();
     }
 
     private static String genFTAA() {
@@ -86,5 +101,12 @@ public class Codeforces {
         if (index == -1) return "";
         int end = body.indexOf("\"", index + 10);
         return body.substring(index + 10, end);
+    }
+
+    private static String findLogOutUID(String body) {
+        int index = body.indexOf("/logout");
+        if (index == -1) return AppData.NULL_STR;
+        int start = body.indexOf("/", index - 33);
+        return body.substring(start + 1, index);
     }
 }

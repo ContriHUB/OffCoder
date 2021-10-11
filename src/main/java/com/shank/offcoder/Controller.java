@@ -18,6 +18,7 @@ import com.shank.offcoder.app.AppData;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -37,6 +38,9 @@ public class Controller {
 
     @FXML
     private AnchorPane welcomePane;
+
+    @FXML
+    private BorderPane loginPane;
 
     @FXML
     private Label userWelcome;
@@ -96,5 +100,28 @@ public class Controller {
                 app.writeData(AppData.AUTO_LOGIN_KEY, true);
             }
         }
+    }
+
+    @FXML
+    protected void logoutUser() {
+        if (NetworkClient.isNetworkNotConnected()) {
+            Alert dialog = new Alert(Alert.AlertType.ERROR);
+            dialog.setTitle("Network Error");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Couldn't connect codeforces");
+            dialog.showAndWait();
+            return;
+        }
+        if (Codeforces.logout()) {
+            removeAutoLogin();
+            loginPane.toFront();
+        }
+    }
+
+    private void removeAutoLogin() {
+        AppData appData = AppData.get();
+        appData.writeData(AppData.AUTO_LOGIN_KEY, false);
+        appData.writeData(AppData.HANDLE_KEY, AppData.NULL_STR);
+        appData.writeData(AppData.PASS_KEY, AppData.NULL_STR);
     }
 }
