@@ -25,15 +25,20 @@ import java.util.Base64;
 
 public class Launcher extends Application {
 
+    public static Stage mStage = null;
+
     @Override
     public void start(Stage stage) throws IOException {
+        mStage = stage;
         FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 800, 400);
-        stage.setTitle("OffCoder");
-        stage.setScene(scene);
-        stage.setMinWidth(800);
-        stage.setMinHeight(400);
-        stage.show();
+        mStage.setTitle("OffCoder");
+        mStage.setScene(scene);
+        mStage.setMinWidth(800);
+        mStage.setMinHeight(400);
+        mStage.setMaxWidth(800);
+        mStage.setMaxHeight(400);
+        mStage.show();
 
         if (AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) {
             ((Controller) fxmlLoader.getController()).attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),

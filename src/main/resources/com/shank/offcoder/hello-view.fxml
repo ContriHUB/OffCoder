@@ -33,8 +33,13 @@
                                AnchorPane.bottomAnchor="127.0" AnchorPane.leftAnchor="237.0"
                                AnchorPane.rightAnchor="237.0" AnchorPane.topAnchor="127.0"/>
                         <Button layoutX="674.0" layoutY="350.0" mnemonicParsing="false" onAction="#logoutUser"
-                                prefHeight="36.0" prefWidth="112.0" text="Log out" AnchorPane.bottomAnchor="14.0"
-                                AnchorPane.rightAnchor="14.0"/>
+                                prefHeight="36.0" prefWidth="112.0" style="-fx-background-color: #1A73E8;"
+                                text="Log out" textFill="WHITE" AnchorPane.bottomAnchor="14.0"
+                                AnchorPane.rightAnchor="14.0">
+                            <font>
+                                <Font name="System Bold" size="14.0"/>
+                            </font>
+                        </Button>
                     </children>
                 </AnchorPane>
                 <BorderPane fx:id="loginPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: #fff;">
@@ -75,9 +80,14 @@
                                                   mnemonicParsing="false" text="Remember me"
                                                   AnchorPane.bottomAnchor="157.0" AnchorPane.leftAnchor="194.0"/>
                                         <Button layoutX="184.0" layoutY="254.0" mnemonicParsing="false"
-                                                onAction="#loginUser" prefHeight="37.0" prefWidth="121.0" text="Login"
+                                                onAction="#loginUser" prefHeight="37.0" prefWidth="121.0"
+                                                style="-fx-background-color: #1A73E8;" text="Login" textFill="WHITE"
                                                 AnchorPane.bottomAnchor="82.0" AnchorPane.leftAnchor="184.0"
-                                                AnchorPane.rightAnchor="182.0"/>
+                                                AnchorPane.rightAnchor="182.0">
+                                            <font>
+                                                <Font name="System Bold" size="14.0"/>
+                                            </font>
+                                        </Button>
                                     </children>
                                 </AnchorPane>
                             </children>
