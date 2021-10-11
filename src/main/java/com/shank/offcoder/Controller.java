@@ -79,8 +79,7 @@ public class Controller {
         }
         if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) return;
 
-        Launcher.mStage.setMaxWidth(Double.MAX_VALUE);
-        Launcher.mStage.setMaxHeight(Double.MAX_VALUE);
+        Launcher.get().freeWindowSize();
         String ret = Codeforces.login(handle, password);
         if (ret.equals("Login Failed") || ret.equals("Error")) {
             handleField.setText("");
@@ -116,8 +115,7 @@ public class Controller {
         }
         if (Codeforces.logout()) {
             removeAutoLogin();
-            Launcher.mStage.setMaxWidth(800);
-            Launcher.mStage.setMaxHeight(400);
+            Launcher.get().limitWindowSize();
             loginPane.toFront();
         }
     }

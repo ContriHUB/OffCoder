@@ -25,7 +25,17 @@ import java.util.Base64;
 
 public class Launcher extends Application {
 
-    public static Stage mStage = null;
+    Stage mStage = null;
+
+    private static Launcher _instance = null;
+
+    public Launcher() {
+        _instance = this;
+    }
+
+    public static Launcher get() {
+        return _instance;
+    }
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -44,6 +54,16 @@ public class Launcher extends Application {
             ((Controller) fxmlLoader.getController()).attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),
                     new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))));
         }
+    }
+
+    public void limitWindowSize() {
+        mStage.setMaxWidth(800);
+        mStage.setMaxHeight(400);
+    }
+
+    public void freeWindowSize() {
+        mStage.setMaxWidth(Double.MAX_VALUE);
+        mStage.setMaxHeight(Double.MAX_VALUE);
     }
 
     public static void main(String[] args) {

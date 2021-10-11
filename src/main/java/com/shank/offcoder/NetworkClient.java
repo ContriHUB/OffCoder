@@ -67,7 +67,7 @@ public class NetworkClient {
                 e.printStackTrace();
                 return true;
             }
-        }, false);
+        }, true);
     }
 
     // ---------- Functions that extend to native lib ---------- //
