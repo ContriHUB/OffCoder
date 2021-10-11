@@ -22,20 +22,33 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 
+/**
+ * Class for handling app data
+ */
 public class AppData {
 
+    // Singleton instance
     private static volatile AppData _instance = null;
 
     private static final String APP_DATA_FILE = "cf_coder.dat";
     public static final String NULL_STR = "&^";
 
+    // Keys used in JSON
+
+    // Key for handle
     public static final String HANDLE_KEY = "handle";
+
+    // Key for password (stored in encoded Base64)
     public static final String PASS_KEY = "password";
+
+    // Key for whether to automatically login on launch
     public static final String AUTO_LOGIN_KEY = "auto_login";
 
+    // Main json to hold all the data
     private static JSONObject mData = null;
 
     private AppData() {
+        // Initialize folder and files
         File dat = new File(getDataFolder(), APP_DATA_FILE);
         if (dat.exists()) {
             readFile(dat);
@@ -49,6 +62,7 @@ public class AppData {
         }
     }
 
+    // Get singleton instance
     public static AppData get() {
         if (_instance == null) {
             _instance = new AppData();
@@ -56,12 +70,26 @@ public class AppData {
         return _instance;
     }
 
+    /**
+     * Function to write/save data
+     *
+     * @param key   The key to store value
+     * @param <T>   Type of value to store
+     * @param value value to store
+     */
     public <T> void writeData(String key, T value) {
         mData.put(key, value);
         writeFile(new File(getDataFolder(), APP_DATA_FILE));
     }
 
-    public <T> T readData(String key, T def) {
+    /**
+     * Function to retrieve the data
+     *
+     * @param key To get data from that key
+     * @param <T> Type of data to return
+     * @param def Return default in case key is absent
+     */
+    public <T> T getData(String key, T def) {
         try {
             Object obj = mData.get(key);
             return (T) obj;

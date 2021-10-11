@@ -18,12 +18,32 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * Simple coroutine class that returns value
+ * from async execution.
+ *
+ * @param <T> Type of data to handle/return from async
+ */
 public class Coroutine<T> {
 
+    /**
+     * Interface to send the block of code
+     * to be executed async.
+     *
+     * @param <T> Type of return value
+     */
     public interface ProcessAsync<T> {
         T event();
     }
 
+    /**
+     * Main function that will run async and return value
+     * of provided type.
+     *
+     * @param process Process/code to execute
+     * @param def     Default value in case of any error
+     * @return T
+     */
     public T runAsync(ProcessAsync<T> process, T def) {
         final ExecutorService threadPool = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
         Future<T> future = null;

@@ -43,7 +43,7 @@ public class Controller {
 
     @FXML
     protected void loginUser() {
-        if (!NetworkClient.isNetworkConnected()) {
+        if (NetworkClient.isNetworkNotConnected()) {
             Alert dialog = new Alert(Alert.AlertType.ERROR);
             dialog.setTitle("Network Error");
             dialog.setHeaderText(null);
@@ -65,7 +65,7 @@ public class Controller {
     }
 
     public void attemptLogin(String handle, String password) {
-        if (!NetworkClient.isNetworkConnected()) {
+        if (NetworkClient.isNetworkNotConnected()) {
             Alert dialog = new Alert(Alert.AlertType.ERROR);
             dialog.setTitle("Network Error");
             dialog.setHeaderText(null);

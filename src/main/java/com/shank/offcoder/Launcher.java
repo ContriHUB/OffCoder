@@ -35,9 +35,9 @@ public class Launcher extends Application {
         stage.setMinHeight(400);
         stage.show();
 
-        if (AppData.get().<Boolean>readData(AppData.AUTO_LOGIN_KEY, false)) {
-            ((Controller) fxmlLoader.getController()).attemptLogin(AppData.get().readData(AppData.HANDLE_KEY, AppData.NULL_STR),
-                    new String(Base64.getDecoder().decode(AppData.get().readData(AppData.PASS_KEY, AppData.NULL_STR))));
+        if (AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) {
+            ((Controller) fxmlLoader.getController()).attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),
+                    new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))));
         }
     }
 

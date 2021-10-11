@@ -20,11 +20,23 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+/**
+ * Class for handling tasks for Codeforces
+ */
 public class Codeforces {
 
     private static final String HOST = "https://codeforces.com";
     private static final String CHAR_DAT = "abcdefghijklmnopqrstuvwxyz0123456789";
 
+    // --------- LOGIN SPECIFIC CODE --------- //
+
+    /**
+     * Function to log in on codeforces
+     *
+     * @param handle   codeforces handle
+     * @param password password for the handle
+     * @return handle but from webpage (returned value from POST)
+     */
     public static String login(String handle, String password) {
         String url = HOST + "/enter";
         String body = NetworkClient.ReqGet(url);

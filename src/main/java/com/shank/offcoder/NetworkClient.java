@@ -24,10 +24,16 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Class for handling networking
+ * from native client.
+ */
 public class NetworkClient {
 
+    // Singleton instance of native network client
     private static volatile NativeNetworkClient networkClient = null;
 
+    // Creating instance by loading native dll
     private static synchronized NativeNetworkClient get() {
         if (networkClient == null) {
             System.setProperty("java.library.path", "D:/IdeaProjects/OffCoder/libs/;" + System.getProperty("java.library.path"));
@@ -36,6 +42,10 @@ public class NetworkClient {
         return networkClient;
     }
 
+    /**
+     * A function to convert {@link String} to {@link NativeNetworkClient.GoString}
+     * needed by {@link NativeNetworkClient}.
+     */
     private static NativeNetworkClient.GoString.ByValue getGoString(String str) {
         NativeNetworkClient.GoString.ByValue goStr = new NativeNetworkClient.GoString.ByValue();
         goStr.p = str;
@@ -43,48 +53,72 @@ public class NetworkClient {
         return goStr;
     }
 
-    public static boolean isNetworkConnected() {
+    /**
+     * A function to check network connectivity
+     *
+     * @return false if connected
+     */
+    public static boolean isNetworkNotConnected() {
         return new Coroutine<Boolean>().runAsync(() -> {
             try {
                 new URL("https://www.google.com").openConnection().connect();
-                return true;
+                return false;
             } catch (IOException e) {
                 e.printStackTrace();
-                return false;
+                return true;
             }
         }, false);
     }
 
+    // ---------- Functions that extend to native lib ---------- //
+
+    /**
+     * Initialize native client
+     */
     public static void InitClient() {
         get().InitClient();
     }
 
+    /**
+     * Execute GET on given
+     *
+     * @param URL URL for GET
+     */
     public static String ReqGet(String URL) {
         return new Coroutine<String>().runAsync(() -> get().ReqGet(getGoString(URL)), "");
     }
 
+    /**
+     * Execute POST on given
+     *
+     * @param URL       URL for POST
+     * @param urlParams Params for the URL
+     */
     public static String ReqPost(String URL, String urlParams) {
         return new Coroutine<String>().runAsync(() -> get().ReqPost(getGoString(URL), getGoString(urlParams)), "");
     }
 
+    /**
+     * Interface that binds to native client (lib/dll)
+     */
     public interface NativeNetworkClient extends Library {
 
-        public class GoString extends Structure {
+        class GoString extends Structure {
             public static class ByValue extends GoString implements Structure.ByValue {
             }
 
             public String p;
             public long n;
 
-            protected List getFieldOrder() {
+            protected List<String> getFieldOrder() {
                 return Arrays.asList("p", "n");
             }
         }
 
-        public void InitClient();
+        void InitClient();
 
-        public String ReqGet(GoString.ByValue URL);
+        String ReqGet(GoString.ByValue URL);
 
-        public String ReqPost(GoString.ByValue URL, GoString.ByValue urlParams);
+        String ReqPost(GoString.ByValue URL, GoString.ByValue urlParams);
     }
 }
