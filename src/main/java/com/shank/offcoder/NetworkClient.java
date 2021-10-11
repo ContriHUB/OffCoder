@@ -104,8 +104,7 @@ public class NetworkClient {
     public interface NativeNetworkClient extends Library {
 
         class GoString extends Structure {
-            public static class ByValue extends GoString implements Structure.ByValue {
-            }
+            public static class ByValue extends GoString implements Structure.ByValue {}
 
             public String p;
             public long n;

@@ -29,13 +29,9 @@ public class Launcher extends Application {
 
     private static Launcher _instance = null;
 
-    public Launcher() {
-        _instance = this;
-    }
+    public Launcher() {_instance = this;}
 
-    public static Launcher get() {
-        return _instance;
-    }
+    public static Launcher get() {return _instance;}
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -46,8 +42,7 @@ public class Launcher extends Application {
         mStage.setScene(scene);
         mStage.setMinWidth(800);
         mStage.setMinHeight(400);
-        mStage.setMaxWidth(800);
-        mStage.setMaxHeight(400);
+        limitWindowSize();
         mStage.show();
 
         if (AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) {

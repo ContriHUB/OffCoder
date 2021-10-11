@@ -64,9 +64,7 @@ public class AppData {
 
     // Get singleton instance
     public static AppData get() {
-        if (_instance == null) {
-            _instance = new AppData();
-        }
+        if (_instance == null) _instance = new AppData();
         return _instance;
     }
 

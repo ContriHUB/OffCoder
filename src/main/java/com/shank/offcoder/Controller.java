@@ -25,7 +25,7 @@ import java.util.Base64;
 
 public class Controller {
 
-    private boolean mLoginStarted = false;
+    private boolean mStarted = false;
 
     @FXML
     private TextField handleField;
@@ -47,16 +47,9 @@ public class Controller {
 
     @FXML
     protected void loginUser() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            Alert dialog = new Alert(Alert.AlertType.ERROR);
-            dialog.setTitle("Network Error");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Couldn't connect codeforces");
-            dialog.showAndWait();
-            return;
-        }
-        if (mLoginStarted) return;
-        mLoginStarted = true;
+        checkInternet();
+        if (mStarted) return;
+        mStarted = true;
 
         String handle = handleField.getText(), password = passwordField.getText();
         if (!handle.isEmpty() && !password.isEmpty()) {
@@ -65,7 +58,7 @@ public class Controller {
 
             attemptLogin(handle, password);
         }
-        mLoginStarted = false;
+        mStarted = false;
     }
 
     public void attemptLogin(String handle, String password) {
@@ -82,9 +75,6 @@ public class Controller {
         Launcher.get().freeWindowSize();
         String ret = Codeforces.login(handle, password);
         if (ret.equals("Login Failed") || ret.equals("Error")) {
-            handleField.setText("");
-            passwordField.setText("");
-
             Alert dialog = new Alert(Alert.AlertType.ERROR);
             dialog.setTitle("Login Error");
             dialog.setHeaderText(null);
@@ -101,22 +91,30 @@ public class Controller {
                 app.writeData(AppData.AUTO_LOGIN_KEY, true);
             }
         }
+        handleField.setText("");
+        passwordField.setText("");
     }
 
     @FXML
     protected void logoutUser() {
+        checkInternet();
+        if (mStarted) return;
+        mStarted = true;
+        if (Codeforces.logout()) {
+            removeAutoLogin();
+            Launcher.get().limitWindowSize();
+            loginPane.toFront();
+        }
+        mStarted = false;
+    }
+
+    private void checkInternet() {
         if (NetworkClient.isNetworkNotConnected()) {
             Alert dialog = new Alert(Alert.AlertType.ERROR);
             dialog.setTitle("Network Error");
             dialog.setHeaderText(null);
             dialog.setContentText("Couldn't connect codeforces");
             dialog.showAndWait();
-            return;
-        }
-        if (Codeforces.logout()) {
-            removeAutoLogin();
-            Launcher.get().limitWindowSize();
-            loginPane.toFront();
         }
     }
 
