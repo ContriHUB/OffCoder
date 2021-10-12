@@ -15,9 +15,9 @@
 package com.shank.offcoder.controllers;
 
 import com.shank.offcoder.Launcher;
-import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.app.AppData;
 import com.shank.offcoder.app.Coroutine;
+import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.cf.Codeforces;
 import com.shank.offcoder.cf.ProblemSetHandler;
 import javafx.fxml.FXML;
@@ -63,36 +63,17 @@ public class Controller {
     private void initialize() {
         if (!AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) loginPane.toFront();
         problemRetProgress.setVisible(false);
+        loadPageIndicator.setVisible(false);
         problemListView.setCellFactory(param -> new ProblemCell());
         difficultyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() >= 5) newValue = newValue.substring(0, 4);
             if (!newValue.matches("\\d*")) {
                 difficultyTextField.setText(newValue.replaceAll("[^\\d]", ""));
             }
         });
     }
 
-    @FXML
-    protected void applyDifficulty() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        problemRetProgress.setVisible(true);
-        new Coroutine<Void>().delay(() -> {
-            problemListView.getSelectionModel().clearSelection();
-            populateListView(mProblemSetHandler.changeDifficulty(Integer.parseInt(difficultyTextField.getText().trim())));
-            return null;
-        }, 1000);
-    }
-
-    private void populateListView(List<ProblemSetHandler.Problem> list) {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        problemRetProgress.setVisible(false);
-        problemListView.getItems().setAll(list);
-    }
+    // ----------------- LOGIN / LOGOUT ----------------- //
 
     @FXML
     protected void loginUser() {
@@ -134,7 +115,7 @@ public class Controller {
             userWelcome.setText("Welcome " + ret + " !");
 
             new Coroutine<Void>().delay(() -> {
-                populateListView(mProblemSetHandler.get());
+                populateListView(mProblemSetHandler.get(), false);
                 return null;
             }, 150);
             if (rememberCheck.isSelected()) {
@@ -159,6 +140,7 @@ public class Controller {
         if (Codeforces.logout()) {
             problemListView.getSelectionModel().clearSelection();
             problemListView.getItems().clear();
+            mProblemSetHandler.reset();
             removeAutoLogin();
             Launcher.get().limitWindowSize();
             loginPane.toFront();
@@ -180,5 +162,76 @@ public class Controller {
         dialog.setContentText("Couldn't connect codeforces");
         dialog.initOwner(Launcher.get().mStage);
         dialog.showAndWait();
+    }
+
+    // ----------------- PROBLEM LIST VIEW ----------------- //
+
+    @FXML
+    private Label pageNoLabel;
+
+    @FXML
+    private Button prevPageBtn, nextPageBtn;
+
+    @FXML
+    private ProgressIndicator loadPageIndicator;
+
+    @FXML
+    protected void applyDifficulty() {
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
+        problemRetProgress.setVisible(true);
+        new Coroutine<Void>().delay(() -> {
+            prevPageBtn.setDisable(true);
+            nextPageBtn.setDisable(false);
+            pageNoLabel.setText("Page: 1");
+
+            problemListView.getSelectionModel().clearSelection();
+            populateListView(mProblemSetHandler.changeDifficulty(Integer.parseInt(difficultyTextField.getText().trim())), true);
+            return null;
+        }, 500);
+    }
+
+    @FXML
+    protected void nextPage() {
+        loadPageIndicator.setVisible(true);
+        new Coroutine<Void>().delay(() -> {
+            populateListView(mProblemSetHandler.nextPage(), false);
+            return null;
+        }, 500);
+    }
+
+    @FXML
+    protected void prevPage() {
+        loadPageIndicator.setVisible(true);
+        new Coroutine<Void>().delay(() -> {
+            populateListView(mProblemSetHandler.prevPage(), false);
+            return null;
+        }, 500);
+    }
+
+    private void populateListView(List<ProblemSetHandler.Problem> list, boolean diffChange) {
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
+        problemRetProgress.setVisible(false);
+        prevPageBtn.setDisable(mProblemSetHandler.getPage() == 1);
+        boolean updated = listUpdated(list, problemListView.getItems());
+        nextPageBtn.setDisable(!updated && !diffChange);
+        pageNoLabel.setText("Page: " + (updated || diffChange ? mProblemSetHandler.getPage() : mProblemSetHandler.revertPage()));
+
+        problemListView.getItems().setAll(list);
+        loadPageIndicator.setVisible(false);
+    }
+
+    private boolean listUpdated(List<ProblemSetHandler.Problem> prev, List<ProblemSetHandler.Problem> next) {
+        if (prev.isEmpty() || next.isEmpty()) return true;
+        if (prev.size() != next.size()) return true;
+        for (int i = 0; i < prev.size(); i++) {
+            if (!prev.get(i).equals(next.get(i))) return true;
+        }
+        return false;
     }
 }

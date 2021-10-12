@@ -43,6 +43,15 @@ public class ProblemSetHandler {
                     ", rating=" + rating +
                     '}';
         }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (obj == null || getClass() != obj.getClass()) return false;
+            Problem pr = (Problem) obj;
+            return this.code.equals(pr.code) && this.name.equals(pr.name) &&
+                    this.url.equals(pr.url) && this.rating.equals(pr.rating) &&
+                    (this.accepted == pr.accepted);
+        }
     }
 
     /**
@@ -56,8 +65,8 @@ public class ProblemSetHandler {
      * @return list with changed difficulty
      */
     public List<Problem> changeDifficulty(int difficulty) {
-        maxDifficulty = difficulty;
-        minDifficulty = difficulty == 800 ? 0 : difficulty - 99;
+        maxDifficulty = Math.min(difficulty, 3500);
+        minDifficulty = maxDifficulty == 800 ? 0 : maxDifficulty - 99;
         page = 1;
         return getProblemList();
     }
@@ -67,10 +76,23 @@ public class ProblemSetHandler {
         return getProblemList();
     }
 
+    public List<Problem> prevPage() {
+        if (page >= 2) --page;
+        return getProblemList();
+    }
+
     public void reset() {
         minDifficulty = 0;
         maxDifficulty = 800;
         page = 1;
+    }
+
+    public int getPage() {
+        return page;
+    }
+
+    public int revertPage() {
+        return page >= 2 ? --page : page;
     }
 
     /**
