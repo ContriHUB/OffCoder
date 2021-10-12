@@ -14,13 +14,14 @@
   ~ copies or substantial portions of the Software.
   -->
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
 <AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="800.0"
             prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.2"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.Controller">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.controllers.Controller">
     <children>
         <StackPane prefHeight="400.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -28,18 +29,34 @@
                 <AnchorPane fx:id="welcomePane" prefHeight="400.0" prefWidth="800.0"
                             style="-fx-background-color: #fff;">
                     <children>
-                        <Label fx:id="userWelcome" alignment="CENTER" contentDisplay="CENTER" layoutX="237.0"
-                               layoutY="127.0" prefHeight="146.0" prefWidth="326.0" text="Welcome"
-                               AnchorPane.bottomAnchor="127.0" AnchorPane.leftAnchor="237.0"
-                               AnchorPane.rightAnchor="237.0" AnchorPane.topAnchor="127.0"/>
-                        <Button layoutX="674.0" layoutY="350.0" mnemonicParsing="false" onAction="#logoutUser"
-                                prefHeight="36.0" prefWidth="112.0" style="-fx-background-color: #1A73E8;"
-                                text="Log out" textFill="WHITE" AnchorPane.bottomAnchor="14.0"
-                                AnchorPane.rightAnchor="14.0">
+                        <Label fx:id="userWelcome" layoutX="13.0" layoutY="14.0" prefWidth="254.0" text="Welcome"
+                               AnchorPane.leftAnchor="13.0" AnchorPane.topAnchor="14.0">
+                            <opaqueInsets>
+                                <Insets/>
+                            </opaqueInsets>
                             <font>
-                                <Font name="System Bold" size="14.0"/>
+                                <Font name="System Bold" size="15.0"/>
+                            </font>
+                        </Label>
+                        <Button layoutX="4.0" layoutY="33.0" mnemonicParsing="false" onAction="#logoutUser"
+                                prefHeight="31.0" prefWidth="75.0" style="-fx-background-color: #fff; -fx-cursor: hand;"
+                                text="Log out" textFill="#1a73e8" AnchorPane.leftAnchor="4.0"
+                                AnchorPane.topAnchor="33.0">
+                            <font>
+                                <Font name="System Bold" size="15.0"/>
                             </font>
                         </Button>
+                        <ListView fx:id="problemListView" layoutX="14.0" layoutY="67.0" prefHeight="321.0"
+                                  prefWidth="515.0" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="14.0"
+                                  AnchorPane.rightAnchor="271.0" AnchorPane.topAnchor="67.0"/>
+                        <Label layoutX="543.0" layoutY="71.0" text="Difficulty" AnchorPane.rightAnchor="210.0"
+                               AnchorPane.topAnchor="71.0"/>
+                        <TextField fx:id="difficultyTextField" layoutX="609.0" layoutY="67.0" text="800"
+                                   AnchorPane.rightAnchor="42.0" AnchorPane.topAnchor="67.0"/>
+                        <Button layoutX="711.0" layoutY="100.0" mnemonicParsing="false" onAction="#applyDifficulty"
+                                text="Apply" AnchorPane.rightAnchor="42.0" AnchorPane.topAnchor="100.0"/>
+                        <ProgressIndicator fx:id="problemRetProgress" layoutX="684.0" layoutY="102.0" prefHeight="21.0"
+                                           prefWidth="19.0" AnchorPane.rightAnchor="97.0" AnchorPane.topAnchor="102.0"/>
                     </children>
                 </AnchorPane>
                 <BorderPane fx:id="loginPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: #fff;">
@@ -81,9 +98,9 @@
                                                   AnchorPane.bottomAnchor="157.0" AnchorPane.leftAnchor="194.0"/>
                                         <Button layoutX="184.0" layoutY="254.0" mnemonicParsing="false"
                                                 onAction="#loginUser" prefHeight="37.0" prefWidth="121.0"
-                                                style="-fx-background-color: #1A73E8;" text="Login" textFill="WHITE"
-                                                AnchorPane.bottomAnchor="82.0" AnchorPane.leftAnchor="184.0"
-                                                AnchorPane.rightAnchor="182.0">
+                                                style="-fx-background-color: #1A73E8; -fx-cursor: hand;" text="Login"
+                                                textFill="WHITE" AnchorPane.bottomAnchor="82.0"
+                                                AnchorPane.leftAnchor="184.0" AnchorPane.rightAnchor="182.0">
                                             <font>
                                                 <Font name="System Bold" size="14.0"/>
                                             </font>
@@ -94,6 +111,15 @@
                         </AnchorPane>
                     </center>
                 </BorderPane>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #fff;">
+                    <children>
+                        <Label layoutX="346.0" layoutY="183.0" text="Loading ...">
+                            <font>
+                                <Font size="24.0"/>
+                            </font>
+                        </Label>
+                    </children>
+                </AnchorPane>
             </children>
         </StackPane>
     </children>

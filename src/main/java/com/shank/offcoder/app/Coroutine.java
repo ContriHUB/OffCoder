@@ -14,6 +14,10 @@
 
 package com.shank.offcoder.app;
 
+import javafx.application.Platform;
+
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -65,5 +69,20 @@ public class Coroutine<T> {
         } catch (Exception e) {
             return def;
         }
+    }
+
+    /**
+     * A function to delay the execution
+     *
+     * @param process Code to execute of Void type
+     * @param delay   Milli to delay
+     */
+    public void delay(ProcessAsync<Void> process, long delay) {
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Platform.runLater(process::event);
+            }
+        }, delay);
     }
 }

@@ -12,9 +12,8 @@
  * copies or substantial portions of the Software.
  */
 
-package com.shank.offcoder;
+package com.shank.offcoder.app;
 
-import com.shank.offcoder.app.Coroutine;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Structure;

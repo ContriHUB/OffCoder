@@ -17,4 +17,8 @@ module com.shank.offcoder {
     exports com.shank.offcoder;
     opens com.shank.offcoder.app to javafx.fxml;
     exports com.shank.offcoder.app;
+    opens com.shank.offcoder.cf to javafx.fxml;
+    exports com.shank.offcoder.cf;
+    opens com.shank.offcoder.controllers to javafx.fxml;
+    exports com.shank.offcoder.controllers;
 }

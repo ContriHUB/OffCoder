@@ -12,8 +12,9 @@
  * copies or substantial portions of the Software.
  */
 
-package com.shank.offcoder;
+package com.shank.offcoder.cf;
 
+import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.app.AppData;
 
 import java.net.URLEncoder;
@@ -32,6 +33,8 @@ public class Codeforces {
 
     // UID needed for logout
     private static String LOG_OUT_UID = AppData.NULL_STR;
+
+    public static String HANDLE = AppData.NULL_STR, PASS = AppData.NULL_STR;
 
     // --------- LOGIN/LOGOUT SPECIFIC CODE --------- //
 
@@ -63,7 +66,8 @@ public class Codeforces {
             String reqPost = NetworkClient.ReqPost(url, urlValues), mHandle;
             LOG_OUT_UID = findLogOutUID(reqPost);
             if (!(mHandle = findHandle(reqPost)).isEmpty()) {
-                System.out.println("Welcome " + mHandle + "!");
+                HANDLE = mHandle;
+                PASS = password;
                 return mHandle;
             } else {
                 return "Login Failed";

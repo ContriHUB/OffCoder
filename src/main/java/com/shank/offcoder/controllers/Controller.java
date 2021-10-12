@@ -12,9 +12,14 @@
  * copies or substantial portions of the Software.
  */
 
-package com.shank.offcoder;
+package com.shank.offcoder.controllers;
 
+import com.shank.offcoder.Launcher;
+import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.app.AppData;
+import com.shank.offcoder.app.Coroutine;
+import com.shank.offcoder.cf.Codeforces;
+import com.shank.offcoder.cf.ProblemSetHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -22,13 +27,16 @@ import javafx.scene.layout.BorderPane;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.List;
 
 public class Controller {
+
+    private final ProblemSetHandler mProblemSetHandler = new ProblemSetHandler();
 
     private boolean mStarted = false;
 
     @FXML
-    private TextField handleField;
+    private TextField handleField, difficultyTextField;
 
     @FXML
     private PasswordField passwordField;
@@ -46,14 +54,58 @@ public class Controller {
     private Label userWelcome;
 
     @FXML
+    private ListView<ProblemSetHandler.Problem> problemListView;
+
+    @FXML
+    private ProgressIndicator problemRetProgress;
+
+    @FXML
+    private void initialize() {
+        if (!AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) loginPane.toFront();
+        problemRetProgress.setVisible(false);
+        problemListView.setCellFactory(param -> new ProblemCell());
+        difficultyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.matches("\\d*")) {
+                difficultyTextField.setText(newValue.replaceAll("[^\\d]", ""));
+            }
+        });
+    }
+
+    @FXML
+    protected void applyDifficulty() {
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
+        problemRetProgress.setVisible(true);
+        new Coroutine<Void>().delay(() -> {
+            problemListView.getSelectionModel().clearSelection();
+            populateListView(mProblemSetHandler.changeDifficulty(Integer.parseInt(difficultyTextField.getText().trim())));
+            return null;
+        }, 1000);
+    }
+
+    private void populateListView(List<ProblemSetHandler.Problem> list) {
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
+        problemRetProgress.setVisible(false);
+        problemListView.getItems().setAll(list);
+    }
+
+    @FXML
     protected void loginUser() {
-        checkInternet();
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
         if (mStarted) return;
         mStarted = true;
 
-        String handle = handleField.getText(), password = passwordField.getText();
+        String handle = handleField.getText().trim(), password = passwordField.getText().trim();
         if (!handle.isEmpty() && !password.isEmpty()) {
-            System.out.println("Handle: " + handleField.getText());
+            System.out.println("Handle: " + handleField.getText().trim());
             System.out.println("Got Password");
 
             attemptLogin(handle, password);
@@ -63,27 +115,28 @@ public class Controller {
 
     public void attemptLogin(String handle, String password) {
         if (NetworkClient.isNetworkNotConnected()) {
-            Alert dialog = new Alert(Alert.AlertType.ERROR);
-            dialog.setTitle("Network Error");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Couldn't connect codeforces");
-            dialog.showAndWait();
+            showNetworkErrDialog();
             return;
         }
         if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) return;
 
-        Launcher.get().freeWindowSize();
         String ret = Codeforces.login(handle, password);
         if (ret.equals("Login Failed") || ret.equals("Error")) {
             Alert dialog = new Alert(Alert.AlertType.ERROR);
             dialog.setTitle("Login Error");
             dialog.setHeaderText(null);
             dialog.setContentText("Invalid handle or password");
+            dialog.initOwner(Launcher.get().mStage);
             dialog.showAndWait();
         } else {
+            Launcher.get().freeWindowSize();
             welcomePane.toFront();
             userWelcome.setText("Welcome " + ret + " !");
 
+            new Coroutine<Void>().delay(() -> {
+                populateListView(mProblemSetHandler.get());
+                return null;
+            }, 150);
             if (rememberCheck.isSelected()) {
                 AppData app = AppData.get();
                 app.writeData(AppData.HANDLE_KEY, ret);
@@ -97,10 +150,15 @@ public class Controller {
 
     @FXML
     protected void logoutUser() {
-        checkInternet();
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
         if (mStarted) return;
         mStarted = true;
         if (Codeforces.logout()) {
+            problemListView.getSelectionModel().clearSelection();
+            problemListView.getItems().clear();
             removeAutoLogin();
             Launcher.get().limitWindowSize();
             loginPane.toFront();
@@ -108,20 +166,19 @@ public class Controller {
         mStarted = false;
     }
 
-    private void checkInternet() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            Alert dialog = new Alert(Alert.AlertType.ERROR);
-            dialog.setTitle("Network Error");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Couldn't connect codeforces");
-            dialog.showAndWait();
-        }
-    }
-
     private void removeAutoLogin() {
         AppData appData = AppData.get();
         appData.writeData(AppData.AUTO_LOGIN_KEY, false);
         appData.writeData(AppData.HANDLE_KEY, AppData.NULL_STR);
         appData.writeData(AppData.PASS_KEY, AppData.NULL_STR);
+    }
+
+    private void showNetworkErrDialog() {
+        Alert dialog = new Alert(Alert.AlertType.ERROR);
+        dialog.setTitle("Network Error");
+        dialog.setHeaderText(null);
+        dialog.setContentText("Couldn't connect codeforces");
+        dialog.initOwner(Launcher.get().mStage);
+        dialog.showAndWait();
     }
 }
