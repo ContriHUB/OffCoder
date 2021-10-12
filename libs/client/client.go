@@ -7,7 +7,6 @@ package main
 import "C"
 
 import (
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
@@ -20,14 +19,12 @@ var jar *cookiejar.Jar = nil
 
 //export InitClient
 func InitClient() {
-	fmt.Println("GO: InitClient: Called")
 	jar, _ := cookiejar.New(nil)
 	client = &http.Client{Jar: jar, Transport: &http.Transport{Proxy: http.ProxyFromEnvironment}}
 }
 
 //export ReqGet
 func ReqGet(URL string) *C.char {
-	fmt.Println("GO: ReqGet: Called")
 	data, err := GetBody(&URL)
 	if err != nil {
 		return C.CString("")
@@ -37,7 +34,6 @@ func ReqGet(URL string) *C.char {
 
 //export ReqPost
 func ReqPost(URL string, urlParams string) *C.char {
-	fmt.Println("GO: ReqPost: Called")
 	data, err := PostBody(URL, GetUrlValues(urlParams))
 	if err != nil {
 		return C.CString("")
@@ -47,7 +43,6 @@ func ReqPost(URL string, urlParams string) *C.char {
 
 func GetUrlValues(urlParams string) url.Values {
 	values := url.Values{}
-	fmt.Println("GO: GetUrlValues: Called")
 	if len(urlParams) > 0 {
 		index := strings.Index(urlParams, "?")
 		urlParams = urlParams[index+1:]
@@ -66,7 +61,6 @@ func GetUrlValues(urlParams string) url.Values {
 }
 
 func GetBody(URL *string) ([]byte, error) {
-	fmt.Println("GO: GetBody: Called")
 	resp, err := client.Get(*URL)
 	if err != nil {
 		return nil, err
@@ -76,7 +70,6 @@ func GetBody(URL *string) ([]byte, error) {
 }
 
 func PostBody(URL string, data url.Values) ([]byte, error) {
-	fmt.Println("GO: PostBody: Called")
 	resp, err := client.PostForm(URL, data)
 	if err != nil {
 		return nil, err
