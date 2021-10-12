@@ -102,6 +102,17 @@ public class Controller {
         if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) return;
 
         String ret = Codeforces.login(handle, password);
+        if (ret.equals("Codeforces down")) {
+            Alert dialog = new Alert(Alert.AlertType.ERROR);
+            dialog.setTitle("Connection Error");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Codeforces down");
+            dialog.initOwner(Launcher.get().mStage);
+            dialog.showAndWait();
+            handleField.setText("");
+            passwordField.setText("");
+            return;
+        }
         if (ret.equals("Login Failed") || ret.equals("Error")) {
             Alert dialog = new Alert(Alert.AlertType.ERROR);
             dialog.setTitle("Login Error");
@@ -109,7 +120,10 @@ public class Controller {
             dialog.setContentText("Invalid handle or password");
             dialog.initOwner(Launcher.get().mStage);
             dialog.showAndWait();
+            passwordField.setText("");
         } else {
+            handleField.setText("");
+            passwordField.setText("");
             Launcher.get().freeWindowSize();
             welcomePane.toFront();
             userWelcome.setText("Welcome " + ret + " !");
@@ -125,8 +139,6 @@ public class Controller {
                 app.writeData(AppData.AUTO_LOGIN_KEY, true);
             }
         }
-        handleField.setText("");
-        passwordField.setText("");
     }
 
     @FXML

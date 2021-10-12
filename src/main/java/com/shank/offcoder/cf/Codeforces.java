@@ -14,8 +14,8 @@
 
 package com.shank.offcoder.cf;
 
-import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.app.AppData;
+import com.shank.offcoder.app.NetworkClient;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -48,6 +48,7 @@ public class Codeforces {
     public static String login(String handle, String password) {
         String url = HOST + "/enter";
         String body = NetworkClient.ReqGet(url);
+        if (hasError(body)) return "Codeforces down";
 
         HashMap<String, String> params = new HashMap<>();
         params.put("csrf_token", getCsrf(body));
@@ -64,6 +65,8 @@ public class Codeforces {
                 .collect(Collectors.joining("&", url + "?", ""));
         try {
             String reqPost = NetworkClient.ReqPost(url, urlValues), mHandle;
+            if (hasError(reqPost)) return "Codeforces down";
+
             LOG_OUT_UID = findLogOutUID(reqPost);
             if (!(mHandle = findHandle(reqPost)).isEmpty()) {
                 HANDLE = mHandle;
@@ -112,5 +115,14 @@ public class Codeforces {
         if (index == -1) return AppData.NULL_STR;
         int start = body.indexOf("/", index - 33);
         return body.substring(start + 1, index);
+    }
+
+    private static boolean hasError(String body) {
+        try {
+            Integer.parseInt(body.substring(0, 3));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

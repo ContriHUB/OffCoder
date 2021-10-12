@@ -66,7 +66,11 @@ func GetBody(URL *string) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	if resp.StatusCode == 200 {
+		return ioutil.ReadAll(resp.Body)
+	} else {
+		return []byte(resp.Status), nil
+	}
 }
 
 func PostBody(URL string, data url.Values) ([]byte, error) {
@@ -75,7 +79,11 @@ func PostBody(URL string, data url.Values) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	return ioutil.ReadAll(resp.Body)
+	if resp.StatusCode == 200 {
+		return ioutil.ReadAll(resp.Body)
+	} else {
+		return []byte(resp.Status), nil
+	}
 }
 
 func main() {}
