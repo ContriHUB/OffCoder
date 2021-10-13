@@ -16,10 +16,11 @@ package com.shank.offcoder.controllers;
 
 import com.shank.offcoder.Launcher;
 import com.shank.offcoder.app.AppData;
-import com.shank.offcoder.app.Coroutine;
+import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.cf.Codeforces;
 import com.shank.offcoder.cf.ProblemSetHandler;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -45,6 +46,9 @@ public class Controller {
     private CheckBox rememberCheck;
 
     @FXML
+    private ProgressIndicator loginProgress;
+
+    @FXML
     private AnchorPane welcomePane;
 
     @FXML
@@ -64,6 +68,7 @@ public class Controller {
         if (!AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) loginPane.toFront();
         problemRetProgress.setVisible(false);
         loadPageIndicator.setVisible(false);
+        loginProgress.setVisible(false);
         problemListView.setCellFactory(param -> new ProblemCell());
         difficultyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() >= 5) newValue = newValue.substring(0, 4);
@@ -89,25 +94,34 @@ public class Controller {
             System.out.println("Handle: " + handleField.getText().trim());
             System.out.println("Got Password");
 
+            loginProgress.setVisible(mStarted);
             attemptLogin(handle, password);
         }
-        mStarted = false;
     }
 
     public void attemptLogin(String handle, String password) {
         if (NetworkClient.isNetworkNotConnected()) {
             showNetworkErrDialog();
+            mStarted = false;
+            loginProgress.setVisible(false);
             return;
         }
-        if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) return;
+        if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) {
+            mStarted = false;
+            loginProgress.setVisible(false);
+            return;
+        }
 
-        String ret = Codeforces.login(handle, password);
+        Codeforces.login(handle, password, ret -> Platform.runLater(() -> {
         if (ret.equals("Codeforces down")) {
             Alert dialog = new Alert(Alert.AlertType.ERROR);
             dialog.setTitle("Connection Error");
             dialog.setHeaderText(null);
             dialog.setContentText("Codeforces down");
             dialog.initOwner(Launcher.get().mStage);
+                mStarted = false;
+                loginProgress.setVisible(false);
+
             dialog.showAndWait();
             handleField.setText("");
             passwordField.setText("");
@@ -119,6 +133,7 @@ public class Controller {
             dialog.setHeaderText(null);
             dialog.setContentText("Invalid handle or password");
             dialog.initOwner(Launcher.get().mStage);
+                loginProgress.setVisible(false);
             dialog.showAndWait();
             passwordField.setText("");
         } else {
@@ -128,10 +143,7 @@ public class Controller {
             welcomePane.toFront();
             userWelcome.setText("Welcome " + ret + " !");
 
-            new Coroutine<Void>().delay(() -> {
-                populateListView(mProblemSetHandler.get(), false);
-                return null;
-            }, 150);
+                AppThreader.delay(() -> mProblemSetHandler.get(data -> populateListView(data, false)), 150);
             if (rememberCheck.isSelected()) {
                 AppData app = AppData.get();
                 app.writeData(AppData.HANDLE_KEY, ret);
@@ -139,6 +151,9 @@ public class Controller {
                 app.writeData(AppData.AUTO_LOGIN_KEY, true);
             }
         }
+            mStarted = false;
+            loginProgress.setVisible(false);
+        }));
     }
 
     @FXML
@@ -149,15 +164,19 @@ public class Controller {
         }
         if (mStarted) return;
         mStarted = true;
-        if (Codeforces.logout()) {
+        Codeforces.logout(data -> {
+            if (data) {
+                Platform.runLater(() -> {
             problemListView.getSelectionModel().clearSelection();
             problemListView.getItems().clear();
             mProblemSetHandler.reset();
             removeAutoLogin();
             Launcher.get().limitWindowSize();
             loginPane.toFront();
+                });
         }
         mStarted = false;
+        });
     }
 
     private void removeAutoLogin() {
@@ -194,33 +213,26 @@ public class Controller {
             return;
         }
         problemRetProgress.setVisible(true);
-        new Coroutine<Void>().delay(() -> {
+        AppThreader.delay(() -> {
             prevPageBtn.setDisable(true);
             nextPageBtn.setDisable(false);
             pageNoLabel.setText("Page: 1");
 
             problemListView.getSelectionModel().clearSelection();
-            populateListView(mProblemSetHandler.changeDifficulty(Integer.parseInt(difficultyTextField.getText().trim())), true);
-            return null;
+            mProblemSetHandler.changeDifficulty(Integer.parseInt(difficultyTextField.getText().trim()), data -> populateListView(data, true));
         }, 500);
     }
 
     @FXML
     protected void nextPage() {
         loadPageIndicator.setVisible(true);
-        new Coroutine<Void>().delay(() -> {
-            populateListView(mProblemSetHandler.nextPage(), false);
-            return null;
-        }, 500);
+        AppThreader.delay(() -> mProblemSetHandler.nextPage(data -> populateListView(data, false)), 500);
     }
 
     @FXML
     protected void prevPage() {
         loadPageIndicator.setVisible(true);
-        new Coroutine<Void>().delay(() -> {
-            populateListView(mProblemSetHandler.prevPage(), false);
-            return null;
-        }, 500);
+        AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(data, false)), 500);
     }
 
     private void populateListView(List<ProblemSetHandler.Problem> list, boolean diffChange) {
@@ -228,6 +240,7 @@ public class Controller {
             showNetworkErrDialog();
             return;
         }
+        Platform.runLater(() -> {
         problemRetProgress.setVisible(false);
         prevPageBtn.setDisable(mProblemSetHandler.getPage() == 1);
         boolean updated = listUpdated(list, problemListView.getItems());
@@ -236,6 +249,7 @@ public class Controller {
 
         problemListView.getItems().setAll(list);
         loadPageIndicator.setVisible(false);
+        });
     }
 
     private boolean listUpdated(List<ProblemSetHandler.Problem> prev, List<ProblemSetHandler.Problem> next) {

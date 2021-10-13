@@ -14,6 +14,7 @@
 
 package com.shank.offcoder.cf;
 
+import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
 
 import java.util.ArrayList;
@@ -30,8 +31,7 @@ public class ProblemSetHandler {
         public String code, name, url, rating;
         public boolean accepted = false;
 
-        public Problem() {
-        }
+        public Problem() {}
 
         @Override
         public String toString() {
@@ -55,30 +55,28 @@ public class ProblemSetHandler {
     }
 
     /**
-     * @return Default initial list
+     * Default initial list
      */
-    public List<Problem> get() {
-        return getProblemList();
-    }
+    public void get(AppThreader.EventListener<List<Problem>> listener) {getProblemList(listener);}
 
     /**
-     * @return list with changed difficulty
+     * List with changed difficulty
      */
-    public List<Problem> changeDifficulty(int difficulty) {
+    public void changeDifficulty(int difficulty, AppThreader.EventListener<List<Problem>> listener) {
         maxDifficulty = Math.min(difficulty, 3500);
         minDifficulty = maxDifficulty == 800 ? 0 : maxDifficulty - 99;
         page = 1;
-        return getProblemList();
+        getProblemList(listener);
     }
 
-    public List<Problem> nextPage() {
+    public void nextPage(AppThreader.EventListener<List<Problem>> listener) {
         ++page;
-        return getProblemList();
+        getProblemList(listener);
     }
 
-    public List<Problem> prevPage() {
+    public void prevPage(AppThreader.EventListener<List<Problem>> listener) {
         if (page >= 2) --page;
-        return getProblemList();
+        getProblemList(listener);
     }
 
     public void reset() {
@@ -87,67 +85,67 @@ public class ProblemSetHandler {
         page = 1;
     }
 
-    public int getPage() {
-        return page;
-    }
+    public int getPage() {return page;}
 
-    public int revertPage() {
-        return page >= 2 ? --page : page;
-    }
+    public int revertPage() {return page >= 2 ? --page : page;}
 
     /**
      * Function that parses the HTML to get list of problems
-     *
-     * @return list of problems
      */
-    private List<Problem> getProblemList() {
-        List<Problem> arr = new ArrayList<>();
-
-        Codeforces.login(Codeforces.HANDLE, Codeforces.PASS);
-        String body = NetworkClient.ReqGet(getURL());
-        String[] lines = body.split("\n");
-
-        Problem pr = new Problem();
-        boolean problemStarted = false;
-        for (int i = 0; i < lines.length; i++) {
-            String line = lines[i].trim();
-            if (line.equals("<tr class=\"accepted-problem\">") || line.equals("<tr>")) {
-                problemStarted = i <= lines.length - 1 && lines[i + 1].trim().equals("<td class=\"id\">");
-                if (problemStarted && !pr.accepted) {
-                    pr.accepted = line.equals("<tr class=\"accepted-problem\">");
-                    continue;
-                }
+    private void getProblemList(AppThreader.EventListener<List<Problem>> listener) {
+        Codeforces.login(Codeforces.HANDLE, Codeforces.PASS, data -> {
+            if (!data.equals(Codeforces.HANDLE)) {
+                listener.onEvent(new ArrayList<>());
+                return;
             }
-            if (problemStarted) {
-                if (line.equals("<td class=\"id\">")) {
-                    pr.code = lines[i + 2].trim();
-                    pr.url = lines[i + 1].trim().replace("<a href=\"", "").replace(">", "").trim();
-                    i += 2;
-                    continue;
-                }
-                if (line.equals("<div style=\"float: left;\">")) {
-                    pr.name = lines[i + 2].replace("</a>", "").trim();
-                    i += 2;
-                    continue;
-                }
-                if (line.equals("<td style=\"font-size: 1.1rem\">")) {
-                    String str_rating = lines[i + 1].trim();
-                    StringBuilder number = new StringBuilder();
-                    for (char c : str_rating.toCharArray()) {
-                        if (c >= 48 && c <= 57) number.append(c);
+            NetworkClient.ReqGet(getURL(), body -> {
+                List<Problem> arr = new ArrayList<>();
+                String[] lines = body.split("\n");
+
+                Problem pr = new Problem();
+                boolean problemStarted = false;
+                for (int i = 0; i < lines.length; i++) {
+                    String line = lines[i].trim();
+                    if (line.equals("<tr class=\"accepted-problem\">") || line.equals("<tr>")) {
+                        problemStarted = i <= lines.length - 1 && lines[i + 1].trim().equals("<td class=\"id\">");
+                        if (problemStarted && !pr.accepted) {
+                            pr.accepted = line.equals("<tr class=\"accepted-problem\">");
+                            continue;
+                        }
                     }
-                    ++i;
-                    pr.rating = number.toString();
-                    continue;
+                    if (problemStarted) {
+                        if (line.equals("<td class=\"id\">")) {
+                            pr.code = lines[i + 2].trim();
+                            pr.url = lines[i + 1].trim().replace("<a href=\"", "").replace(">", "").trim();
+                            i += 2;
+                            continue;
+                        }
+                        if (line.equals("<div style=\"float: left;\">")) {
+                            pr.name = lines[i + 2].replace("</a>", "").trim();
+                            i += 2;
+                            continue;
+                        }
+                        if (line.equals("<td style=\"font-size: 1.1rem\">")) {
+                            String str_rating = lines[i + 1].trim();
+                            StringBuilder number = new StringBuilder();
+                            for (char c : str_rating.toCharArray()) {
+                                if (c >= 48 && c <= 57) number.append(c);
+                            }
+                            ++i;
+                            pr.rating = number.toString();
+                            continue;
+                        }
+                        if (line.equals("</tr>")) {
+                            problemStarted = false;
+                            arr.add(pr);
+                            pr = new Problem();
+                        }
+                    }
                 }
-                if (line.equals("</tr>")) {
-                    problemStarted = false;
-                    arr.add(pr);
-                    pr = new Problem();
-                }
-            }
-        }
-        return arr;
+
+                listener.onEvent(arr);
+            });
+        });
     }
 
     /**
@@ -158,6 +156,5 @@ public class ProblemSetHandler {
                 minDifficulty + "-" + maxDifficulty + "&order=BY_RATING_ASC";
     }
 
-    public ProblemSetHandler() {
-    }
+    public ProblemSetHandler() {}
 }

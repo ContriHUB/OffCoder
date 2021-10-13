@@ -58,15 +58,13 @@ public class NetworkClient {
      * @return false if connected
      */
     public static boolean isNetworkNotConnected() {
-        return new Coroutine<Boolean>().runAsync(() -> {
-            try {
-                new URL("https://www.google.com").openConnection().connect();
-                return false;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return true;
-            }
-        }, true);
+        try {
+            new URL("https://www.codeforces.com").openConnection().connect();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return true;
+        }
     }
 
     // ---------- Functions that extend to native lib ---------- //
@@ -83,8 +81,8 @@ public class NetworkClient {
      *
      * @param URL URL for GET
      */
-    public static String ReqGet(String URL) {
-        return new Coroutine<String>().runAsync(() -> get().ReqGet(getGoString(URL)), "");
+    public static void ReqGet(String URL, AppThreader.EventListener<String> listener) {
+        new Thread(() -> listener.onEvent(get().ReqGet(getGoString(URL)))).start();
     }
 
     /**
@@ -93,8 +91,8 @@ public class NetworkClient {
      * @param URL       URL for POST
      * @param urlParams Params for the URL
      */
-    public static String ReqPost(String URL, String urlParams) {
-        return new Coroutine<String>().runAsync(() -> get().ReqPost(getGoString(URL), getGoString(urlParams)), "");
+    public static void ReqPost(String URL, String urlParams, AppThreader.EventListener<String> listener) {
+        new Thread(() -> listener.onEvent(get().ReqPost(getGoString(URL), getGoString(urlParams)))).start();
     }
 
     /**

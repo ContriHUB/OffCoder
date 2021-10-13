@@ -15,6 +15,7 @@
 package com.shank.offcoder.cf;
 
 import com.shank.offcoder.app.AppData;
+import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
 
 import java.net.URLEncoder;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
  */
 public class Codeforces {
 
-    private static final String HOST = "https://codeforces.com";
+    public static final String HOST = "https://codeforces.com";
     private static final String CHAR_DAT = "abcdefghijklmnopqrstuvwxyz0123456789";
 
     // UID needed for logout
@@ -43,51 +44,57 @@ public class Codeforces {
      *
      * @param handle   codeforces handle
      * @param password password for the handle
-     * @return handle but from webpage (returned value from POST)
      */
-    public static String login(String handle, String password) {
+    public static void login(String handle, String password, AppThreader.EventListener<String> listener) {
         String url = HOST + "/enter";
-        String body = NetworkClient.ReqGet(url);
-        if (hasError(body)) return "Codeforces down";
-
-        HashMap<String, String> params = new HashMap<>();
-        params.put("csrf_token", getCsrf(body));
-        params.put("action", "enter");
-        params.put("ftaa", genFTAA());
-        params.put("bfaa", "f1b3f18c715565b589b7823cda7448ce");
-        params.put("handleOrEmail", handle);
-        params.put("password", password);
-        params.put("_tta", "176");
-        params.put("remember", "on");
-
-        String urlValues = params.keySet().stream()
-                .map(key -> key + "=" + URLEncoder.encode(params.get(key), StandardCharsets.UTF_8))
-                .collect(Collectors.joining("&", url + "?", ""));
-        try {
-            String reqPost = NetworkClient.ReqPost(url, urlValues), mHandle;
-            if (hasError(reqPost)) return "Codeforces down";
-
-            LOG_OUT_UID = findLogOutUID(reqPost);
-            if (!(mHandle = findHandle(reqPost)).isEmpty()) {
-                HANDLE = mHandle;
-                PASS = password;
-                return mHandle;
-            } else {
-                return "Login Failed";
+        NetworkClient.ReqGet(url, body -> {
+            if (hasError(body)) {
+                listener.onEvent("Codeforces down");
+                return;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Error";
-        }
+
+            HashMap<String, String> params = new HashMap<>();
+            params.put("csrf_token", getCsrf(body));
+            params.put("action", "enter");
+            params.put("ftaa", genFTAA());
+            params.put("bfaa", "f1b3f18c715565b589b7823cda7448ce");
+            params.put("handleOrEmail", handle);
+            params.put("password", password);
+            params.put("_tta", "176");
+            params.put("remember", "on");
+
+            String urlValues = params.keySet().stream()
+                    .map(key -> key + "=" + URLEncoder.encode(params.get(key), StandardCharsets.UTF_8))
+                    .collect(Collectors.joining("&", url + "?", ""));
+
+            NetworkClient.ReqPost(url, urlValues, reqPost -> {
+                if (hasError(reqPost)) {
+                    listener.onEvent("Codeforces down");
+                    return;
+                }
+
+                String mHandle;
+                LOG_OUT_UID = findLogOutUID(reqPost);
+                if (!(mHandle = findHandle(reqPost)).isEmpty()) {
+                    HANDLE = mHandle;
+                    PASS = password;
+                    listener.onEvent(mHandle);
+                } else {
+                    listener.onEvent("Login Failed");
+                }
+            });
+        });
     }
 
     /**
      * Function to log out from codeforces
      */
-    public static boolean logout() {
-        if (LOG_OUT_UID.equals(AppData.NULL_STR)) return false;
-        String body = NetworkClient.ReqGet(HOST + "/" + LOG_OUT_UID + "/logout");
-        return !body.isEmpty();
+    public static void logout(AppThreader.EventListener<Boolean> listener) {
+        if (LOG_OUT_UID.equals(AppData.NULL_STR)) {
+            listener.onEvent(false);
+            return;
+        }
+        NetworkClient.ReqGet(HOST + "/" + LOG_OUT_UID + "/logout", data -> listener.onEvent(!data.isEmpty()));
     }
 
     private static String genFTAA() {

@@ -15,7 +15,6 @@
 package com.shank.offcoder;
 
 import com.shank.offcoder.app.AppData;
-import com.shank.offcoder.app.Coroutine;
 import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.controllers.Controller;
 import javafx.application.Application;
@@ -31,6 +30,7 @@ import java.util.Base64;
 public class Launcher extends Application {
 
     public Stage mStage = null;
+    public FXMLLoader mFxmlLoader = null;
 
     private static Launcher _instance = null;
 
@@ -43,8 +43,8 @@ public class Launcher extends Application {
         mStage = stage;
         centerWindow(800, 400);
 
-        FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 800, 400);
+        mFxmlLoader = new FXMLLoader(Launcher.class.getResource("hello-view.fxml"));
+        Scene scene = new Scene(mFxmlLoader.load(), 800, 400);
         mStage.setTitle("OffCoder");
         mStage.setScene(scene);
         mStage.setMinWidth(800);
@@ -52,13 +52,10 @@ public class Launcher extends Application {
         limitWindowSize();
         mStage.show();
 
-        new Coroutine<Void>().delay(() -> {
-            if (AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) {
-                ((Controller) fxmlLoader.getController()).attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),
-                        new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))));
-            }
-            return null;
-        }, 150);
+        if (AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) {
+            ((Controller) mFxmlLoader.getController()).attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),
+                    new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))));
+        }
     }
 
     public void limitWindowSize() {
