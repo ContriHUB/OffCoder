@@ -189,12 +189,14 @@ public class Controller {
     }
 
     private void showNetworkErrDialog() {
-        Alert dialog = new Alert(Alert.AlertType.ERROR);
-        dialog.setTitle("Network Error");
-        dialog.setHeaderText(null);
-        dialog.setContentText("Couldn't connect codeforces");
-        dialog.initOwner(Launcher.get().mStage);
-        dialog.showAndWait();
+        Platform.runLater(() -> {
+            Alert dialog = new Alert(Alert.AlertType.ERROR);
+            dialog.setTitle("Network Error");
+            dialog.setHeaderText(null);
+            dialog.setContentText("Couldn't connect codeforces");
+            dialog.initOwner(Launcher.get().mStage);
+            dialog.showAndWait();
+        });
     }
 
     // ----------------- PROBLEM LIST VIEW ----------------- //
@@ -228,13 +230,13 @@ public class Controller {
     @FXML
     protected void nextPage() {
         loadPageIndicator.setVisible(true);
-        AppThreader.delay(() -> mProblemSetHandler.nextPage(data -> populateListView(data, false)), 500);
+        AppThreader.delay(() -> mProblemSetHandler.nextPage(data -> populateListView(data, false)), 250);
     }
 
     @FXML
     protected void prevPage() {
         loadPageIndicator.setVisible(true);
-        AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(data, false)), 500);
+        AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(data, false)), 250);
     }
 
     private void populateListView(List<ProblemSetHandler.Problem> list, boolean diffChange) {
@@ -279,6 +281,7 @@ public class Controller {
 
     public void loadWebPage(String url) {
         problemPane.toFront();
-        webView.getEngine().load(url);
+        webView.getEngine().setJavaScriptEnabled(true);
+        webView.getEngine().loadContent(ProblemSetHandler.trimHTML(url));
     }
 }

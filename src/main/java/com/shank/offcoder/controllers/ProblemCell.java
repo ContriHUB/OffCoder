@@ -72,9 +72,7 @@ public class ProblemCell extends ListCell<ProblemSetHandler.Problem> {
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 if (e.getClickCount() == 2) {
-                    System.out.println("Double clicked: " + item);
-//                    Codeforces.login(Codeforces.HANDLE, Codeforces.PASS);
-//                    System.out.println("WEB: " + NetworkClient.ReqGet(Codeforces.HOST + item.url));
+                    System.out.println("WEB: " + Codeforces.HOST + item.url);
                     ((Controller) Launcher.get().mFxmlLoader.getController()).loadWebPage(Codeforces.HOST + item.url);
                 }
             }

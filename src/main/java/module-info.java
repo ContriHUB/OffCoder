@@ -13,6 +13,7 @@ module com.shank.offcoder {
 
     requires com.sun.jna;
     requires org.json;
+    requires org.jsoup;
 
     opens com.shank.offcoder to javafx.fxml;
     exports com.shank.offcoder;
