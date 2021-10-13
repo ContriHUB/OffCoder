@@ -29,7 +29,7 @@ application {
 
 javafx {
     version = '15.0.1'
-    modules = ['javafx.controls', 'javafx.fxml']
+    modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
 }
 
 dependencies {
@@ -37,7 +37,14 @@ dependencies {
     implementation('com.dlsc.formsfx:formsfx-core:11.4.2') {
         exclude(group: 'org.openjfx')
     }
+    implementation('net.synedra:validatorfx:0.1.13') {
+        exclude(group: 'org.openjfx')
+    }
+    implementation('org.kordamp.ikonli:ikonli-javafx:12.2.0')
     implementation('org.kordamp.bootstrapfx:bootstrapfx-core:0.4.0')
+    implementation('eu.hansolo:tilesfx:11.48') {
+        exclude(group: 'org.openjfx')
+    }
     implementation('org.apache.httpcomponents:httpclient:4.5.13')
     implementation(files("libs/jna-5.9.0.jar"))
     implementation('org.json:json:20210307')

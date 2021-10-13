@@ -25,6 +25,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.web.WebView;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -76,6 +77,7 @@ public class Controller {
                 difficultyTextField.setText(newValue.replaceAll("[^\\d]", ""));
             }
         });
+        webView.getEngine().load("about:blank");
     }
 
     // ----------------- LOGIN / LOGOUT ----------------- //
@@ -113,44 +115,44 @@ public class Controller {
         }
 
         Codeforces.login(handle, password, ret -> Platform.runLater(() -> {
-        if (ret.equals("Codeforces down")) {
-            Alert dialog = new Alert(Alert.AlertType.ERROR);
-            dialog.setTitle("Connection Error");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Codeforces down");
-            dialog.initOwner(Launcher.get().mStage);
+            if (ret.equals("Codeforces down")) {
+                Alert dialog = new Alert(Alert.AlertType.ERROR);
+                dialog.setTitle("Connection Error");
+                dialog.setHeaderText(null);
+                dialog.setContentText("Codeforces down");
+                dialog.initOwner(Launcher.get().mStage);
                 mStarted = false;
                 loginProgress.setVisible(false);
 
-            dialog.showAndWait();
-            handleField.setText("");
-            passwordField.setText("");
-            return;
-        }
-        if (ret.equals("Login Failed") || ret.equals("Error")) {
-            Alert dialog = new Alert(Alert.AlertType.ERROR);
-            dialog.setTitle("Login Error");
-            dialog.setHeaderText(null);
-            dialog.setContentText("Invalid handle or password");
-            dialog.initOwner(Launcher.get().mStage);
+                dialog.showAndWait();
+                handleField.setText("");
+                passwordField.setText("");
+                return;
+            }
+            if (ret.equals("Login Failed") || ret.equals("Error")) {
+                Alert dialog = new Alert(Alert.AlertType.ERROR);
+                dialog.setTitle("Login Error");
+                dialog.setHeaderText(null);
+                dialog.setContentText("Invalid handle or password");
+                dialog.initOwner(Launcher.get().mStage);
                 loginProgress.setVisible(false);
-            dialog.showAndWait();
-            passwordField.setText("");
-        } else {
-            handleField.setText("");
-            passwordField.setText("");
-            Launcher.get().freeWindowSize();
-            welcomePane.toFront();
-            userWelcome.setText("Welcome " + ret + " !");
+                dialog.showAndWait();
+                passwordField.setText("");
+            } else {
+                handleField.setText("");
+                passwordField.setText("");
+                Launcher.get().freeWindowSize();
+                welcomePane.toFront();
+                userWelcome.setText("Welcome " + ret + " !");
 
                 AppThreader.delay(() -> mProblemSetHandler.get(data -> populateListView(data, false)), 150);
-            if (rememberCheck.isSelected()) {
-                AppData app = AppData.get();
-                app.writeData(AppData.HANDLE_KEY, ret);
-                app.writeData(AppData.PASS_KEY, Base64.getEncoder().encodeToString(password.getBytes(StandardCharsets.UTF_8)));
-                app.writeData(AppData.AUTO_LOGIN_KEY, true);
+                if (rememberCheck.isSelected()) {
+                    AppData app = AppData.get();
+                    app.writeData(AppData.HANDLE_KEY, ret);
+                    app.writeData(AppData.PASS_KEY, Base64.getEncoder().encodeToString(password.getBytes(StandardCharsets.UTF_8)));
+                    app.writeData(AppData.AUTO_LOGIN_KEY, true);
+                }
             }
-        }
             mStarted = false;
             loginProgress.setVisible(false);
         }));
@@ -167,15 +169,15 @@ public class Controller {
         Codeforces.logout(data -> {
             if (data) {
                 Platform.runLater(() -> {
-            problemListView.getSelectionModel().clearSelection();
-            problemListView.getItems().clear();
-            mProblemSetHandler.reset();
-            removeAutoLogin();
-            Launcher.get().limitWindowSize();
-            loginPane.toFront();
+                    problemListView.getSelectionModel().clearSelection();
+                    problemListView.getItems().clear();
+                    mProblemSetHandler.reset();
+                    removeAutoLogin();
+                    Launcher.get().limitWindowSize();
+                    loginPane.toFront();
                 });
-        }
-        mStarted = false;
+            }
+            mStarted = false;
         });
     }
 
@@ -241,14 +243,14 @@ public class Controller {
             return;
         }
         Platform.runLater(() -> {
-        problemRetProgress.setVisible(false);
-        prevPageBtn.setDisable(mProblemSetHandler.getPage() == 1);
-        boolean updated = listUpdated(list, problemListView.getItems());
-        nextPageBtn.setDisable(!updated && !diffChange);
-        pageNoLabel.setText("Page: " + (updated || diffChange ? mProblemSetHandler.getPage() : mProblemSetHandler.revertPage()));
+            problemRetProgress.setVisible(false);
+            prevPageBtn.setDisable(mProblemSetHandler.getPage() == 1);
+            boolean updated = listUpdated(list, problemListView.getItems());
+            nextPageBtn.setDisable(!updated && !diffChange);
+            pageNoLabel.setText("Page: " + (updated || diffChange ? mProblemSetHandler.getPage() : mProblemSetHandler.revertPage()));
 
-        problemListView.getItems().setAll(list);
-        loadPageIndicator.setVisible(false);
+            problemListView.getItems().setAll(list);
+            loadPageIndicator.setVisible(false);
         });
     }
 
@@ -259,5 +261,24 @@ public class Controller {
             if (!prev.get(i).equals(next.get(i))) return true;
         }
         return false;
+    }
+
+    // ----------------- PROBLEM VIEW PAGE ----------------- //
+
+    @FXML
+    private AnchorPane problemPane;
+
+    @FXML
+    private WebView webView;
+
+    @FXML
+    protected void webBtnGoBack() {
+        welcomePane.toFront();
+        webView.getEngine().load("about:blank");
+    }
+
+    public void loadWebPage(String url) {
+        problemPane.toFront();
+        webView.getEngine().load(url);
     }
 }

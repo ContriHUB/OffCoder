@@ -14,6 +14,8 @@
 
 package com.shank.offcoder.controllers;
 
+import com.shank.offcoder.Launcher;
+import com.shank.offcoder.cf.Codeforces;
 import com.shank.offcoder.cf.ProblemSetHandler;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -69,7 +71,12 @@ public class ProblemCell extends ListCell<ProblemSetHandler.Problem> {
 
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
-                if (e.getClickCount() == 2) System.out.println("Double clicked: " + item);
+                if (e.getClickCount() == 2) {
+                    System.out.println("Double clicked: " + item);
+//                    Codeforces.login(Codeforces.HANDLE, Codeforces.PASS);
+//                    System.out.println("WEB: " + NetworkClient.ReqGet(Codeforces.HOST + item.url));
+                    ((Controller) Launcher.get().mFxmlLoader.getController()).loadWebPage(Codeforces.HOST + item.url);
+                }
             }
         });
     }
