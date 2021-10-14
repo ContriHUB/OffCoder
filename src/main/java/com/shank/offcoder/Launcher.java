@@ -15,7 +15,6 @@
 package com.shank.offcoder;
 
 import com.shank.offcoder.app.AppData;
-import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.controllers.Controller;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -80,8 +79,5 @@ public class Launcher extends Application {
         mStage.setY((screenBounds.getHeight() - height) / 2);
     }
 
-    public static void main(String[] args) {
-        NetworkClient.InitClient();
-        launch();
-    }
+    public static void main(String[] args) {launch();}
 }

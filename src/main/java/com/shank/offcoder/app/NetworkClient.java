@@ -14,42 +14,52 @@
 
 package com.shank.offcoder.app;
 
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.Structure;
+import com.shank.offcoder.cf.Codeforces;
+import org.jsoup.Connection;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Class for handling networking
- * from native client.
+ * Class for handling networking.
  */
 public class NetworkClient {
 
-    // Singleton instance of native network client
-    private static volatile NativeNetworkClient networkClient = null;
+    // Cookies for persisting session
+    private final Map<String, String> mCookies = new HashMap<>(), mParams = new HashMap<>();
 
-    // Creating instance by loading native dll
-    private static synchronized NativeNetworkClient get() {
-        if (networkClient == null) {
-            System.setProperty("java.library.path", "D:/IdeaProjects/OffCoder/libs/;" + System.getProperty("java.library.path"));
-            networkClient = Native.loadLibrary("network_client", NativeNetworkClient.class);
-        }
-        return networkClient;
+    private static volatile NetworkClient _instance = null;
+
+    public static NetworkClient get() {
+        if (_instance == null) _instance = new NetworkClient();
+        return _instance;
     }
 
-    /**
-     * A function to convert {@link String} to {@link NativeNetworkClient.GoString}
-     * needed by {@link NativeNetworkClient}.
-     */
-    private static NativeNetworkClient.GoString.ByValue getGoString(String str) {
-        NativeNetworkClient.GoString.ByValue goStr = new NativeNetworkClient.GoString.ByValue();
-        goStr.p = str;
-        goStr.n = goStr.p.length();
-        return goStr;
+    private NetworkClient() {}
+
+    public void setParams(String csrf, String ftaa, String handle, String password) {
+        mParams.put("csrf_token", csrf);
+        mParams.put("action", "enter");
+        mParams.put("ftaa", ftaa);
+        mParams.put("bfaa", "f1b3f18c715565b589b7823cda7448ce");
+        mParams.put("handleOrEmail", handle);
+        mParams.put("password", password);
+        mParams.put("_tta", "176");
+        mParams.put("remember", "on");
+    }
+
+    public Map<String, String> getCookies() {return mCookies;}
+
+    public void updateCookies(Map<String, String> _nCookies) {mCookies.putAll(_nCookies);}
+
+    public Map<String, String> getParams() {return mParams;}
+
+    public void clearData() {
+        mCookies.clear();
+        mParams.clear();
     }
 
     /**
@@ -59,7 +69,7 @@ public class NetworkClient {
      */
     public static boolean isNetworkNotConnected() {
         try {
-            new URL("https://www.codeforces.com").openConnection().connect();
+            Jsoup.connect(Codeforces.HOST).execute();
             return false;
         } catch (IOException e) {
             e.printStackTrace();
@@ -67,54 +77,23 @@ public class NetworkClient {
         }
     }
 
-    // ---------- Functions that extend to native lib ---------- //
-
-    /**
-     * Initialize native client
-     */
-    public static void InitClient() {
-        get().InitClient();
-    }
-
     /**
      * Execute GET on given
      *
      * @param URL URL for GET
      */
-    public static void ReqGet(String URL, AppThreader.EventListener<String> listener) {
-        new Thread(() -> listener.onEvent(get().ReqGet(getGoString(URL)))).start();
-    }
-
-    /**
-     * Execute POST on given
-     *
-     * @param URL       URL for POST
-     * @param urlParams Params for the URL
-     */
-    public static void ReqPost(String URL, String urlParams, AppThreader.EventListener<String> listener) {
-        new Thread(() -> listener.onEvent(get().ReqPost(getGoString(URL), getGoString(urlParams)))).start();
-    }
-
-    /**
-     * Interface that binds to native client (lib/dll)
-     */
-    public interface NativeNetworkClient extends Library {
-
-        class GoString extends Structure {
-            public static class ByValue extends GoString implements Structure.ByValue {}
-
-            public String p;
-            public long n;
-
-            protected List<String> getFieldOrder() {
-                return Arrays.asList("p", "n");
+    public void ReqGet(String URL, AppThreader.EventListener<Document> listener) {
+        new Thread(() -> {
+            Document errDoc = Jsoup.parse("<html> <body> <p id=\"OffError\">Error</p> </body> </html>");
+            try {
+                Connection connection = Jsoup.connect(URL).method(Connection.Method.GET).followRedirects(true);
+                Connection.Response response = connection.cookies(mCookies).data(mParams.isEmpty() ? new HashMap<>() : mParams).execute();
+                mCookies.putAll(response.cookies());
+                listener.onEvent(response.statusCode() == 200 ? response.parse() : errDoc);
+            } catch (Exception e) {
+                e.printStackTrace();
+                listener.onEvent(errDoc);
             }
-        }
-
-        void InitClient();
-
-        String ReqGet(GoString.ByValue URL);
-
-        String ReqPost(GoString.ByValue URL, GoString.ByValue urlParams);
+        }).start();
     }
 }

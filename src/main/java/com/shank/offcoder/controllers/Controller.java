@@ -19,7 +19,7 @@ import com.shank.offcoder.app.AppData;
 import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.cf.Codeforces;
-import com.shank.offcoder.cf.ProblemSetHandler;
+import com.shank.offcoder.cf.ProblemParser;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -33,7 +33,7 @@ import java.util.List;
 
 public class Controller {
 
-    private final ProblemSetHandler mProblemSetHandler = new ProblemSetHandler();
+    private final ProblemParser mProblemSetHandler = new ProblemParser();
 
     private boolean mStarted = false;
 
@@ -59,7 +59,7 @@ public class Controller {
     private Label userWelcome;
 
     @FXML
-    private ListView<ProblemSetHandler.Problem> problemListView;
+    private ListView<ProblemParser.Problem> problemListView;
 
     @FXML
     private ProgressIndicator problemRetProgress;
@@ -188,7 +188,7 @@ public class Controller {
         appData.writeData(AppData.PASS_KEY, AppData.NULL_STR);
     }
 
-    private void showNetworkErrDialog() {
+    public void showNetworkErrDialog() {
         Platform.runLater(() -> {
             Alert dialog = new Alert(Alert.AlertType.ERROR);
             dialog.setTitle("Network Error");
@@ -239,7 +239,7 @@ public class Controller {
         AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(data, false)), 250);
     }
 
-    private void populateListView(List<ProblemSetHandler.Problem> list, boolean diffChange) {
+    private void populateListView(List<ProblemParser.Problem> list, boolean diffChange) {
         if (NetworkClient.isNetworkNotConnected()) {
             showNetworkErrDialog();
             return;
@@ -256,7 +256,7 @@ public class Controller {
         });
     }
 
-    private boolean listUpdated(List<ProblemSetHandler.Problem> prev, List<ProblemSetHandler.Problem> next) {
+    private boolean listUpdated(List<ProblemParser.Problem> prev, List<ProblemParser.Problem> next) {
         if (prev.isEmpty() || next.isEmpty()) return true;
         if (prev.size() != next.size()) return true;
         for (int i = 0; i < prev.size(); i++) {
@@ -281,7 +281,9 @@ public class Controller {
 
     public void loadWebPage(String url) {
         problemPane.toFront();
-        webView.getEngine().setJavaScriptEnabled(true);
-        webView.getEngine().loadContent(ProblemSetHandler.trimHTML(url));
+        Platform.runLater(() -> {
+            webView.getEngine().setJavaScriptEnabled(true);
+            webView.getEngine().loadContent(ProblemParser.trimHTML(url));
+        });
     }
 }

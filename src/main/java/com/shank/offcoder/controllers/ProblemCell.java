@@ -15,8 +15,9 @@
 package com.shank.offcoder.controllers;
 
 import com.shank.offcoder.Launcher;
+import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.cf.Codeforces;
-import com.shank.offcoder.cf.ProblemSetHandler;
+import com.shank.offcoder.cf.ProblemParser;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.input.MouseButton;
@@ -25,7 +26,7 @@ import javafx.scene.layout.AnchorPane;
 /**
  * Class for custom item
  */
-public class ProblemCell extends ListCell<ProblemSetHandler.Problem> {
+public class ProblemCell extends ListCell<ProblemParser.Problem> {
 
     private final Label problemCode, problemName, problemDiff;
     private final AnchorPane anchorPane;
@@ -56,7 +57,7 @@ public class ProblemCell extends ListCell<ProblemSetHandler.Problem> {
     }
 
     @Override
-    protected void updateItem(ProblemSetHandler.Problem item, boolean empty) {
+    protected void updateItem(ProblemParser.Problem item, boolean empty) {
         super.updateItem(item, empty);
 
         if (empty || item == null) {
@@ -66,12 +67,16 @@ public class ProblemCell extends ListCell<ProblemSetHandler.Problem> {
         problemCode.setText(item.code);
         problemName.setText(item.name);
         problemDiff.setText(item.rating);
-        anchorPane.setStyle(item.accepted ? isSelected() ? "" : "-fx-background-color: #6aff00" : "");
+        anchorPane.setStyle(item.accepted ? isSelected() ? "" : "-fx-background-color: #0BDA51" : "");
         setGraphic(anchorPane);
 
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 if (e.getClickCount() == 2) {
+                    if (NetworkClient.isNetworkNotConnected()) {
+                        ((Controller) Launcher.get().mFxmlLoader.getController()).showNetworkErrDialog();
+                        return;
+                    }
                     System.out.println("WEB: " + Codeforces.HOST + item.url);
                     ((Controller) Launcher.get().mFxmlLoader.getController()).loadWebPage(Codeforces.HOST + item.url);
                 }

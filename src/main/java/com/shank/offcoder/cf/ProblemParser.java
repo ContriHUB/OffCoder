@@ -18,12 +18,14 @@ import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProblemSetHandler {
+public class ProblemParser {
 
     private int minDifficulty = 0, maxDifficulty = 800, page = 1;
 
@@ -96,58 +98,27 @@ public class ProblemSetHandler {
      * Function that parses the HTML to get list of problems
      */
     private void getProblemList(AppThreader.EventListener<List<Problem>> listener) {
-        Codeforces.login(Codeforces.HANDLE, Codeforces.PASS, data -> {
-            if (!data.equals(Codeforces.HANDLE)) {
-                listener.onEvent(new ArrayList<>());
-                return;
+        NetworkClient.get().ReqGet(getURL(), body -> {
+            List<Problem> arr = new ArrayList<>();
+
+            Elements problems = body.select("table.problems").select("tr");
+            for (int i = 1; i < problems.size(); i++) {
+                ProblemParser.Problem pr = new ProblemParser.Problem();
+                Element problem = problems.get(i);
+
+                Element pID = problem.select("td.id").select("a").first(),
+                        pName = problem.select("td").select("div").select("a").first(),
+                        pRating = problem.select("span.ProblemRating").first();
+                if (pID == null || pName == null || pRating == null) continue;
+
+                pr.accepted = problem.hasClass("accepted-problem");
+                pr.code = pID.text().trim();
+                pr.name = pName.text().trim();
+                pr.rating = pRating.text().trim();
+                pr.url = problem.select("td").select("div").select("a").attr("href").trim();
+                arr.add(pr);
             }
-            NetworkClient.ReqGet(getURL(), body -> {
-                List<Problem> arr = new ArrayList<>();
-                String[] lines = body.split("\n");
-
-                Problem pr = new Problem();
-                boolean problemStarted = false;
-                for (int i = 0; i < lines.length; i++) {
-                    String line = lines[i].trim();
-                    if (line.equals("<tr class=\"accepted-problem\">") || line.equals("<tr>")) {
-                        problemStarted = i <= lines.length - 1 && lines[i + 1].trim().equals("<td class=\"id\">");
-                        if (problemStarted && !pr.accepted) {
-                            pr.accepted = line.equals("<tr class=\"accepted-problem\">");
-                            continue;
-                        }
-                    }
-                    if (problemStarted) {
-                        if (line.equals("<td class=\"id\">")) {
-                            pr.code = lines[i + 2].trim();
-                            pr.url = lines[i + 1].trim().replace("<a href=\"", "").replace("\">", "").trim();
-                            i += 2;
-                            continue;
-                        }
-                        if (line.equals("<div style=\"float: left;\">")) {
-                            pr.name = lines[i + 2].replace("</a>", "").trim();
-                            i += 2;
-                            continue;
-                        }
-                        if (line.equals("<td style=\"font-size: 1.1rem\">")) {
-                            String str_rating = lines[i + 1].trim();
-                            StringBuilder number = new StringBuilder();
-                            for (char c : str_rating.toCharArray()) {
-                                if (c >= 48 && c <= 57) number.append(c);
-                            }
-                            ++i;
-                            pr.rating = number.toString();
-                            continue;
-                        }
-                        if (line.equals("</tr>")) {
-                            problemStarted = false;
-                            arr.add(pr);
-                            pr = new Problem();
-                        }
-                    }
-                }
-
-                listener.onEvent(arr);
-            });
+            listener.onEvent(arr);
         });
     }
 
@@ -162,7 +133,7 @@ public class ProblemSetHandler {
     public static String trimHTML(String url) {
         Document doc;
         try {
-            doc = Jsoup.connect(url).get();
+            doc = Jsoup.connect(url).cookies(NetworkClient.get().getCookies()).data(NetworkClient.get().getParams()).followRedirects(true).execute().parse();
             doc.select("div#header").remove();
             doc.select("div.roundbox.menu-box").remove();
             doc.select("div.roundbox.sidebox").remove();
@@ -176,5 +147,5 @@ public class ProblemSetHandler {
         }
     }
 
-    public ProblemSetHandler() {}
+    public ProblemParser() {}
 }
