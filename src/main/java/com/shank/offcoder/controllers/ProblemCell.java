@@ -15,7 +15,6 @@
 package com.shank.offcoder.controllers;
 
 import com.shank.offcoder.Launcher;
-import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.cf.Codeforces;
 import com.shank.offcoder.cf.ProblemParser;
 import javafx.scene.control.Label;
@@ -73,12 +72,8 @@ public class ProblemCell extends ListCell<ProblemParser.Problem> {
         setOnMouseClicked(e -> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 if (e.getClickCount() == 2) {
-                    if (NetworkClient.isNetworkNotConnected()) {
-                        ((Controller) Launcher.get().mFxmlLoader.getController()).showNetworkErrDialog();
-                        return;
-                    }
                     System.out.println("WEB: " + Codeforces.HOST + item.url);
-                    ((Controller) Launcher.get().mFxmlLoader.getController()).loadWebPage(Codeforces.HOST + item.url);
+                    ((Controller) Launcher.get().mFxmlLoader.getController()).loadWebPage(Codeforces.HOST + item.url, item.code);
                 }
             }
         });

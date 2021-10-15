@@ -14,11 +14,12 @@
   ~ copies or substantial portions of the Software.
   -->
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?import javafx.scene.web.WebView?>
+<?import javafx.scene.web.*?>
+
 <AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="800.0"
             prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.2"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.controllers.Controller">
@@ -35,8 +36,8 @@
                         <Button layoutX="734.0" layoutY="360.0" mnemonicParsing="false" onAction="#webBtnGoBack"
                                 prefWidth="71.0" text="Back" AnchorPane.bottomAnchor="14.0"
                                 AnchorPane.rightAnchor="14.0"/>
-                        <Button layoutX="734.0" layoutY="319.0" mnemonicParsing="false" text="Download"
-                                AnchorPane.bottomAnchor="56.0" AnchorPane.rightAnchor="14.0"/>
+                        <Button fx:id="singlePageDownloadBtn" layoutX="734.0" layoutY="319.0" mnemonicParsing="false"
+                                text="Download" AnchorPane.bottomAnchor="56.0" AnchorPane.rightAnchor="14.0"/>
                     </children>
                 </AnchorPane>
                 <BorderPane fx:id="loginPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: #fff;">
@@ -127,8 +128,9 @@
                         <TextField fx:id="difficultyTextField" layoutX="609.0" layoutY="67.0" prefHeight="25.0"
                                    prefWidth="173.0" text="800" AnchorPane.rightAnchor="18.0"
                                    AnchorPane.topAnchor="67.0"/>
-                        <Button layoutX="735.0" layoutY="100.0" mnemonicParsing="false" onAction="#applyDifficulty"
-                                text="Apply" AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="100.0"/>
+                        <Button fx:id="applyRateBtn" layoutX="735.0" layoutY="100.0" mnemonicParsing="false"
+                                onAction="#applyDifficulty" text="Apply" AnchorPane.rightAnchor="18.0"
+                                AnchorPane.topAnchor="100.0"/>
                         <ProgressIndicator fx:id="problemRetProgress" layoutX="709.0" layoutY="102.0" prefHeight="21.0"
                                            prefWidth="19.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="102.0"/>
                         <Button fx:id="prevPageBtn" disable="true" layoutX="609.0" layoutY="361.0"
@@ -146,6 +148,12 @@
                         <ProgressIndicator fx:id="loadPageIndicator" layoutX="767.0" layoutY="364.0" prefHeight="20.0"
                                            prefWidth="19.0" AnchorPane.bottomAnchor="16.0"
                                            AnchorPane.rightAnchor="14.0"/>
+                        <Button fx:id="quesDownloadBtn" layoutX="609.0" layoutY="298.0" mnemonicParsing="false"
+                                onAction="#downloadQuestions" prefHeight="25.0" prefWidth="152.0"
+                                text="Download Question" AnchorPane.bottomAnchor="77.0" AnchorPane.rightAnchor="39.0"/>
+                        <ProgressBar fx:id="downloadProgress" layoutX="609.0" layoutY="328.0" prefHeight="10.0"
+                                     prefWidth="152.0" progress="0.0" AnchorPane.bottomAnchor="62.0"
+                                     AnchorPane.rightAnchor="39.0"/>
                     </children>
                 </AnchorPane>
                 <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #fff;">

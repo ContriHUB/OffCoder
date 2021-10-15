@@ -14,11 +14,15 @@
 
 package com.shank.offcoder.cf;
 
+import com.shank.offcoder.app.AppData;
 import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Entities;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -130,7 +134,17 @@ public class ProblemParser {
                 minDifficulty + "-" + maxDifficulty + "&order=BY_RATING_ASC";
     }
 
-    public static String trimHTML(String url) {
+    public static String trimHTML(String url, String code) {
+        if (code != null) {
+            JSONArray probArr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+            for (Object obj : probArr) {
+                JSONObject jObj = (JSONObject) obj;
+                if (jObj.has(code) && !hasError(Jsoup.parse(jObj.getString(code)))) {
+                    System.out.println("Returning downloaded");
+                    return jObj.getString(code);
+                }
+            }
+        }
         Document doc;
         try {
             doc = Jsoup.connect(url).cookies(NetworkClient.get().getCookies()).data(NetworkClient.get().getParams()).followRedirects(true).execute().parse();
@@ -140,10 +154,20 @@ public class ProblemParser {
             doc.select("div.second-level-menu").remove();
             doc.select("div#pageContent").removeClass("content-with-sidebar");
             doc.select("div#footer").remove();
-            return doc.toString().replaceAll("//codeforces.org", "https://codeforces.org");
+            doc.outputSettings(doc.outputSettings().prettyPrint(false).escapeMode(Entities.EscapeMode.extended).charset("ASCII"));
+            return doc.html().replaceAll("//codeforces.org", "https://codeforces.org");
         } catch (IOException e) {
             e.printStackTrace();
             return "<h2>Unable to load page</h2>";
+        }
+    }
+
+    public static boolean hasError(Document doc) {
+        try {
+            Element ele = doc.select("h2").first();
+            return ele != null && ele.text().equals("Unable to load page");
+        } catch (Exception e) {
+            return false;
         }
     }
 

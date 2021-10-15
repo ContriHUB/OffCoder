@@ -26,10 +26,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.jsoup.Jsoup;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Optional;
 
 public class Controller {
 
@@ -67,10 +71,23 @@ public class Controller {
     @FXML
     private void initialize() {
         if (!AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) loginPane.toFront();
+
         problemRetProgress.setVisible(false);
         loadPageIndicator.setVisible(false);
         loginProgress.setVisible(false);
+        downloadProgress.setVisible(false);
+
         problemListView.setCellFactory(param -> new ProblemCell());
+        problemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        problemListView.setOnMouseClicked(event -> {
+            List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
+            quesDownloadBtn.setDisable(list.isEmpty());
+
+            if (!list.isEmpty()) quesDownloadBtn.setDisable(questionsDownloaded(list));
+            quesDownloadBtn.setText("Download " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
+        });
+        quesDownloadBtn.setDisable(true);
+
         difficultyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() >= 5) newValue = newValue.substring(0, 4);
             if (!newValue.matches("\\d*")) {
@@ -81,6 +98,9 @@ public class Controller {
     }
 
     // ----------------- LOGIN / LOGOUT ----------------- //
+
+    @FXML
+    private Button applyRateBtn;
 
     @FXML
     protected void loginUser() {
@@ -166,26 +186,38 @@ public class Controller {
         }
         if (mStarted) return;
         mStarted = true;
+
+        if (!AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray()).isEmpty()) {
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+            alert.setTitle("Confirmation");
+            alert.setHeaderText("Are you sure to logout ?");
+            alert.setContentText("You will loose all the downloaded questions.");
+
+            Optional<ButtonType> result = alert.showAndWait();
+            if (result.get() == ButtonType.OK) attemptLogout();
+            return;
+        }
+        attemptLogout();
+    }
+
+    private void attemptLogout() {
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
         Codeforces.logout(data -> {
             if (data) {
                 Platform.runLater(() -> {
                     problemListView.getSelectionModel().clearSelection();
                     problemListView.getItems().clear();
                     mProblemSetHandler.reset();
-                    removeAutoLogin();
+                    AppData.get().clearData();
                     Launcher.get().limitWindowSize();
                     loginPane.toFront();
                 });
             }
             mStarted = false;
         });
-    }
-
-    private void removeAutoLogin() {
-        AppData appData = AppData.get();
-        appData.writeData(AppData.AUTO_LOGIN_KEY, false);
-        appData.writeData(AppData.HANDLE_KEY, AppData.NULL_STR);
-        appData.writeData(AppData.PASS_KEY, AppData.NULL_STR);
     }
 
     public void showNetworkErrDialog() {
@@ -205,10 +237,13 @@ public class Controller {
     private Label pageNoLabel;
 
     @FXML
-    private Button prevPageBtn, nextPageBtn;
+    private Button prevPageBtn, nextPageBtn, quesDownloadBtn;
 
     @FXML
     private ProgressIndicator loadPageIndicator;
+
+    @FXML
+    private ProgressBar downloadProgress;
 
     @FXML
     protected void applyDifficulty() {
@@ -237,6 +272,96 @@ public class Controller {
     protected void prevPage() {
         loadPageIndicator.setVisible(true);
         AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(data, false)), 250);
+    }
+
+    private boolean wasPrevBtnDisabled, wasNextBtnDisabled;
+
+    @FXML
+    protected void downloadQuestions() {
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
+        final List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
+        if (list.isEmpty()) return;
+
+        problemListView.setDisable(true);
+        quesDownloadBtn.setDisable(true);
+        applyRateBtn.setDisable(true);
+
+        wasPrevBtnDisabled = prevPageBtn.isDisabled();
+        prevPageBtn.setDisable(true);
+
+        wasNextBtnDisabled = nextPageBtn.isDisabled();
+        nextPageBtn.setDisable(true);
+        downloadProgress.setVisible(true);
+        _downloadQues(list, data -> Platform.runLater(() -> {
+            problemListView.setDisable(false);
+            applyRateBtn.setDisable(false);
+
+            if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
+            if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
+            downloadProgress.setVisible(false);
+            if (data != 0) {
+                Alert dialog = new Alert(Alert.AlertType.ERROR);
+                dialog.setTitle("Network Error");
+                dialog.setHeaderText(null);
+                dialog.setContentText("Couldn't download all questions\nFailed " + data + " questions.");
+                dialog.initOwner(Launcher.get().mStage);
+                dialog.showAndWait();
+            }
+        }));
+    }
+
+    private void _downloadQues(final List<ProblemParser.Problem> list, AppThreader.EventListener<Integer> listener) {
+        new Thread(() -> {
+            JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+            double counter = 0;
+            int failedCount = 0;
+            for (ProblemParser.Problem p : list) {
+                ++counter;
+                downloadProgress.setProgress(counter / list.size());
+                if (arr.toString().contains(p.code)) continue;
+
+                String html = ProblemParser.trimHTML(Codeforces.HOST + p.url, null);
+                if (ProblemParser.hasError(Jsoup.parse(html))) {
+                    failedCount++;
+                    continue;
+                }
+
+                arr.put(new JSONObject().put(p.code, html));
+            }
+            AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
+            listener.onEvent(failedCount);
+        }).start();
+    }
+
+    private boolean questionDownloaded(String code) {
+        JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+        if (arr.isEmpty()) return false;
+
+        for (Object obj : arr) {
+            JSONObject jObj = (JSONObject) obj;
+            if (jObj.has(code)) return true;
+        }
+        return false;
+    }
+
+    private boolean questionsDownloaded(List<ProblemParser.Problem> list) {
+        JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+        if (arr.isEmpty()) return false;
+
+        int count = 0;
+        for (ProblemParser.Problem p : list) {
+            for (Object obj : arr) {
+                JSONObject jObj = (JSONObject) obj;
+                if (jObj.has(p.code)) {
+                    count++;
+                    break;
+                }
+            }
+        }
+        return count == list.size();
     }
 
     private void populateListView(List<ProblemParser.Problem> list, boolean diffChange) {
@@ -274,16 +399,27 @@ public class Controller {
     private WebView webView;
 
     @FXML
+    private Button singlePageDownloadBtn;
+
+    @FXML
     protected void webBtnGoBack() {
         welcomePane.toFront();
         webView.getEngine().load("about:blank");
     }
 
-    public void loadWebPage(String url) {
+    public void loadWebPage(String url, String code) {
+        boolean downloaded = questionDownloaded(code);
+        singlePageDownloadBtn.setDisable(downloaded);
+        if (!downloaded) {
+            if (NetworkClient.isNetworkNotConnected()) {
+                ((Controller) Launcher.get().mFxmlLoader.getController()).showNetworkErrDialog();
+                return;
+            }
+        }
         problemPane.toFront();
         Platform.runLater(() -> {
             webView.getEngine().setJavaScriptEnabled(true);
-            webView.getEngine().loadContent(ProblemParser.trimHTML(url));
+            webView.getEngine().loadContent(ProblemParser.trimHTML(url, code));
         });
     }
 }

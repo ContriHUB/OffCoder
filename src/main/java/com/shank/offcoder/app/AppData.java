@@ -14,6 +14,7 @@
 
 package com.shank.offcoder.app;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -43,6 +44,9 @@ public class AppData {
 
     // Key for whether to automatically login on launch
     public static final String AUTO_LOGIN_KEY = "auto_login";
+
+    // Key for saving downloaded problems
+    public static final String DOWNLOADED_QUES = "downloaded_ques";
 
     // Main json to hold all the data
     private static JSONObject mData = null;
@@ -94,6 +98,13 @@ public class AppData {
         } catch (Exception e) {
             return def;
         }
+    }
+
+    public void clearData() {
+        writeData(AUTO_LOGIN_KEY, false);
+        writeData(HANDLE_KEY, NULL_STR);
+        writeData(PASS_KEY, NULL_STR);
+        writeData(DOWNLOADED_QUES, new JSONArray());
     }
 
     // -----
