@@ -45,6 +45,7 @@ public class Codeforces {
      * @param password password for the handle
      */
     public static void login(String handle, String password, AppThreader.EventListener<String> listener) {
+        NetworkClient.get().clearData();
         String url = HOST + "/enter";
         NetworkClient.get().ReqGet(url, body -> {
             FormElement formElement = (FormElement) body.select("form#enterForm").first();

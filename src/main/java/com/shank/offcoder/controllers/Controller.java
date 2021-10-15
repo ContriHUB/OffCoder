@@ -60,13 +60,16 @@ public class Controller {
     private BorderPane loginPane;
 
     @FXML
-    private Label userWelcome;
+    private Label userWelcome, splashText;
 
     @FXML
     private ListView<ProblemParser.Problem> problemListView;
 
     @FXML
     private ProgressIndicator problemRetProgress;
+
+    @FXML
+    private Button retryBtn;
 
     @FXML
     private void initialize() {
@@ -76,6 +79,7 @@ public class Controller {
         loadPageIndicator.setVisible(false);
         loginProgress.setVisible(false);
         downloadProgress.setVisible(false);
+        retryBtn.setVisible(false);
 
         problemListView.setCellFactory(param -> new ProblemCell());
         problemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -117,15 +121,28 @@ public class Controller {
             System.out.println("Got Password");
 
             loginProgress.setVisible(mStarted);
-            attemptLogin(handle, password);
+            attemptLogin(handle, password, false);
         }
     }
 
-    public void attemptLogin(String handle, String password) {
+    @FXML
+    protected void reAttemptLogin() {
+        retryBtn.setVisible(false);
+        splashText.setText("Loading ...");
+        attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),
+                new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))), true);
+    }
+
+    public void attemptLogin(String handle, String password, boolean auto) {
         if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
             mStarted = false;
-            loginProgress.setVisible(false);
+            if (auto) {
+                splashText.setText("Couldn't connect codeforces");
+                retryBtn.setVisible(true);
+            } else {
+                showNetworkErrDialog();
+                loginProgress.setVisible(false);
+            }
             return;
         }
         if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) {
@@ -136,15 +153,19 @@ public class Controller {
 
         Codeforces.login(handle, password, ret -> Platform.runLater(() -> {
             if (ret.equals("Codeforces down")) {
-                Alert dialog = new Alert(Alert.AlertType.ERROR);
-                dialog.setTitle("Connection Error");
-                dialog.setHeaderText(null);
-                dialog.setContentText("Codeforces down");
-                dialog.initOwner(Launcher.get().mStage);
                 mStarted = false;
-                loginProgress.setVisible(false);
+                if (auto) {
+                    retryBtn.setVisible(true);
+                } else {
+                    Alert dialog = new Alert(Alert.AlertType.ERROR);
+                    dialog.setTitle("Connection Error");
+                    dialog.setHeaderText(null);
+                    dialog.setContentText("Codeforces down");
+                    dialog.initOwner(Launcher.get().mStage);
+                    loginProgress.setVisible(false);
 
-                dialog.showAndWait();
+                    dialog.showAndWait();
+                }
                 handleField.setText("");
                 passwordField.setText("");
                 return;

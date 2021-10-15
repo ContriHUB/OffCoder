@@ -53,7 +53,7 @@ public class Launcher extends Application {
 
         if (AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) {
             ((Controller) mFxmlLoader.getController()).attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),
-                    new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))));
+                    new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))), true);
         }
     }
 

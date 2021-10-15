@@ -158,11 +158,17 @@
                 </AnchorPane>
                 <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #fff;">
                     <children>
-                        <Label layoutX="346.0" layoutY="183.0" text="Loading ...">
+                        <Label fx:id="splashText" alignment="CENTER" contentDisplay="CENTER" layoutX="33.0"
+                               layoutY="185.0" prefHeight="51.0" prefWidth="735.0" text="Loading ..."
+                               textAlignment="CENTER">
                             <font>
                                 <Font size="24.0"/>
                             </font>
                         </Label>
+                        <Button fx:id="retryBtn" layoutX="365.0" layoutY="281.0" mnemonicParsing="false"
+                                onAction="#reAttemptLogin" prefHeight="25.0" prefWidth="71.0" text="Retry"
+                                AnchorPane.bottomAnchor="94.0" AnchorPane.leftAnchor="365.0"
+                                AnchorPane.rightAnchor="364.0"/>
                     </children>
                 </AnchorPane>
             </children>
