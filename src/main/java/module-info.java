@@ -11,7 +11,6 @@ module com.shank.offcoder {
     requires org.apache.httpcomponents.httpclient;
     requires org.apache.httpcomponents.httpcore;
 
-    requires com.sun.jna;
     requires org.json;
     requires org.jsoup;
 
