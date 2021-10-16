@@ -23,12 +23,16 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.FormElement;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 /**
  * Class for handling tasks for Codeforces
  */
 public class Codeforces {
+
+    private Codeforces() {}
 
     public static final String HOST = "https://codeforces.com";
     private static final String CHAR_DAT = "abcdefghijklmnopqrstuvwxyz0123456789";
@@ -117,4 +121,42 @@ public class Codeforces {
             return false;
         }
     }
+
+    // --------- SUBMISSION SPECIFIC CODE --------- //
+
+    /**
+     * Class to store ID and extension based on language
+     */
+    public static class LangMeta {
+        public String ext, ID;
+
+        public LangMeta(String ext, String ID) {
+            this.ext = ext;
+            this.ID = ID;
+        }
+    }
+
+    /**
+     * Store the mapping of key being language and value {@link LangMeta}
+     */
+    private static final Map<String, LangMeta> mLangID = new HashMap<>();
+    public static final String[] mLang = {"GNU GCC C11 5.1.0",
+            "GNU G++11 5.1.0", "GNU G++14 6.4.0", "GNU G++17 7.3.0",
+            "Java 11.0.5", "Kotlin 1.3.10",
+            "Python 2.7.15", "Python 3.7.2"};
+
+    static {
+        mLangID.put("GNU GCC C11 5.1.0", new LangMeta(".c", "43"));
+        mLangID.put("GNU G++11 5.1.0", new LangMeta(".cpp", "42"));
+        mLangID.put("GNU G++14 6.4.0", new LangMeta(".cpp", "50"));
+        mLangID.put("GNU G++17 7.3.0", new LangMeta(".cpp", "54"));
+        mLangID.put("Java 11.0.5", new LangMeta(".java", "60"));
+        mLangID.put("Kotlin 1.3.10", new LangMeta(".kt", "48"));
+        mLangID.put("Python 2.7.15", new LangMeta(".py", "7"));
+        mLangID.put("Python 3.7.2", new LangMeta(".py", "31"));
+    }
+
+    public static String getLangID(String lang) {return mLangID.getOrDefault(lang, new LangMeta("", "")).ID;}
+
+    public static String getLangExt(String lang) {return mLangID.getOrDefault(lang, new LangMeta("", "")).ext;}
 }

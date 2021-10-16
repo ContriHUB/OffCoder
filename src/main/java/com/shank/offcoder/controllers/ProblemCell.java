@@ -73,7 +73,7 @@ public class ProblemCell extends ListCell<ProblemParser.Problem> {
             if (e.getButton().equals(MouseButton.PRIMARY)) {
                 if (e.getClickCount() == 2) {
                     System.out.println("WEB: " + Codeforces.HOST + item.url);
-                    ((Controller) Launcher.get().mFxmlLoader.getController()).loadWebPage(Codeforces.HOST + item.url, item.code);
+                    ((Controller) Launcher.get().mFxmlLoader.getController()).loadWebPage(item);
                 }
             }
         });

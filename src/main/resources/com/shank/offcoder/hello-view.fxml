@@ -30,14 +30,38 @@
                 <AnchorPane fx:id="problemPane" prefHeight="200.0" prefWidth="200.0"
                             style="-fx-background-color: #fff;">
                     <children>
-                        <WebView fx:id="webView" layoutX="14.0" layoutY="14.0" prefHeight="372.0" prefWidth="687.0"
+                        <WebView fx:id="webView" layoutX="14.0" layoutY="14.0" prefHeight="372.0" prefWidth="620.0"
                                  AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0"
-                                 AnchorPane.rightAnchor="99.0" AnchorPane.topAnchor="14.0"/>
+                                 AnchorPane.rightAnchor="166.0" AnchorPane.topAnchor="14.0"/>
                         <Button layoutX="734.0" layoutY="360.0" mnemonicParsing="false" onAction="#webBtnGoBack"
-                                prefWidth="71.0" text="Back" AnchorPane.bottomAnchor="14.0"
+                                prefHeight="25.0" prefWidth="111.0" text="Back" AnchorPane.bottomAnchor="14.0"
                                 AnchorPane.rightAnchor="14.0"/>
                         <Button fx:id="singlePageDownloadBtn" layoutX="734.0" layoutY="319.0" mnemonicParsing="false"
-                                text="Download" AnchorPane.bottomAnchor="56.0" AnchorPane.rightAnchor="14.0"/>
+                                prefHeight="25.0" prefWidth="111.0" text="Download" AnchorPane.bottomAnchor="56.0"
+                                AnchorPane.rightAnchor="14.0"/>
+                        <Label fx:id="acceptedLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="675.0"
+                               layoutY="14.0" prefHeight="25.0" prefWidth="111.0" text="Already Accepted"
+                               textFill="#0bda51" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                            <font>
+                                <Font name="System Bold" size="13.0"/>
+                            </font>
+                        </Label>
+                        <ChoiceBox fx:id="langSelector" layoutX="675.0" layoutY="78.0" prefHeight="25.0"
+                                   prefWidth="111.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="78.0"/>
+                        <Label fx:id="selectedFile" layoutX="675.0" layoutY="110.0" prefHeight="17.0" prefWidth="111.0"
+                               text="&lt;No file selected&gt;" AnchorPane.rightAnchor="14.0"
+                               AnchorPane.topAnchor="110.0"/>
+                        <Button layoutX="675.0" layoutY="131.0" mnemonicParsing="false" onAction="#selectFile"
+                                prefHeight="25.0" prefWidth="111.0" text="Select File" AnchorPane.rightAnchor="14.0"
+                                AnchorPane.topAnchor="131.0"/>
+                        <Button fx:id="submitBtn" layoutX="675.0" layoutY="231.0" mnemonicParsing="false"
+                                prefHeight="25.0" prefWidth="111.0" text="Submit" AnchorPane.rightAnchor="14.0"
+                                AnchorPane.topAnchor="230.0"/>
+                        <Label layoutX="675.0" layoutY="59.0" text="Language" AnchorPane.rightAnchor="73.0"
+                               AnchorPane.topAnchor="59.0"/>
+                        <Button fx:id="compileBtn" layoutX="675.0" layoutY="200.0" mnemonicParsing="false"
+                                onAction="#compileTest" prefHeight="25.0" prefWidth="111.0" text="Compile &amp; Test"
+                                AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="200.0"/>
                     </children>
                 </AnchorPane>
                 <BorderPane fx:id="loginPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: #fff;">

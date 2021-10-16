@@ -109,7 +109,7 @@ public class AppData {
 
     // -----
 
-    private File getDataFolder() {
+    public File getDataFolder() {
         File dir = new File("data");
         if (!dir.exists()) dir.mkdirs();
         return dir;

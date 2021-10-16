@@ -20,16 +20,20 @@ import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.cf.Codeforces;
 import com.shank.offcoder.cf.ProblemParser;
+import com.shank.offcoder.cf.SampleCompilationTests;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
+import javafx.stage.FileChooser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -38,6 +42,7 @@ import java.util.Optional;
 public class Controller {
 
     private final ProblemParser mProblemSetHandler = new ProblemParser();
+    private SampleCompilationTests mCompilation = new SampleCompilationTests();
 
     private boolean mStarted = false;
 
@@ -80,6 +85,9 @@ public class Controller {
         loginProgress.setVisible(false);
         downloadProgress.setVisible(false);
         retryBtn.setVisible(false);
+        acceptedLabel.setVisible(false);
+        compileBtn.setDisable(true);
+        submitBtn.setDisable(true);
 
         problemListView.setCellFactory(param -> new ProblemCell());
         problemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -99,6 +107,15 @@ public class Controller {
             }
         });
         webView.getEngine().load("about:blank");
+
+        langSelector.setItems(FXCollections.observableArrayList(Codeforces.mLang));
+        langSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            System.out.println("Selected: " + newValue);
+            String loadedExt = mCompilation.getExt(), expectedExt = Codeforces.getLangExt(newValue);
+            compileBtn.setDisable(!loadedExt.equals(expectedExt));
+            submitBtn.setDisable(!loadedExt.equals(expectedExt));
+        });
+        langSelector.setValue(Codeforces.mLang[0]);
     }
 
     // ----------------- LOGIN / LOGOUT ----------------- //
@@ -155,6 +172,7 @@ public class Controller {
             if (ret.equals("Codeforces down")) {
                 mStarted = false;
                 if (auto) {
+                    splashText.setText("Codeforces down");
                     retryBtn.setVisible(true);
                 } else {
                     Alert dialog = new Alert(Alert.AlertType.ERROR);
@@ -171,13 +189,18 @@ public class Controller {
                 return;
             }
             if (ret.equals("Login Failed") || ret.equals("Error")) {
-                Alert dialog = new Alert(Alert.AlertType.ERROR);
-                dialog.setTitle("Login Error");
-                dialog.setHeaderText(null);
-                dialog.setContentText("Invalid handle or password");
-                dialog.initOwner(Launcher.get().mStage);
-                loginProgress.setVisible(false);
-                dialog.showAndWait();
+                if (auto) {
+                    splashText.setText("Invalid handle or password");
+                    retryBtn.setVisible(true);
+                } else {
+                    Alert dialog = new Alert(Alert.AlertType.ERROR);
+                    dialog.setTitle("Login Error");
+                    dialog.setHeaderText(null);
+                    dialog.setContentText("Invalid handle or password");
+                    dialog.initOwner(Launcher.get().mStage);
+                    loginProgress.setVisible(false);
+                    dialog.showAndWait();
+                }
                 passwordField.setText("");
             } else {
                 handleField.setText("");
@@ -215,7 +238,7 @@ public class Controller {
             alert.setContentText("You will loose all the downloaded questions.");
 
             Optional<ButtonType> result = alert.showAndWait();
-            if (result.get() == ButtonType.OK) attemptLogout();
+            if (result.isPresent() && result.get() == ButtonType.OK) attemptLogout();
             return;
         }
         attemptLogout();
@@ -344,7 +367,7 @@ public class Controller {
                 downloadProgress.setProgress(counter / list.size());
                 if (arr.toString().contains(p.code)) continue;
 
-                String html = ProblemParser.trimHTML(Codeforces.HOST + p.url, null);
+                String html = ProblemParser.getQuestion(Codeforces.HOST + p.url, null);
                 if (ProblemParser.hasError(Jsoup.parse(html))) {
                     failedCount++;
                     continue;
@@ -420,16 +443,47 @@ public class Controller {
     private WebView webView;
 
     @FXML
-    private Button singlePageDownloadBtn;
+    private Button singlePageDownloadBtn, compileBtn, submitBtn;
+
+    @FXML
+    private Label acceptedLabel, selectedFile;
+
+    @FXML
+    private ChoiceBox<String> langSelector;
 
     @FXML
     protected void webBtnGoBack() {
+        mCompilation = new SampleCompilationTests();
         welcomePane.toFront();
+        acceptedLabel.setVisible(false);
         webView.getEngine().load("about:blank");
     }
 
-    public void loadWebPage(String url, String code) {
-        boolean downloaded = questionDownloaded(code);
+    @FXML
+    protected void selectFile() {
+        FileChooser chooser = new FileChooser();
+        chooser.setTitle("Select source code file");
+        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Source File", "*.cpp", "*.c", "*.py"));
+        File sourceCodeFile = chooser.showOpenDialog(Launcher.get().mStage);
+        if (sourceCodeFile != null && mCompilation.setSourceFile(sourceCodeFile)) {
+            selectedFile.setText(sourceCodeFile.getName());
+
+            String loadedExt = mCompilation.getExt(), expectedExt = Codeforces.getLangExt(langSelector.getSelectionModel().getSelectedItem());
+            compileBtn.setDisable(!loadedExt.equals(expectedExt));
+            submitBtn.setDisable(!loadedExt.equals(expectedExt));
+        }
+    }
+
+    @FXML
+    protected void compileTest() {mCompilation.compile(langSelector.getSelectionModel().getSelectedItem());}
+
+    public void loadWebPage(ProblemParser.Problem pr) {
+        mCompilation = new SampleCompilationTests();
+        compileBtn.setDisable(true);
+        submitBtn.setDisable(true);
+        selectedFile.setText("<No file selected>");
+
+        boolean downloaded = questionDownloaded(pr.code);
         singlePageDownloadBtn.setDisable(downloaded);
         if (!downloaded) {
             if (NetworkClient.isNetworkNotConnected()) {
@@ -438,9 +492,12 @@ public class Controller {
             }
         }
         problemPane.toFront();
+        if (pr.accepted) acceptedLabel.setVisible(true);
         Platform.runLater(() -> {
             webView.getEngine().setJavaScriptEnabled(true);
-            webView.getEngine().loadContent(ProblemParser.trimHTML(url, code));
+            String html = ProblemParser.trimHTML(ProblemParser.getQuestion(Codeforces.HOST + pr.url, pr.code));
+            webView.getEngine().loadContent(html);
+            mCompilation.setDoc(html);
         });
     }
 }

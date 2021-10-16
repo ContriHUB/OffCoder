@@ -134,7 +134,10 @@ public class ProblemParser {
                 minDifficulty + "-" + maxDifficulty + "&order=BY_RATING_ASC";
     }
 
-    public static String trimHTML(String url, String code) {
+    /**
+     * Get HTML of the question
+     */
+    public static String getQuestion(String url, String code) {
         if (code != null) {
             JSONArray probArr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
             for (Object obj : probArr) {
@@ -145,21 +148,36 @@ public class ProblemParser {
                 }
             }
         }
-        Document doc;
         try {
-            doc = Jsoup.connect(url).cookies(NetworkClient.get().getCookies()).data(NetworkClient.get().getParams()).followRedirects(true).execute().parse();
-            doc.select("div#header").remove();
-            doc.select("div.roundbox.menu-box").remove();
-            doc.select("div.roundbox.sidebox").remove();
-            doc.select("div.second-level-menu").remove();
-            doc.select("div#pageContent").removeClass("content-with-sidebar");
-            doc.select("div#footer").remove();
+            Document doc = Jsoup.connect(url).cookies(NetworkClient.get().getCookies()).data(NetworkClient.get().getParams()).followRedirects(true).execute().parse();
             doc.outputSettings(doc.outputSettings().prettyPrint(false).escapeMode(Entities.EscapeMode.extended).charset("ASCII"));
             return doc.html().replaceAll("//codeforces.org", "https://codeforces.org");
         } catch (IOException e) {
             e.printStackTrace();
             return "<h2>Unable to load page</h2>";
         }
+    }
+
+    /**
+     * Removes some elements
+     */
+    public static String trimHTML(String html) {
+        Document doc = Jsoup.parse(html);
+        doc.select("div#header").remove();
+        doc.select("div.roundbox.menu-box").remove();
+
+        Element sidebar = doc.select("div#sidebar").first();
+        if (sidebar != null) {
+            for (Element ele : sidebar.children()) {
+                if (ele.hasClass("roundbox") && ele.hasClass("sidebox") &&
+                        ele.select("div.caption.titled").text().contains("submissions")) continue;
+                ele.remove();
+            }
+        }
+        doc.select("div.second-level-menu").remove();
+        doc.select("div#footer").remove();
+        doc.outputSettings(doc.outputSettings().prettyPrint(false).escapeMode(Entities.EscapeMode.extended).charset("ASCII"));
+        return doc.html();
     }
 
     public static boolean hasError(Document doc) {
