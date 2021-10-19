@@ -17,15 +17,13 @@ package com.shank.offcoder.cf;
 import com.shank.offcoder.app.AppData;
 import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
-import org.jsoup.Connection;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.FormElement;
 
-import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Class for handling tasks for Codeforces
@@ -35,10 +33,6 @@ public class Codeforces {
     private Codeforces() {}
 
     public static final String HOST = "https://codeforces.com";
-    private static final String CHAR_DAT = "abcdefghijklmnopqrstuvwxyz0123456789";
-
-    // UID needed for logout
-    private static String LOG_OUT_UID = AppData.NULL_STR;
 
     // --------- LOGIN/LOGOUT SPECIFIC CODE --------- //
 
@@ -48,34 +42,23 @@ public class Codeforces {
      * @param handle   codeforces handle
      * @param password password for the handle
      */
-    public static void login(String handle, String password, AppThreader.EventListener<String> listener) {
-        NetworkClient.get().clearData();
-        String url = HOST + "/enter";
-        NetworkClient.get().ReqGet(url, body -> {
+    public static void login(String handle, String password, boolean remember, AppThreader.EventListener<String> listener) {
+        AppData.get().writeData(AppData.AUTO_LOGIN_KEY, remember);
+        AppData.get().writeData(AppData.HANDLE_KEY, handle);
+        AppData.get().writeData(AppData.PASS_KEY, Base64.getEncoder().encodeToString(password.getBytes(StandardCharsets.UTF_8)));
+        NetworkClient.get().login(body -> {
             FormElement formElement = (FormElement) body.select("form#enterForm").first();
-            if (formElement == null) {
-                System.out.println("Form NULL");
+            if (formElement != null) {
+                System.out.println("Not logged in");
+
+                AppData.get().writeData(AppData.HANDLE_KEY, AppData.NULL_STR);
+                AppData.get().writeData(AppData.PASS_KEY, AppData.NULL_STR);
+                AppData.get().writeData(AppData.AUTO_LOGIN_KEY, false);
                 listener.onEvent("Error");
                 return;
             }
-            String csrf = formElement.select("input[name=\"csrf_token\"]").val();
-            NetworkClient.get().setParams(csrf, genFTAA(), handle, password);
-
-            formElement.select("input#handleOrEmail").val(handle);
-            formElement.select("input#password").val(password);
-            try {
-                Connection.Response response = formElement.submit().cookies(NetworkClient.get().getCookies()).data(NetworkClient.get().getParams())
-                        .followRedirects(true).execute();
-                NetworkClient.get().updateCookies(response.cookies());
-                Document html = response.parse();
-
-                LOG_OUT_UID = findLogOutUID(html.toString());
-                String mHandle;
-                listener.onEvent(response.statusCode() == 200 && !(mHandle = findHandle(html.toString())).isEmpty() ? mHandle : "Error");
-            } catch (IOException e) {
-                e.printStackTrace();
-                listener.onEvent("Error");
-            }
+            String mHandle;
+            listener.onEvent((mHandle = findHandle(body.html())).isEmpty() ? "Error" : mHandle);
         });
     }
 
@@ -83,20 +66,10 @@ public class Codeforces {
      * Function to log out from codeforces
      */
     public static void logout(AppThreader.EventListener<Boolean> listener) {
-        if (LOG_OUT_UID.equals(AppData.NULL_STR)) {
-            listener.onEvent(false);
-            return;
-        }
-        NetworkClient.get().ReqGet(HOST + "/" + LOG_OUT_UID + "/logout", data -> {
-            NetworkClient.get().clearData();
-            listener.onEvent(!hasError(data));
+        NetworkClient.get().logout(data -> {
+            Element regEl = data.select("a[href=\"/register\"]").first();
+            listener.onEvent(regEl != null);
         });
-    }
-
-    public static String genFTAA() {
-        StringBuilder ftaa = new StringBuilder();
-        for (int i = 0; i < 18; i++) ftaa.append(CHAR_DAT.charAt(new Random().nextInt(CHAR_DAT.length())));
-        return ftaa.toString();
     }
 
     private static String findHandle(String body) {
@@ -104,22 +77,6 @@ public class Codeforces {
         if (index == -1) return "";
         int end = body.indexOf("\"", index + 10);
         return body.substring(index + 10, end);
-    }
-
-    private static String findLogOutUID(String body) {
-        int index = body.indexOf("/logout");
-        if (index == -1) return AppData.NULL_STR;
-        int start = body.indexOf("/", index - 33);
-        return body.substring(start + 1, index);
-    }
-
-    private static boolean hasError(Document doc) {
-        try {
-            Element ele = doc.select("p#OffError").first();
-            return ele != null && ele.val().equals("Error");
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     // --------- SUBMISSION SPECIFIC CODE --------- //
