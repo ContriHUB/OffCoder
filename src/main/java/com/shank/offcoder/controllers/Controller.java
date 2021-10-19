@@ -88,6 +88,8 @@ public class Controller {
         compileBtn.setDisable(true);
         submitBtn.setDisable(true);
 
+        prevSubListView.setCellFactory(para -> new SubmissionCell());
+
         problemListView.setCellFactory(param -> new ProblemCell());
         problemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         problemListView.setOnMouseClicked(event -> {
@@ -492,5 +494,30 @@ public class Controller {
             webView.getEngine().loadContent(html);
             mCompilation.setDoc(html);
         }));
+    }
+
+    // ----------------- PREVIOUS SUBMISSION ----------------- //
+
+    @FXML
+    private ListView<Codeforces.PreviousSubmission> prevSubListView;
+
+    @FXML
+    private AnchorPane prevSubPane;
+
+    @FXML
+    protected void goToPrevSub() {
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
+        prevSubPane.toFront();
+        Codeforces.getPreviousSubmission(data -> Platform.runLater(() -> prevSubListView.getItems().setAll(data)));
+    }
+
+    @FXML
+    protected void goBackPrevSub() {
+        prevSubListView.getSelectionModel().clearSelection();
+        prevSubListView.getItems().clear();
+        welcomePane.toFront();
     }
 }

@@ -19,11 +19,10 @@ import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
 import org.jsoup.nodes.Element;
 import org.jsoup.nodes.FormElement;
+import org.jsoup.select.Elements;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class for handling tasks for Codeforces
@@ -80,6 +79,34 @@ public class Codeforces {
     }
 
     // --------- SUBMISSION SPECIFIC CODE --------- //
+
+    public static class PreviousSubmission {
+        public String date, sub_time, problemName, lang, verdict, time, mem;
+
+        public PreviousSubmission(String date, String sub_time, String problemName, String lang, String verdict, String time, String mem) {
+            this.date = date;
+            this.sub_time = sub_time;
+            this.problemName = problemName;
+            this.lang = lang;
+            this.verdict = verdict;
+            this.time = time;
+            this.mem = mem;
+        }
+    }
+
+    public static void getPreviousSubmission(AppThreader.EventListener<List<PreviousSubmission>> listener) {
+        NetworkClient.get().getPage("https://codeforces.com/problemset/status?my=on", data -> {
+            List<PreviousSubmission> arr = new ArrayList<>();
+            Elements submissions = data.select("table.status-frame-datatable").select("tr");
+            for (int i = 1; i < submissions.size(); i++) {
+                Elements subInfo = submissions.get(i).select("td");
+
+                arr.add(new PreviousSubmission(subInfo.get(1).text(), subInfo.get(2).text(), subInfo.get(3).text(), subInfo.get(4).text(),
+                        subInfo.get(5).text(), subInfo.get(6).text(), subInfo.get(7).text()));
+            }
+            listener.onEvent(arr);
+        });
+    }
 
     /**
      * Class to store ID and extension based on language
