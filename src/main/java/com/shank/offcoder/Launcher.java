@@ -24,6 +24,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Base64;
 
 public class Launcher extends Application {
 
@@ -51,7 +52,8 @@ public class Launcher extends Application {
         mStage.show();
 
         if (AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) {
-            ((Controller) mFxmlLoader.getController()).attemptLogin(null, null, true);
+            ((Controller) mFxmlLoader.getController()).attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),
+                    new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))), true);
         }
     }
 

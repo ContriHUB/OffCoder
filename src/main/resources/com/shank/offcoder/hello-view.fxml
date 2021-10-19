@@ -14,12 +14,11 @@
   ~ copies or substantial portions of the Software.
   -->
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?import javafx.scene.web.*?>
-
+<?import javafx.scene.web.WebView?>
 <AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="800.0"
             prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.2"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.controllers.Controller">
@@ -191,8 +190,8 @@
                         <ProgressBar fx:id="downloadProgress" layoutX="609.0" layoutY="328.0" prefHeight="10.0"
                                      prefWidth="152.0" progress="0.0" AnchorPane.bottomAnchor="62.0"
                                      AnchorPane.rightAnchor="39.0"/>
-                        <Button layoutX="609.0" layoutY="256.0" mnemonicParsing="false" onAction="#goToPrevSub"
-                                prefHeight="25.0" prefWidth="152.0" text="Previous Submission"
+                        <Button fx:id="prevSubBtn" layoutX="609.0" layoutY="256.0" mnemonicParsing="false"
+                                onAction="#goToPrevSub" prefHeight="25.0" prefWidth="152.0" text="Previous Submission"
                                 AnchorPane.bottomAnchor="119.0" AnchorPane.rightAnchor="39.0"/>
                     </children>
                 </AnchorPane>

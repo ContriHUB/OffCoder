@@ -34,6 +34,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -163,21 +164,13 @@ public class Controller {
             }
             return;
         }
-        if (auto) {
-            Launcher.get().freeWindowSize();
-            welcomePane.toFront();
-            userWelcome.setText("Welcome back !");
-
-            AppThreader.delay(() -> mProblemSetHandler.get(data -> populateListView(data, false)), 150);
-            return;
-        }
         if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) {
             mStarted = false;
             loginProgress.setVisible(false);
             return;
         }
 
-        Codeforces.login(handle, password, rememberCheck.isSelected(), ret -> Platform.runLater(() -> {
+        Codeforces.login(handle, password, ret -> Platform.runLater(() -> {
             if (ret.equals("Codeforces down")) {
                 mStarted = false;
                 Alert dialog = new Alert(Alert.AlertType.ERROR);
@@ -209,6 +202,12 @@ public class Controller {
                 userWelcome.setText("Welcome " + ret + " !");
 
                 AppThreader.delay(() -> mProblemSetHandler.get(data -> populateListView(data, false)), 150);
+                if (rememberCheck.isSelected()) {
+                    AppData app = AppData.get();
+                    app.writeData(AppData.HANDLE_KEY, ret);
+                    app.writeData(AppData.PASS_KEY, Base64.getEncoder().encodeToString(password.getBytes(StandardCharsets.UTF_8)));
+                    app.writeData(AppData.AUTO_LOGIN_KEY, true);
+                }
             }
             mStarted = false;
             loginProgress.setVisible(false);
@@ -322,6 +321,7 @@ public class Controller {
         final List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
         if (list.isEmpty()) return;
 
+        prevSubBtn.setDisable(true);
         problemListView.setDisable(true);
         quesDownloadBtn.setDisable(true);
         applyRateBtn.setDisable(true);
@@ -333,6 +333,7 @@ public class Controller {
         nextPageBtn.setDisable(true);
         downloadProgress.setVisible(true);
         _downloadQues(list, data -> Platform.runLater(() -> {
+            prevSubBtn.setDisable(false);
             problemListView.setDisable(false);
             applyRateBtn.setDisable(false);
 
@@ -351,29 +352,26 @@ public class Controller {
     }
 
     private void _downloadQues(final List<ProblemParser.Problem> list, AppThreader.EventListener<Integer> listener) {
-        new Thread(() -> _singleDownload(list, 0, 0, AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray()), listener)).start();
-    }
+        new Thread(() -> {
+            JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+            double counter = 0;
+            int failedCount = 0;
+            for (ProblemParser.Problem p : list) {
+                ++counter;
+                downloadProgress.setProgress(counter / list.size());
+                if (arr.toString().contains(p.code)) continue;
 
-    private void _singleDownload(final List<ProblemParser.Problem> list, int idx, int failed, JSONArray arr, AppThreader.EventListener<Integer> listener) {
-        if (idx == list.size()) {
-            AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
-            listener.onEvent(failed);
-            return;
-        }
-        ProblemParser.Problem p = list.get(idx);
-        if (arr.toString().contains(p.code)) {
-            _singleDownload(list, idx + 1, failed, arr, listener);
-            return;
-        }
-        ProblemParser.getQuestion(Codeforces.HOST + p.url, null, data -> {
-            Platform.runLater(() -> downloadProgress.setProgress((idx + 1.0) / list.size()));
-            if (ProblemParser.hasError(Jsoup.parse(data))) {
-                _singleDownload(list, idx + 1, failed + 1, arr, listener);
-            } else {
-                arr.put(new JSONObject().put(p.code, data));
-                _singleDownload(list, idx + 1, failed, arr, listener);
+                String html = ProblemParser.getQuestion(Codeforces.HOST + p.url, null);
+                if (ProblemParser.hasError(Jsoup.parse(html))) {
+                    failedCount++;
+                    continue;
+                }
+
+                arr.put(new JSONObject().put(p.code, html));
             }
-        });
+            AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
+            listener.onEvent(failedCount);
+        }).start();
     }
 
     private boolean questionDownloaded(String code) {
@@ -488,12 +486,12 @@ public class Controller {
         }
         problemPane.toFront();
         if (pr.accepted) acceptedLabel.setVisible(true);
-        webView.getEngine().setJavaScriptEnabled(true);
-        ProblemParser.getQuestion(Codeforces.HOST + pr.url, pr.code, data -> Platform.runLater(() -> {
-            String html = ProblemParser.trimHTML(data);
+        Platform.runLater(() -> {
+            webView.getEngine().setJavaScriptEnabled(true);
+            String html = ProblemParser.trimHTML(ProblemParser.getQuestion(Codeforces.HOST + pr.url, pr.code));
             webView.getEngine().loadContent(html);
             mCompilation.setDoc(html);
-        }));
+        });
     }
 
     // ----------------- PREVIOUS SUBMISSION ----------------- //
@@ -503,6 +501,9 @@ public class Controller {
 
     @FXML
     private AnchorPane prevSubPane;
+
+    @FXML
+    private Button prevSubBtn;
 
     @FXML
     protected void goToPrevSub() {

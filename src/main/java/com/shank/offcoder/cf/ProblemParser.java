@@ -25,6 +25,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Entities;
 import org.jsoup.select.Elements;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,7 +102,7 @@ public class ProblemParser {
      * Function that parses the HTML to get list of problems
      */
     private void getProblemList(AppThreader.EventListener<List<Problem>> listener) {
-        NetworkClient.get().getPage(getURL(), body -> {
+        NetworkClient.get().ReqGet(getURL(), body -> {
             List<Problem> arr = new ArrayList<>();
 
             Elements problems = body.select("table.problems").select("tr");
@@ -136,22 +137,25 @@ public class ProblemParser {
     /**
      * Get HTML of the question
      */
-    public static void getQuestion(String url, String code, AppThreader.EventListener<String> listener) {
+    public static String getQuestion(String url, String code) {
         if (code != null) {
             JSONArray probArr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
             for (Object obj : probArr) {
                 JSONObject jObj = (JSONObject) obj;
                 if (jObj.has(code) && !hasError(Jsoup.parse(jObj.getString(code)))) {
                     System.out.println("Returning downloaded");
-                    listener.onEvent(jObj.getString(code));
-                    return;
+                    return jObj.getString(code);
                 }
             }
         }
-        NetworkClient.get().getPage(url, data -> {
-            data.outputSettings(data.outputSettings().prettyPrint(false).escapeMode(Entities.EscapeMode.extended).charset("ASCII"));
-            listener.onEvent(data.html());
-        });
+        try {
+            Document doc = Jsoup.connect(url).cookies(NetworkClient.get().getCookies()).data(NetworkClient.get().getParams()).followRedirects(true).execute().parse();
+            doc.outputSettings(doc.outputSettings().prettyPrint(false).escapeMode(Entities.EscapeMode.extended).charset("ASCII"));
+            return doc.html().replaceAll("//codeforces.org", "https://codeforces.org");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "<h2>Unable to load page</h2>";
+        }
     }
 
     /**
