@@ -21,8 +21,10 @@ import com.shank.offcoder.app.NetworkClient;
 import com.shank.offcoder.cf.Codeforces;
 import com.shank.offcoder.cf.ProblemParser;
 import com.shank.offcoder.cf.SampleCompilationTests;
+import com.shank.offcoder.cf.SubmissionQueue;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -475,34 +477,40 @@ public class Controller {
 
     @FXML
     protected void submitCode() {
+        if (mProblem == null) return;
         if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
+            SubmissionQueue.get().queue(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem),
+                    this::showSubmitDialog);
             return;
         }
-        if (mProblem == null) return;
 
         Alert alert = new Alert(Alert.AlertType.NONE, "Uploading ...");
         alert.setTitle("Submitting");
         alert.getButtonTypes().addAll(ButtonType.OK);
         alert.getDialogPane().lookupButton(ButtonType.OK).setVisible(false);
         alert.initOwner(Launcher.get().mStage);
-        alert.setOnShown(e -> Codeforces.submitCode(mCompilation, langSelector.getSelectionModel().getSelectedItem(),
-                Codeforces.HOST + mProblem.url, data -> Platform.runLater(() -> {
+        alert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::consume);
+        alert.setOnShown(e -> Codeforces.submitCode(
+                new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem),
+                data -> Platform.runLater(() -> {
                     alert.close();
-
-                    Alert infoAlert;
-                    if (data) {
-                        infoAlert = new Alert(Alert.AlertType.INFORMATION);
-                        infoAlert.setTitle("Submission");
-                        infoAlert.setContentText("Submitted successfully");
-                    } else {
-                        infoAlert = new Alert(Alert.AlertType.ERROR);
-                        infoAlert.setTitle("Submission error");
-                        infoAlert.setContentText("Could not submit");
-                    }
-                    infoAlert.showAndWait();
+                    showSubmitDialog(data);
                 })));
         alert.show();
+    }
+
+    private void showSubmitDialog(SubmissionQueue.PostResult data) {
+        Alert infoAlert;
+        if (data.submitted) {
+            infoAlert = new Alert(Alert.AlertType.INFORMATION);
+            infoAlert.setTitle("Submission");
+            infoAlert.setContentText("Problem " + data.code + " submitted successfully");
+        } else {
+            infoAlert = new Alert(Alert.AlertType.ERROR);
+            infoAlert.setTitle("Submission error");
+            infoAlert.setContentText("Could not submit " + data.code);
+        }
+        infoAlert.showAndWait();
     }
 
     public void loadWebPage(ProblemParser.Problem pr) {

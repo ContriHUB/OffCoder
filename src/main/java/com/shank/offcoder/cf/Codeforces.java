@@ -17,6 +17,7 @@ package com.shank.offcoder.cf;
 import com.shank.offcoder.app.AppData;
 import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
+import javafx.application.Platform;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -151,6 +152,17 @@ public class Codeforces {
         });
     }
 
+    public static class Submission {
+        public String lang, sourceCode;
+        public ProblemParser.Problem pr;
+
+        public Submission(String lang, String sourceCode, ProblemParser.Problem pr) {
+            this.lang = lang;
+            this.sourceCode = sourceCode;
+            this.pr = pr;
+        }
+    }
+
     /**
      * Store the mapping of key being language and value exit
      */
@@ -172,34 +184,34 @@ public class Codeforces {
 
     public static String getLangExt(String lang) {return mLangID.getOrDefault(lang, "");}
 
-    public static void submitCode(SampleCompilationTests compilationTests, String lang, String url, AppThreader.EventListener<Boolean> listener) {
-        NetworkClient.get().ReqGet(url + "?csrf_token=" + NetworkClient.get().getParams().get("csrf_token"), data -> {
+    public static void submitCode(Submission submission, AppThreader.EventListener<SubmissionQueue.PostResult> listener) {
+        NetworkClient.get().ReqGet(HOST + submission.pr.url + "?csrf_token=" + NetworkClient.get().getParams().get("csrf_token"), data -> {
             FormElement formElement = (FormElement) data.select("form.submitForm").first();
             if (formElement == null) {
                 System.out.println("Submission FORM NULL");
-                listener.onEvent(false);
+                Platform.runLater(() -> listener.onEvent(new SubmissionQueue.PostResult(false, submission.pr.code)));
                 return;
             }
 
             Elements option = formElement.select("select > option");
             for (Element el : option) {
                 if (el.attr("selected").equals("selected")) {
-                    if (!el.text().trim().equals(lang)) el.removeAttr("selected");
+                    if (!el.text().trim().equals(submission.lang)) el.removeAttr("selected");
                 } else {
-                    if (el.text().trim().equals(lang)) el.attr("selected", "selected");
+                    if (el.text().trim().equals(submission.lang)) el.attr("selected", "selected");
                 }
             }
 
-            formElement.select("input[name=\"source\"]").val(compilationTests.getSourceCode());
+            formElement.select("input[name=\"source\"]").val(submission.sourceCode);
 
             try {
                 Connection.Response response = formElement.submit().cookies(NetworkClient.get().getCookies()).data(NetworkClient.get().getParams())
                         .followRedirects(true).execute();
                 NetworkClient.get().updateCookies(response.cookies());
-                listener.onEvent(true);
+                Platform.runLater(() -> listener.onEvent(new SubmissionQueue.PostResult(true, submission.pr.code)));
             } catch (Exception e) {
                 e.printStackTrace();
-                listener.onEvent(false);
+                Platform.runLater(() -> listener.onEvent(new SubmissionQueue.PostResult(false, submission.pr.code)));
             }
         });
     }

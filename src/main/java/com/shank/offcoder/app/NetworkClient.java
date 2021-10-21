@@ -72,7 +72,6 @@ public class NetworkClient {
             Jsoup.connect(Codeforces.HOST).execute();
             return false;
         } catch (IOException e) {
-            e.printStackTrace();
             return true;
         }
     }
