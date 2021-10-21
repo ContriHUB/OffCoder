@@ -124,6 +124,9 @@ public class Codeforces {
 
     // --------- SUBMISSION SPECIFIC CODE --------- //
 
+    /**
+     * Class for storing the submission history
+     */
     public static class PreviousSubmission {
         public String date, sub_time, problemName, lang, verdict, time, mem;
 
@@ -138,6 +141,9 @@ public class Codeforces {
         }
     }
 
+    /**
+     * @param listener Provides {@link List<PreviousSubmission>} by fetching history from profile
+     */
     public static void getPreviousSubmission(AppThreader.EventListener<List<PreviousSubmission>> listener) {
         NetworkClient.get().ReqGet("https://codeforces.com/problemset/status?my=on", data -> {
             List<PreviousSubmission> arr = new ArrayList<>();
@@ -152,6 +158,9 @@ public class Codeforces {
         });
     }
 
+    /**
+     * Class for storing values needed to submit a submission
+     */
     public static class Submission {
         public String lang, sourceCode;
         public ProblemParser.Problem pr;
@@ -184,6 +193,9 @@ public class Codeforces {
 
     public static String getLangExt(String lang) {return mLangID.getOrDefault(lang, "");}
 
+    /**
+     * Method to submit the problem
+     */
     public static void submitCode(Submission submission, AppThreader.EventListener<SubmissionQueue.PostResult> listener) {
         NetworkClient.get().ReqGet(HOST + submission.pr.url + "?csrf_token=" + NetworkClient.get().getParams().get("csrf_token"), data -> {
             FormElement formElement = (FormElement) data.select("form.submitForm").first();

@@ -26,6 +26,7 @@ public class SubmissionQueue {
 
     private boolean mWorking = false;
 
+    // Singleton instanced to persist `mWorking`
     private static volatile SubmissionQueue _instance = null;
 
     public static SubmissionQueue get() {
@@ -35,6 +36,9 @@ public class SubmissionQueue {
 
     private SubmissionQueue() {}
 
+    /**
+     * Class for storing result from submitting code
+     */
     public static class PostResult {
         public boolean submitted;
         public String code;
@@ -45,6 +49,12 @@ public class SubmissionQueue {
         }
     }
 
+    /**
+     * Function to queue the submission.
+     * <p>
+     * Creates a timer task and runs at interval of 2 sec.
+     * {@link #mWorking} is used to execute only one task at any time.
+     */
     public void queue(Codeforces.Submission submission, AppThreader.EventListener<PostResult> listener) {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
