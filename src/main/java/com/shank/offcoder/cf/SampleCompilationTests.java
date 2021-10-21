@@ -71,6 +71,8 @@ public class SampleCompilationTests {
 
     public String getExt() {return mExt;}
 
+    public String getSourceCode() {return mSourceCode;}
+
     public boolean setSourceFile(File sourceFile) {
         try (BufferedReader br = new BufferedReader(new FileReader(sourceFile))) {
             String line;

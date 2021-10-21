@@ -14,11 +14,12 @@
   ~ copies or substantial portions of the Software.
   -->
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?import javafx.scene.web.WebView?>
+<?import javafx.scene.web.*?>
+
 <AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="800.0"
             prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.2"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.controllers.Controller">
@@ -67,8 +68,8 @@
                                 prefHeight="25.0" prefWidth="111.0" text="Select File" AnchorPane.rightAnchor="14.0"
                                 AnchorPane.topAnchor="131.0"/>
                         <Button fx:id="submitBtn" layoutX="675.0" layoutY="231.0" mnemonicParsing="false"
-                                prefHeight="25.0" prefWidth="111.0" text="Submit" AnchorPane.rightAnchor="14.0"
-                                AnchorPane.topAnchor="230.0"/>
+                                onAction="#submitCode" prefHeight="25.0" prefWidth="111.0" text="Submit"
+                                AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="230.0"/>
                         <Label layoutX="675.0" layoutY="59.0" text="Language" AnchorPane.rightAnchor="73.0"
                                AnchorPane.topAnchor="59.0"/>
                         <Button fx:id="compileBtn" layoutX="675.0" layoutY="200.0" mnemonicParsing="false"

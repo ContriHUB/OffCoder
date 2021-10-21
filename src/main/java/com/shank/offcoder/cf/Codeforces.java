@@ -152,37 +152,55 @@ public class Codeforces {
     }
 
     /**
-     * Class to store ID and extension based on language
+     * Store the mapping of key being language and value exit
      */
-    public static class LangMeta {
-        public String ext, ID;
-
-        public LangMeta(String ext, String ID) {
-            this.ext = ext;
-            this.ID = ID;
-        }
-    }
-
-    /**
-     * Store the mapping of key being language and value {@link LangMeta}
-     */
-    private static final Map<String, LangMeta> mLangID = new HashMap<>();
+    private static final Map<String, String> mLangID = new HashMap<>();
     public static final String[] mLang = {"GNU GCC C11 5.1.0",
             "GNU G++14 6.4.0", "GNU G++17 7.3.0",
             "Java 11.0.5", "Kotlin 1.3.10",
             "Python 2.7.15", "Python 3.7.2"};
 
     static {
-        mLangID.put("GNU GCC C11 5.1.0", new LangMeta(".c", "43"));
-        mLangID.put("GNU G++14 6.4.0", new LangMeta(".cpp", "50"));
-        mLangID.put("GNU G++17 7.3.0", new LangMeta(".cpp", "54"));
-        mLangID.put("Java 11.0.5", new LangMeta(".java", "60"));
-        mLangID.put("Kotlin 1.3.10", new LangMeta(".kt", "48"));
-        mLangID.put("Python 2.7.15", new LangMeta(".py", "7"));
-        mLangID.put("Python 3.7.2", new LangMeta(".py", "31"));
+        mLangID.put("GNU GCC C11 5.1.0", ".c");
+        mLangID.put("GNU G++14 6.4.0", ".cpp");
+        mLangID.put("GNU G++17 7.3.0", ".cpp");
+        mLangID.put("Java 11.0.5", ".java");
+        mLangID.put("Kotlin 1.3.10", ".kt");
+        mLangID.put("Python 2.7.15", ".py");
+        mLangID.put("Python 3.7.2", ".py");
     }
 
-    public static String getLangID(String lang) {return mLangID.getOrDefault(lang, new LangMeta("", "")).ID;}
+    public static String getLangExt(String lang) {return mLangID.getOrDefault(lang, "");}
 
-    public static String getLangExt(String lang) {return mLangID.getOrDefault(lang, new LangMeta("", "")).ext;}
+    public static void submitCode(SampleCompilationTests compilationTests, String lang, String url, AppThreader.EventListener<Boolean> listener) {
+        NetworkClient.get().ReqGet(url + "?csrf_token=" + NetworkClient.get().getParams().get("csrf_token"), data -> {
+            FormElement formElement = (FormElement) data.select("form.submitForm").first();
+            if (formElement == null) {
+                System.out.println("Submission FORM NULL");
+                listener.onEvent(false);
+                return;
+            }
+
+            Elements option = formElement.select("select > option");
+            for (Element el : option) {
+                if (el.attr("selected").equals("selected")) {
+                    if (!el.text().trim().equals(lang)) el.removeAttr("selected");
+                } else {
+                    if (el.text().trim().equals(lang)) el.attr("selected", "selected");
+                }
+            }
+
+            formElement.select("input[name=\"source\"]").val(compilationTests.getSourceCode());
+
+            try {
+                Connection.Response response = formElement.submit().cookies(NetworkClient.get().getCookies()).data(NetworkClient.get().getParams())
+                        .followRedirects(true).execute();
+                NetworkClient.get().updateCookies(response.cookies());
+                listener.onEvent(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+                listener.onEvent(false);
+            }
+        });
+    }
 }

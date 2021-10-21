@@ -43,6 +43,7 @@ public class Controller {
 
     private final ProblemParser mProblemSetHandler = new ProblemParser();
     private SampleCompilationTests mCompilation = new SampleCompilationTests();
+    private ProblemParser.Problem mProblem = null;
 
     private boolean mStarted = false;
 
@@ -447,6 +448,7 @@ public class Controller {
 
     @FXML
     protected void webBtnGoBack() {
+        mProblem = null;
         mCompilation = new SampleCompilationTests();
         welcomePane.toFront();
         acceptedLabel.setVisible(false);
@@ -471,8 +473,41 @@ public class Controller {
     @FXML
     protected void compileTest() {mCompilation.compile(langSelector.getSelectionModel().getSelectedItem());}
 
+    @FXML
+    protected void submitCode() {
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
+        if (mProblem == null) return;
+
+        Alert alert = new Alert(Alert.AlertType.NONE, "Uploading ...");
+        alert.setTitle("Submitting");
+        alert.getButtonTypes().addAll(ButtonType.OK);
+        alert.getDialogPane().lookupButton(ButtonType.OK).setVisible(false);
+        alert.initOwner(Launcher.get().mStage);
+        alert.setOnShown(e -> Codeforces.submitCode(mCompilation, langSelector.getSelectionModel().getSelectedItem(),
+                Codeforces.HOST + mProblem.url, data -> Platform.runLater(() -> {
+                    alert.close();
+
+                    Alert infoAlert;
+                    if (data) {
+                        infoAlert = new Alert(Alert.AlertType.INFORMATION);
+                        infoAlert.setTitle("Submission");
+                        infoAlert.setContentText("Submitted successfully");
+                    } else {
+                        infoAlert = new Alert(Alert.AlertType.ERROR);
+                        infoAlert.setTitle("Submission error");
+                        infoAlert.setContentText("Could not submit");
+                    }
+                    infoAlert.showAndWait();
+                })));
+        alert.show();
+    }
+
     public void loadWebPage(ProblemParser.Problem pr) {
         mCompilation = new SampleCompilationTests();
+        mProblem = pr;
         compileBtn.setDisable(true);
         submitBtn.setDisable(true);
         selectedFile.setText("<No file selected>");
