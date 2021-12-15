@@ -278,12 +278,18 @@ public class Controller {
     @FXML
     private Button prevPageBtn, nextPageBtn, quesDownloadBtn, downloadedBtn;
 
+    @FXML
+    private Label queueLabel;
 
     @FXML
     private ProgressIndicator loadPageIndicator;
 
     @FXML
     private ProgressBar downloadProgress;
+
+    public void updateQueueLab(String updated) {
+        queueLabel.setText(updated);
+    }
 
     @FXML
     protected void applyDifficulty() {

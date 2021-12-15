@@ -198,6 +198,14 @@
                                 onAction="#filterDownloaded" prefHeight="25.0" prefWidth="173.0"
                                 text="Downloaded Questions" textAlignment="CENTER" wrapText="true"
                                 AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="133.0"/>
+                        <Label fx:id="queueLabel" contentDisplay="CENTER" layoutX="610.0" layoutY="228.0"
+                               prefHeight="17.0" text="Queued: 0"
+                               prefWidth="173.0" textAlignment="CENTER" textFill="#1a73e8"
+                               AnchorPane.bottomAnchor="155.0" AnchorPane.rightAnchor="17.0">
+                            <font>
+                                <Font size="16.0"/>
+                            </font>
+                        </Label>
                     </children>
                 </AnchorPane>
                 <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #fff;">
