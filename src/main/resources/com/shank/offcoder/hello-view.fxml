@@ -14,15 +14,14 @@
   ~ copies or substantial portions of the Software.
   -->
 
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<?import javafx.scene.web.*?>
-
+<?import javafx.scene.web.WebView?>
 <AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="800.0"
-            prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/11.0.2"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.controllers.Controller">
+            prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.shank.offcoder.controllers.Controller">
     <children>
         <StackPane prefHeight="400.0" prefWidth="800.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -162,38 +161,43 @@
                                 <Font size="14.0"/>
                             </font>
                         </Label>
-                        <TextField fx:id="difficultyTextField" layoutX="609.0" layoutY="67.0" prefHeight="25.0"
+                        <TextField fx:id="difficultyTextField" layoutX="609.0" layoutY="68.0" prefHeight="25.0"
                                    prefWidth="173.0" text="800" AnchorPane.rightAnchor="18.0"
-                                   AnchorPane.topAnchor="67.0"/>
-                        <Button fx:id="applyRateBtn" layoutX="735.0" layoutY="100.0" mnemonicParsing="false"
+                                   AnchorPane.topAnchor="68.0"/>
+                        <Button fx:id="applyRateBtn" layoutX="735.0" layoutY="101.0" mnemonicParsing="false"
                                 onAction="#applyDifficulty" text="Apply" AnchorPane.rightAnchor="18.0"
-                                AnchorPane.topAnchor="100.0"/>
-                        <ProgressIndicator fx:id="problemRetProgress" layoutX="709.0" layoutY="102.0" prefHeight="21.0"
-                                           prefWidth="19.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="102.0"/>
+                                AnchorPane.topAnchor="101.0"/>
+                        <ProgressIndicator fx:id="problemRetProgress" layoutX="709.0" layoutY="103.0" prefHeight="21.0"
+                                           prefWidth="19.0" AnchorPane.rightAnchor="72.0" AnchorPane.topAnchor="103.0"/>
                         <Button fx:id="prevPageBtn" disable="true" layoutX="609.0" layoutY="361.0"
                                 mnemonicParsing="false" onAction="#prevPage" prefHeight="25.0" prefWidth="66.0"
                                 text="Prev" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="125.0"/>
-                        <Button fx:id="nextPageBtn" layoutX="709.0" layoutY="361.0" mnemonicParsing="false"
+                        <Button fx:id="nextPageBtn" layoutX="716.0" layoutY="361.0" mnemonicParsing="false"
                                 onAction="#nextPage" prefHeight="25.0" prefWidth="66.0" text="Next"
-                                AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="39.0"/>
+                                AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="18.0"/>
                         <Label fx:id="pageNoLabel" layoutX="543.0" layoutY="364.0" text="Page: 1"
                                AnchorPane.bottomAnchor="16.0" AnchorPane.rightAnchor="212.0">
                             <font>
                                 <Font size="14.0"/>
                             </font>
                         </Label>
-                        <ProgressIndicator fx:id="loadPageIndicator" layoutX="767.0" layoutY="364.0" prefHeight="20.0"
+                        <ProgressIndicator fx:id="loadPageIndicator" layoutX="686.0" layoutY="364.0" prefHeight="20.0"
                                            prefWidth="19.0" AnchorPane.bottomAnchor="16.0"
-                                           AnchorPane.rightAnchor="14.0"/>
+                                           AnchorPane.rightAnchor="95.0"/>
                         <Button fx:id="quesDownloadBtn" layoutX="609.0" layoutY="298.0" mnemonicParsing="false"
-                                onAction="#downloadQuestions" prefHeight="25.0" prefWidth="152.0"
-                                text="Download Question" AnchorPane.bottomAnchor="77.0" AnchorPane.rightAnchor="39.0"/>
-                        <ProgressBar fx:id="downloadProgress" layoutX="609.0" layoutY="328.0" prefHeight="10.0"
-                                     prefWidth="152.0" progress="0.0" AnchorPane.bottomAnchor="62.0"
-                                     AnchorPane.rightAnchor="39.0"/>
-                        <Button fx:id="prevSubBtn" layoutX="609.0" layoutY="256.0" mnemonicParsing="false"
-                                onAction="#goToPrevSub" prefHeight="25.0" prefWidth="152.0" text="Previous Submission"
-                                AnchorPane.bottomAnchor="119.0" AnchorPane.rightAnchor="39.0"/>
+                                onAction="#downloadQuestions" prefHeight="25.0" prefWidth="173.0"
+                                text="Download Question" AnchorPane.bottomAnchor="77.0" AnchorPane.rightAnchor="18.0"/>
+                        <ProgressBar fx:id="downloadProgress" layoutX="609.0" layoutY="328.0" prefHeight="25.0"
+                                     prefWidth="173.0" progress="0.0" AnchorPane.bottomAnchor="47.0"
+                                     AnchorPane.rightAnchor="18.0"/>
+                        <Button fx:id="prevSubBtn" layoutX="630.0" layoutY="164.0" mnemonicParsing="false"
+                                onAction="#goToPrevSub" prefHeight="25.0" prefWidth="173.0" text="Previous Submissions"
+                                textAlignment="CENTER" wrapText="true" AnchorPane.rightAnchor="18.0"
+                                AnchorPane.topAnchor="164.0"/>
+                        <Button fx:id="downloadedBtn" layoutX="630.0" layoutY="133.0" mnemonicParsing="false"
+                                onAction="#filterDownloaded" prefHeight="25.0" prefWidth="173.0"
+                                text="Downloaded Questions" textAlignment="CENTER" wrapText="true"
+                                AnchorPane.rightAnchor="18.0" AnchorPane.topAnchor="133.0"/>
                     </children>
                 </AnchorPane>
                 <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #fff;">

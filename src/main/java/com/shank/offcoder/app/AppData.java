@@ -48,6 +48,13 @@ public class AppData {
     // Key for saving downloaded problems
     public static final String DOWNLOADED_QUES = "downloaded_ques";
 
+    public static final String P_RATING_KEY = "rating";
+    public static final String P_CODE_KEY = "code";
+    public static final String P_URL_KEY = "url";
+    public static final String P_HTML_KEY = "html";
+    public static final String P_NAME_KEY = "name";
+    public static final String P_ACCEPTED_KEY = "accepted";
+
     // Main json to hold all the data
     private static JSONObject mData = null;
 

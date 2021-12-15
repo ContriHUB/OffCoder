@@ -12,11 +12,8 @@ repositories {
 }
 
 ext {
-    junitVersion = '5.8.1'
+    junitVersion = '5.8.2'
 }
-
-sourceCompatibility = '15'
-targetCompatibility = '15'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
@@ -28,7 +25,7 @@ application {
 }
 
 javafx {
-    version = '15.0.1'
+    version = '11.0.1'
     modules = ['javafx.controls', 'javafx.fxml', 'javafx.web']
 }
 
@@ -37,7 +34,7 @@ dependencies {
     implementation('com.dlsc.formsfx:formsfx-core:11.4.2') {
         exclude(group: 'org.openjfx')
     }
-    implementation('net.synedra:validatorfx:0.1.13') {
+    implementation('net.synedra:validatorfx:0.2.1') {
         exclude(group: 'org.openjfx')
     }
     implementation('org.kordamp.ikonli:ikonli-javafx:12.2.0')

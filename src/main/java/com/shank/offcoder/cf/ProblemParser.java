@@ -42,6 +42,14 @@ public class ProblemParser {
 
         public Problem() {}
 
+        public Problem(String code, String name, String url, String rating, boolean accepted) {
+            this.code = code;
+            this.name = name;
+            this.url = url;
+            this.rating = rating;
+            this.accepted = accepted;
+        }
+
         @Override
         public String toString() {
             return "Problem{" +
@@ -142,9 +150,11 @@ public class ProblemParser {
             JSONArray probArr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
             for (Object obj : probArr) {
                 JSONObject jObj = (JSONObject) obj;
-                if (jObj.has(code) && !hasError(Jsoup.parse(jObj.getString(code)))) {
-                    System.out.println("Returning downloaded");
-                    return jObj.getString(code);
+                if (jObj.getString(AppData.P_CODE_KEY).equals(code)) {
+                    if (!hasError(Jsoup.parse(jObj.getString(AppData.P_HTML_KEY)))) {
+                        System.out.println("Returning downloaded");
+                        return jObj.getString(AppData.P_HTML_KEY);
+                    }
                 }
             }
         }

@@ -37,6 +37,7 @@ import org.jsoup.Jsoup;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +48,7 @@ public class Controller {
     private SampleCompilationTests mCompilation = new SampleCompilationTests();
     private ProblemParser.Problem mProblem = null;
 
-    private boolean mStarted = false;
+    private boolean mStarted = false, mShowingDownloaded = false;
 
     @FXML
     private TextField handleField, difficultyTextField;
@@ -100,7 +101,7 @@ public class Controller {
             List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
             quesDownloadBtn.setDisable(list.isEmpty());
 
-            if (!list.isEmpty()) quesDownloadBtn.setDisable(questionsDownloaded(list));
+            if (!list.isEmpty()) quesDownloadBtn.setDisable(areQuestionsDownloaded(list));
             quesDownloadBtn.setText("Download " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
         });
         quesDownloadBtn.setDisable(true);
@@ -151,8 +152,7 @@ public class Controller {
     protected void reAttemptLogin() {
         retryBtn.setVisible(false);
         splashText.setText("Loading ...");
-        attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR),
-                new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))), true);
+        attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR), new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))), true);
     }
 
     public void attemptLogin(String handle, String password, boolean auto) {
@@ -276,7 +276,8 @@ public class Controller {
     private Label pageNoLabel;
 
     @FXML
-    private Button prevPageBtn, nextPageBtn, quesDownloadBtn;
+    private Button prevPageBtn, nextPageBtn, quesDownloadBtn, downloadedBtn;
+
 
     @FXML
     private ProgressIndicator loadPageIndicator;
@@ -295,6 +296,8 @@ public class Controller {
             prevPageBtn.setDisable(true);
             nextPageBtn.setDisable(false);
             pageNoLabel.setText("Page: 1");
+
+            if (mShowingDownloaded) filterDownloaded();
 
             problemListView.getSelectionModel().clearSelection();
             mProblemSetHandler.changeDifficulty(Integer.parseInt(difficultyTextField.getText().trim()), data -> populateListView(data, true));
@@ -328,6 +331,7 @@ public class Controller {
         problemListView.setDisable(true);
         quesDownloadBtn.setDisable(true);
         applyRateBtn.setDisable(true);
+        downloadedBtn.setDisable(true);
 
         wasPrevBtnDisabled = prevPageBtn.isDisabled();
         prevPageBtn.setDisable(true);
@@ -339,6 +343,7 @@ public class Controller {
             prevSubBtn.setDisable(false);
             problemListView.setDisable(false);
             applyRateBtn.setDisable(false);
+            downloadedBtn.setDisable(false);
 
             if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
             if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
@@ -370,25 +375,25 @@ public class Controller {
                     continue;
                 }
 
-                arr.put(new JSONObject().put(p.code, html));
+                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating));
             }
             AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
             listener.onEvent(failedCount);
         }).start();
     }
 
-    private boolean questionDownloaded(String code) {
+    private boolean isQuestionDownloaded(String code) {
         JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
         if (arr.isEmpty()) return false;
 
         for (Object obj : arr) {
             JSONObject jObj = (JSONObject) obj;
-            if (jObj.has(code)) return true;
+            if (jObj.getString(AppData.P_CODE_KEY).equals(code)) return true;
         }
         return false;
     }
 
-    private boolean questionsDownloaded(List<ProblemParser.Problem> list) {
+    private boolean areQuestionsDownloaded(List<ProblemParser.Problem> list) {
         JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
         if (arr.isEmpty()) return false;
 
@@ -396,7 +401,7 @@ public class Controller {
         for (ProblemParser.Problem p : list) {
             for (Object obj : arr) {
                 JSONObject jObj = (JSONObject) obj;
-                if (jObj.has(p.code)) {
+                if (jObj.getString(AppData.P_CODE_KEY).equals(p.code)) {
                     count++;
                     break;
                 }
@@ -429,6 +434,36 @@ public class Controller {
             if (!prev.get(i).equals(next.get(i))) return true;
         }
         return false;
+    }
+
+    @FXML
+    protected void filterDownloaded() {
+        if (!mShowingDownloaded) {
+            mShowingDownloaded = true;
+            downloadedBtn.setText("Question Lists");
+
+            JSONArray probArr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+            List<ProblemParser.Problem> list = new ArrayList<>();
+            for (Object obj : probArr) {
+                JSONObject jObj = (JSONObject) obj;
+                list.add(new ProblemParser.Problem(jObj.getString(AppData.P_CODE_KEY), jObj.getString(AppData.P_NAME_KEY), jObj.getString(AppData.P_URL_KEY), jObj.getString(AppData.P_RATING_KEY), jObj.getBoolean(AppData.P_ACCEPTED_KEY)));
+            }
+            populateListView(list, false);
+            quesDownloadBtn.setDisable(true);
+            return;
+        }
+        if (NetworkClient.isNetworkNotConnected()) {
+            showNetworkErrDialog();
+            return;
+        }
+        problemRetProgress.setVisible(true);
+        mShowingDownloaded = false;
+        downloadedBtn.setText("Downloaded Questions");
+        AppThreader.delay(() -> {
+            mProblemSetHandler.get(data -> populateListView(data, false));
+            problemRetProgress.setVisible(false);
+            quesDownloadBtn.setDisable(false);
+        }, 250);
     }
 
     // ----------------- PROBLEM VIEW PAGE ----------------- //
@@ -479,8 +514,7 @@ public class Controller {
     protected void submitCode() {
         if (mProblem == null) return;
         if (NetworkClient.isNetworkNotConnected()) {
-            SubmissionQueue.get().queue(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem),
-                    this::showSubmitDialog);
+            SubmissionQueue.get().queue(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem), this::showSubmitDialog);
             return;
         }
 
@@ -490,9 +524,7 @@ public class Controller {
         alert.getDialogPane().lookupButton(ButtonType.OK).setVisible(false);
         alert.initOwner(Launcher.get().mStage);
         alert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::consume);
-        alert.setOnShown(e -> Codeforces.submitCode(
-                new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem),
-                data -> Platform.runLater(() -> {
+        alert.setOnShown(e -> Codeforces.submitCode(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem), data -> Platform.runLater(() -> {
                     alert.close();
                     showSubmitDialog(data);
                 })));
@@ -520,7 +552,7 @@ public class Controller {
         submitBtn.setDisable(true);
         selectedFile.setText("<No file selected>");
 
-        boolean downloaded = questionDownloaded(pr.code);
+        boolean downloaded = isQuestionDownloaded(pr.code);
         if (!downloaded) {
             if (NetworkClient.isNetworkNotConnected()) {
                 ((Controller) Launcher.get().mFxmlLoader.getController()).showNetworkErrDialog();
