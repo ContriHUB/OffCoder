@@ -29,6 +29,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class for handling parsing problems
+ * and paging of list of problems
+ */
 public class ProblemParser {
 
     private int minDifficulty = 0, maxDifficulty = 800, page = 1;

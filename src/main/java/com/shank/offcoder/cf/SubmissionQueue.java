@@ -26,6 +26,9 @@ import java.util.Base64;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Class for handling submission queue
+ */
 public class SubmissionQueue {
 
     private boolean mWorking = false;

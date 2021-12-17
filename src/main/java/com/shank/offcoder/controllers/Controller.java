@@ -80,6 +80,10 @@ public class Controller {
     @FXML
     private Button retryBtn;
 
+    /**
+     * Main UI method to initialize views
+     * with their default settings.
+     */
     @FXML
     private void initialize() {
         if (!AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) loginPane.toFront();
@@ -94,7 +98,6 @@ public class Controller {
         submitBtn.setDisable(true);
 
         prevSubListView.setCellFactory(para -> new SubmissionCell());
-
         problemListView.setCellFactory(param -> new ProblemCell());
         problemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         problemListView.setOnMouseClicked(event -> {
@@ -129,6 +132,12 @@ public class Controller {
     @FXML
     private Button applyRateBtn;
 
+    /**
+     * Function to log in user from Login Page
+     * <p>
+     * This method checks input and network connect then executes
+     * {@link #attemptLogin(String, String, boolean)}
+     */
     @FXML
     protected void loginUser() {
         if (NetworkClient.isNetworkNotConnected()) {
@@ -148,6 +157,9 @@ public class Controller {
         }
     }
 
+    /**
+     * In case of network error, this method is called
+     */
     @FXML
     protected void reAttemptLogin() {
         retryBtn.setVisible(false);
@@ -155,6 +167,10 @@ public class Controller {
         attemptLogin(AppData.get().getData(AppData.HANDLE_KEY, AppData.NULL_STR), new String(Base64.getDecoder().decode(AppData.get().getData(AppData.PASS_KEY, AppData.NULL_STR))), true);
     }
 
+    /**
+     * The main method of logging in;
+     * {@link Codeforces#login(String, String, AppThreader.EventListener)}
+     */
     public void attemptLogin(String handle, String password, boolean auto) {
         if (NetworkClient.isNetworkNotConnected()) {
             mStarted = false;
@@ -217,6 +233,9 @@ public class Controller {
         }));
     }
 
+    /**
+     * Method to logout
+     */
     @FXML
     protected void logoutUser() {
         if (NetworkClient.isNetworkNotConnected()) {
@@ -239,6 +258,10 @@ public class Controller {
         attemptLogout();
     }
 
+    /**
+     * The main method of logout;
+     * {@link Codeforces#logout(AppThreader.EventListener)}
+     */
     private void attemptLogout() {
         if (NetworkClient.isNetworkNotConnected()) {
             showNetworkErrDialog();
@@ -287,10 +310,16 @@ public class Controller {
     @FXML
     private ProgressBar downloadProgress;
 
+    /**
+     * Method to update the "Queue" label on home page
+     */
     public void updateQueueLab(String updated) {
         queueLabel.setText(updated);
     }
 
+    /**
+     * Method to fetch problems according to rating (difficulty)
+     */
     @FXML
     protected void applyDifficulty() {
         if (NetworkClient.isNetworkNotConnected()) {
@@ -324,6 +353,10 @@ public class Controller {
 
     private boolean wasPrevBtnDisabled, wasNextBtnDisabled;
 
+    /**
+     * Method that download questions and handle UI as well.
+     * calls: {@link #_downloadQues(List, AppThreader.EventListener)}
+     */
     @FXML
     protected void downloadQuestions() {
         if (NetworkClient.isNetworkNotConnected()) {
@@ -365,6 +398,9 @@ public class Controller {
         }));
     }
 
+    /**
+     * Main method to download questions and save them.
+     */
     private void _downloadQues(final List<ProblemParser.Problem> list, AppThreader.EventListener<Integer> listener) {
         new Thread(() -> {
             JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
@@ -416,6 +452,13 @@ public class Controller {
         return count == list.size();
     }
 
+    /**
+     * Method to show the list of problems on UI
+     *
+     * @param list       The list of problems
+     * @param diffChange The page number will change if this is `false`
+     *                   else it will reset to "Page 1"
+     */
     private void populateListView(List<ProblemParser.Problem> list, boolean diffChange) {
         if (NetworkClient.isNetworkNotConnected()) {
             showNetworkErrDialog();
@@ -424,7 +467,7 @@ public class Controller {
         Platform.runLater(() -> {
             problemRetProgress.setVisible(false);
             prevPageBtn.setDisable(mProblemSetHandler.getPage() == 1);
-            boolean updated = listUpdated(list, problemListView.getItems());
+            boolean updated = isListUpdated(list, problemListView.getItems());
             nextPageBtn.setDisable(!updated && !diffChange);
             pageNoLabel.setText("Page: " + (updated || diffChange ? mProblemSetHandler.getPage() : mProblemSetHandler.revertPage()));
 
@@ -433,7 +476,10 @@ public class Controller {
         });
     }
 
-    private boolean listUpdated(List<ProblemParser.Problem> prev, List<ProblemParser.Problem> next) {
+    /**
+     * @return whether the list of problems have updated
+     */
+    private boolean isListUpdated(List<ProblemParser.Problem> prev, List<ProblemParser.Problem> next) {
         if (prev.isEmpty() || next.isEmpty()) return true;
         if (prev.size() != next.size()) return true;
         for (int i = 0; i < prev.size(); i++) {
@@ -442,6 +488,9 @@ public class Controller {
         return false;
     }
 
+    /**
+     * Method to toggle showing of all the downloaded questions.
+     */
     @FXML
     protected void filterDownloaded() {
         if (!mShowingDownloaded) {
@@ -489,6 +538,9 @@ public class Controller {
     @FXML
     private ChoiceBox<String> langSelector;
 
+    /**
+     * Method to go back to problem list view from question view
+     */
     @FXML
     protected void webBtnGoBack() {
         mProblem = null;
@@ -498,6 +550,10 @@ public class Controller {
         webView.getEngine().load("about:blank");
     }
 
+    /**
+     * Method to select file from system
+     * for testing test cases.
+     */
     @FXML
     protected void selectFile() {
         FileChooser chooser = new FileChooser();
@@ -513,9 +569,20 @@ public class Controller {
         }
     }
 
+    /**
+     * Method that compiles, test and
+     * give verdict on sample test cases
+     */
     @FXML
     protected void compileTest() {mCompilation.compile(langSelector.getSelectionModel().getSelectedItem());}
 
+    /**
+     * Method to submit code.
+     * <p>
+     * This will queue the submission in {@link SubmissionQueue}
+     * and {@link SubmissionQueue} will submit the code when connected
+     * to network.
+     */
     @FXML
     protected void submitCode() {
         if (mProblem == null) return;
@@ -530,7 +597,8 @@ public class Controller {
         alert.getDialogPane().lookupButton(ButtonType.OK).setVisible(false);
         alert.initOwner(Launcher.get().mStage);
         alert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::consume);
-        alert.setOnShown(e -> Codeforces.submitCode(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem), data -> Platform.runLater(() -> {
+        alert.setOnShown(e -> Codeforces.submitCode(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem),
+                data -> Platform.runLater(() -> {
                     alert.close();
                     showSubmitDialog(data);
                 })));
@@ -551,6 +619,9 @@ public class Controller {
         infoAlert.showAndWait();
     }
 
+    /**
+     * Method that loads the problem HTML
+     */
     public void loadWebPage(ProblemParser.Problem pr) {
         mCompilation = new SampleCompilationTests();
         mProblem = pr;

@@ -48,6 +48,7 @@ public class AppData {
     // Key for saving downloaded problems
     public static final String DOWNLOADED_QUES = "downloaded_ques";
 
+    // Keys for data of each downloaded question
     public static final String P_RATING_KEY = "rating";
     public static final String P_CODE_KEY = "code";
     public static final String P_URL_KEY = "url";

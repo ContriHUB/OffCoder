@@ -19,6 +19,9 @@ import javafx.application.Platform;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/**
+ * Thread utils class
+ */
 public class AppThreader {
 
     /**

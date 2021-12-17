@@ -234,6 +234,9 @@ public class SampleCompilationTests {
 
     /**
      * Method to execute command
+     * <p>
+     * Creates a {@link Process} by executing the
+     * code runner command in runtime.
      */
     private void runCommand(ProcessListener listener, String[] command) {
         try {
@@ -259,7 +262,7 @@ public class SampleCompilationTests {
     }
 
     /**
-     * Method to copy the to local storage for compilation
+     * Method to copy the {@link #mSourceCode} to local storage for compilation
      */
     private File writeTempCode() {
         File tempFile = new File(AppData.get().getDataFolder(), "temp" + mExt);

@@ -31,6 +31,7 @@ public class NetworkClient {
     // Cookies for persisting session
     private final Map<String, String> mCookies = new HashMap<>(), mParams = new HashMap<>();
 
+    // Singleton instance
     private static volatile NetworkClient _instance = null;
 
     public static NetworkClient get() {
@@ -40,6 +41,9 @@ public class NetworkClient {
 
     private NetworkClient() {}
 
+    /**
+     * Initiate login parameters required by GET request of codeforces
+     */
     public void setParams(String csrf, String ftaa, String handle, String password) {
         mParams.put("csrf_token", csrf);
         mParams.put("action", "enter");
