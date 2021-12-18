@@ -16,6 +16,7 @@ package com.shank.offcoder.cf;
 
 import com.shank.offcoder.Launcher;
 import com.shank.offcoder.app.AppData;
+import com.shank.offcoder.cli.CommandLine;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -25,7 +26,10 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,16 +43,6 @@ public class SampleCompilationTests {
     private String mSourceCode = AppData.NULL_STR, mExt = AppData.NULL_STR, mDoc = AppData.NULL_STR;
     private Alert alert;
     private final List<String> mFailed = new ArrayList<>();
-
-    /**
-     * Interface to listen program execution
-     */
-    public interface ProcessListener {
-
-        void onCompleted(int exitCode, String output);
-
-        void onError(String err);
-    }
 
     /**
      * Class to store each sample test
@@ -104,7 +98,7 @@ public class SampleCompilationTests {
         alert.getButtonTypes().addAll(ButtonType.OK);
         alert.getDialogPane().lookupButton(ButtonType.OK).setVisible(false);
         alert.initOwner(Launcher.get().mStage);
-        alert.setOnShown(event -> runCommand(new ProcessListener() {
+        alert.setOnShown(event -> CommandLine.runCommand(new CommandLine.ProcessListener() {
             @Override
             public void onCompleted(int exitCode, String output) {
                 if (exitCode == 0) {
@@ -132,7 +126,7 @@ public class SampleCompilationTests {
                 });
                 System.out.println("Cmd: err : " + err);
             }
-        }, cmd));
+        }, cmd, false));
         alert.show();
     }
 
@@ -148,34 +142,36 @@ public class SampleCompilationTests {
                     alert.close();
                     alert = null;
                 }
-                Alert failedDialog;
+                Alert resultDialog;
                 if (mFailed.isEmpty()) {
-                    failedDialog = new Alert(Alert.AlertType.INFORMATION);
-                    failedDialog.setTitle("Test case(s) passed");
-                    failedDialog.setHeaderText("All cased passed.");
+                    resultDialog = new Alert(Alert.AlertType.INFORMATION);
+                    resultDialog.setTitle("Test case(s) passed");
+                    resultDialog.setHeaderText("All cased passed.");
                 } else {
-                    failedDialog = new Alert(Alert.AlertType.ERROR);
-                    failedDialog.setTitle("Test case(s) failed");
+                    resultDialog = new Alert(Alert.AlertType.ERROR);
+                    resultDialog.setTitle("Test case(s) failed");
 
                     StringBuilder sb = new StringBuilder();
                     for (String s : mFailed) sb.append(s).append("\n");
-                    failedDialog.setContentText(sb.toString());
+                    resultDialog.setContentText(sb.toString());
                 }
-                failedDialog.initOwner(Launcher.get().mStage);
-                failedDialog.showAndWait();
+                resultDialog.initOwner(Launcher.get().mStage);
+                resultDialog.showAndWait();
                 mFailed.clear();
             });
             return;
         }
         writeTest(list.get(idx).input);
-        runCommand(new ProcessListener() {
+        CommandLine.runCommand(new CommandLine.ProcessListener() {
             @Override
             public void onCompleted(int exitCode, String output) {
-                if (exitCode == 0) {
+                if (exitCode == 0 || exitCode == CommandLine.TIME_OUT_EXIT) {
                     output = output.replaceAll("\r", "");
                     String expOutput = list.get(idx).output;
 
-                    if (outputMatches(output, expOutput)) {
+                    if (exitCode == CommandLine.TIME_OUT_EXIT) {
+                        mFailed.add("Test " + (idx + 1) + " failed:\nTIME LIMIT EXCEEDED");
+                    } else if (outputMatches(output, expOutput)) {
                         System.out.println("Passed: Expected: " + expOutput + "; Got: " + output);
                     } else {
                         mFailed.add("Test " + (idx + 1) + " failed:\nExpected: " + expOutput + " - Got: " + output);
@@ -187,7 +183,7 @@ public class SampleCompilationTests {
 
             @Override
             public void onError(String err) {System.out.println("Exec: err : " + err);}
-        }, new String[]{"cmd.exe", "/c", "data\\temp.exe", "<", "data\\input.txt"});
+        }, new String[]{"cmd.exe", "/c", "data\\temp.exe", "<", "data\\input.txt"}, true);
     }
 
     /**
@@ -229,35 +225,6 @@ public class SampleCompilationTests {
             fos.write(input.getBytes(StandardCharsets.UTF_8));
         } catch (Exception e) {
             e.printStackTrace();
-        }
-    }
-
-    /**
-     * Method to execute command
-     * <p>
-     * Creates a {@link Process} by executing the
-     * code runner command in runtime.
-     */
-    private void runCommand(ProcessListener listener, String[] command) {
-        try {
-            Process process = Runtime.getRuntime().exec(command);
-
-            InputStream is = process.getInputStream();
-            InputStream errStream = process.getErrorStream();
-
-            StringBuilder sb = new StringBuilder(), errSb = new StringBuilder();
-            int val;
-            while ((val = is.read()) != -1) sb.append((char) val);
-            while ((val = errStream.read()) != -1) errSb.append((char) val);
-
-            int exitCode = process.waitFor();
-            if (process.exitValue() != 0) {
-                listener.onError(errSb.toString());
-            }
-            listener.onCompleted(exitCode, sb.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
-            listener.onCompleted(-1, "");
         }
     }
 
