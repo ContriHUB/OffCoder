@@ -22,6 +22,7 @@ import com.shank.offcoder.cf.Codeforces;
 import com.shank.offcoder.cf.ProblemParser;
 import com.shank.offcoder.cf.SampleCompilationTests;
 import com.shank.offcoder.cf.SubmissionQueue;
+import com.shank.offcoder.cli.CompilerManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
@@ -47,6 +48,7 @@ public class Controller {
     private final ProblemParser mProblemSetHandler = new ProblemParser();
     private SampleCompilationTests mCompilation = new SampleCompilationTests();
     private ProblemParser.Problem mProblem = null;
+    private final CompilerManager mCompilerManager = CompilerManager.getInstance();
 
     private boolean mStarted = false, mShowingDownloaded = false;
 
@@ -117,14 +119,12 @@ public class Controller {
         });
         webView.getEngine().load("about:blank");
 
-        langSelector.setItems(FXCollections.observableArrayList(Codeforces.mLang));
         langSelector.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             System.out.println("Selected: " + newValue);
             String loadedExt = mCompilation.getExt(), expectedExt = Codeforces.getLangExt(newValue);
             compileBtn.setDisable(!loadedExt.equals(expectedExt));
             submitBtn.setDisable(!loadedExt.equals(expectedExt));
         });
-        langSelector.setValue(Codeforces.mLang[0]);
     }
 
     // ----------------- LOGIN / LOGOUT ----------------- //
@@ -643,6 +643,7 @@ public class Controller {
             String html = ProblemParser.trimHTML(ProblemParser.getQuestion(Codeforces.HOST + pr.url, pr.code));
             webView.getEngine().loadContent(html);
             mCompilation.setDoc(html);
+            langSelector.setItems(FXCollections.observableArrayList(mCompilerManager.getLanguageList()));
         });
     }
 

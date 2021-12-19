@@ -176,17 +176,12 @@ public class Codeforces {
      * Store the mapping of key being language and value exit
      */
     private static final Map<String, String> mLangID = new HashMap<>();
-    public static final String[] mLang = {"GNU GCC C11 5.1.0",
-            "GNU G++14 6.4.0", "GNU G++17 7.3.0",
-            "Java 11.0.5", "Kotlin 1.3.10",
-            "Python 2.7.15", "Python 3.7.2"};
 
     static {
         mLangID.put("GNU GCC C11 5.1.0", ".c");
         mLangID.put("GNU G++14 6.4.0", ".cpp");
         mLangID.put("GNU G++17 7.3.0", ".cpp");
         mLangID.put("Java 11.0.5", ".java");
-        mLangID.put("Kotlin 1.3.10", ".kt");
         mLangID.put("Python 2.7.15", ".py");
         mLangID.put("Python 3.7.2", ".py");
     }

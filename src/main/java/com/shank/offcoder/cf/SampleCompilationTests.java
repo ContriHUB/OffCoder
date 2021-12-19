@@ -17,6 +17,7 @@ package com.shank.offcoder.cf;
 import com.shank.offcoder.Launcher;
 import com.shank.offcoder.app.AppData;
 import com.shank.offcoder.cli.CommandLine;
+import com.shank.offcoder.cli.CompilerManager;
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
@@ -42,6 +43,7 @@ public class SampleCompilationTests {
 
     private String mSourceCode = AppData.NULL_STR, mExt = AppData.NULL_STR, mDoc = AppData.NULL_STR;
     private Alert alert;
+    private final CompilerManager mCompilerManager = CompilerManager.getInstance();
     private final List<String> mFailed = new ArrayList<>();
 
     /**
@@ -90,7 +92,7 @@ public class SampleCompilationTests {
         File compileCode = writeTempCode();
         if (compileCode == null) return;
 
-        String[] cmd = getCommand(compileCode, lang);
+        String[] cmd = mCompilerManager.getCommandWithShell(getCommand(compileCode, lang));
         System.out.println(Arrays.toString(cmd));
 
         alert = new Alert(Alert.AlertType.NONE, "Compiling");
@@ -183,7 +185,7 @@ public class SampleCompilationTests {
 
             @Override
             public void onError(String err) {System.out.println("Exec: err : " + err);}
-        }, new String[]{"cmd.exe", "/c", "data\\temp.exe", "<", "data\\input.txt"}, true);
+        }, mCompilerManager.getCommandWithShell(new String[]{"data\\temp.exe", "<", "data\\input.txt"}), true);
     }
 
     /**
