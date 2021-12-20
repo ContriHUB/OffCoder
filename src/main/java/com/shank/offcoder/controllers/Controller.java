@@ -140,21 +140,19 @@ public class Controller {
      */
     @FXML
     protected void loginUser() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        if (mStarted) return;
-        mStarted = true;
+        NetworkClient.withNetwork(__ -> {
+            if (mStarted) return;
+            mStarted = true;
 
-        String handle = handleField.getText().trim(), password = passwordField.getText().trim();
-        if (!handle.isEmpty() && !password.isEmpty()) {
-            System.out.println("Handle: " + handleField.getText().trim());
-            System.out.println("Got Password");
+            String handle = handleField.getText().trim(), password = passwordField.getText().trim();
+            if (!handle.isEmpty() && !password.isEmpty()) {
+                System.out.println("Handle: " + handleField.getText().trim());
+                System.out.println("Got Password");
 
-            loginProgress.setVisible(mStarted);
-            attemptLogin(handle, password, false);
-        }
+                loginProgress.setVisible(mStarted);
+                attemptLogin(handle, password, false);
+            }
+        }, null);
     }
 
     /**
@@ -169,10 +167,59 @@ public class Controller {
 
     /**
      * The main method of logging in;
-     * {@link Codeforces#login(String, String, AppThreader.EventListener)}
+     * {@link Codeforces#login(String, String, AppThreader.EventCallback)}
      */
     public void attemptLogin(String handle, String password, boolean auto) {
-        if (NetworkClient.isNetworkNotConnected()) {
+        NetworkClient.withNetwork(__ -> {
+            if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) {
+                mStarted = false;
+                loginProgress.setVisible(false);
+                return;
+            }
+
+            Codeforces.login(handle, password, ret -> Platform.runLater(() -> {
+                if (ret.equals("Codeforces down")) {
+                    mStarted = false;
+                    Alert dialog = new Alert(Alert.AlertType.ERROR);
+                    dialog.setTitle("Connection Error");
+                    dialog.setHeaderText(null);
+                    dialog.setContentText("Codeforces down");
+                    dialog.initOwner(Launcher.get().mStage);
+                    loginProgress.setVisible(false);
+
+                    dialog.showAndWait();
+                    handleField.setText("");
+                    passwordField.setText("");
+                    return;
+                }
+                if (ret.equals("Login Failed") || ret.equals("Error")) {
+                    Alert dialog = new Alert(Alert.AlertType.ERROR);
+                    dialog.setTitle("Login Error");
+                    dialog.setHeaderText(null);
+                    dialog.setContentText("Invalid handle or password");
+                    dialog.initOwner(Launcher.get().mStage);
+                    loginProgress.setVisible(false);
+                    dialog.showAndWait();
+                    passwordField.setText("");
+                } else {
+                    handleField.setText("");
+                    passwordField.setText("");
+                    Launcher.get().freeWindowSize();
+                    welcomePane.toFront();
+                    userWelcome.setText("Welcome " + ret + " !");
+
+                    AppThreader.delay(() -> mProblemSetHandler.get(data -> populateListView(data, false)), 150);
+                    if (rememberCheck.isSelected()) {
+                        AppData app = AppData.get();
+                        app.writeData(AppData.HANDLE_KEY, ret);
+                        app.writeData(AppData.PASS_KEY, Base64.getEncoder().encodeToString(password.getBytes(StandardCharsets.UTF_8)));
+                        app.writeData(AppData.AUTO_LOGIN_KEY, true);
+                    }
+                }
+                mStarted = false;
+                loginProgress.setVisible(false);
+            }));
+        }, __ -> {
             mStarted = false;
             if (auto) {
                 splashText.setText("Couldn't connect codeforces");
@@ -181,56 +228,7 @@ public class Controller {
                 showNetworkErrDialog();
                 loginProgress.setVisible(false);
             }
-            return;
-        }
-        if (handle.equals(AppData.NULL_STR) || password.equals(AppData.NULL_STR)) {
-            mStarted = false;
-            loginProgress.setVisible(false);
-            return;
-        }
-
-        Codeforces.login(handle, password, ret -> Platform.runLater(() -> {
-            if (ret.equals("Codeforces down")) {
-                mStarted = false;
-                Alert dialog = new Alert(Alert.AlertType.ERROR);
-                dialog.setTitle("Connection Error");
-                dialog.setHeaderText(null);
-                dialog.setContentText("Codeforces down");
-                dialog.initOwner(Launcher.get().mStage);
-                loginProgress.setVisible(false);
-
-                dialog.showAndWait();
-                handleField.setText("");
-                passwordField.setText("");
-                return;
-            }
-            if (ret.equals("Login Failed") || ret.equals("Error")) {
-                Alert dialog = new Alert(Alert.AlertType.ERROR);
-                dialog.setTitle("Login Error");
-                dialog.setHeaderText(null);
-                dialog.setContentText("Invalid handle or password");
-                dialog.initOwner(Launcher.get().mStage);
-                loginProgress.setVisible(false);
-                dialog.showAndWait();
-                passwordField.setText("");
-            } else {
-                handleField.setText("");
-                passwordField.setText("");
-                Launcher.get().freeWindowSize();
-                welcomePane.toFront();
-                userWelcome.setText("Welcome " + ret + " !");
-
-                AppThreader.delay(() -> mProblemSetHandler.get(data -> populateListView(data, false)), 150);
-                if (rememberCheck.isSelected()) {
-                    AppData app = AppData.get();
-                    app.writeData(AppData.HANDLE_KEY, ret);
-                    app.writeData(AppData.PASS_KEY, Base64.getEncoder().encodeToString(password.getBytes(StandardCharsets.UTF_8)));
-                    app.writeData(AppData.AUTO_LOGIN_KEY, true);
-                }
-            }
-            mStarted = false;
-            loginProgress.setVisible(false);
-        }));
+        });
     }
 
     /**
@@ -238,36 +236,30 @@ public class Controller {
      */
     @FXML
     protected void logoutUser() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        if (mStarted) return;
-        mStarted = true;
+        NetworkClient.withNetwork(__ -> {
+            if (mStarted) return;
+            mStarted = true;
 
-        if (!AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray()).isEmpty()) {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-            alert.setTitle("Confirmation");
-            alert.setHeaderText("Are you sure to logout ?");
-            alert.setContentText("You will loose all the downloaded questions.");
+            if (!AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray()).isEmpty()) {
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                alert.setTitle("Confirmation");
+                alert.setHeaderText("Are you sure to logout ?");
+                alert.setContentText("You will loose all the downloaded questions.");
 
-            Optional<ButtonType> result = alert.showAndWait();
-            if (result.isPresent() && result.get() == ButtonType.OK) attemptLogout();
-            return;
-        }
-        attemptLogout();
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.isPresent() && result.get() == ButtonType.OK) attemptLogout();
+                return;
+            }
+            attemptLogout();
+        }, null);
     }
 
     /**
      * The main method of logout;
-     * {@link Codeforces#logout(AppThreader.EventListener)}
+     * {@link Codeforces#logout(AppThreader.EventCallback)}
      */
     private void attemptLogout() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        Codeforces.logout(data -> {
+        NetworkClient.withNetwork(__ -> Codeforces.logout(data -> {
             if (data) {
                 Platform.runLater(() -> {
                     problemListView.getSelectionModel().clearSelection();
@@ -279,7 +271,7 @@ public class Controller {
                 });
             }
             mStarted = false;
-        });
+        }), null);
     }
 
     public void showNetworkErrDialog() {
@@ -322,21 +314,19 @@ public class Controller {
      */
     @FXML
     protected void applyDifficulty() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        problemRetProgress.setVisible(true);
-        AppThreader.delay(() -> {
-            prevPageBtn.setDisable(true);
-            nextPageBtn.setDisable(false);
-            pageNoLabel.setText("Page: 1");
+        NetworkClient.withNetwork(__ -> {
+            problemRetProgress.setVisible(true);
+            AppThreader.delay(() -> {
+                prevPageBtn.setDisable(true);
+                nextPageBtn.setDisable(false);
+                pageNoLabel.setText("Page: 1");
 
-            if (mShowingDownloaded) filterDownloaded();
+                if (mShowingDownloaded) filterDownloaded();
 
-            problemListView.getSelectionModel().clearSelection();
-            mProblemSetHandler.changeDifficulty(Integer.parseInt(difficultyTextField.getText().trim()), data -> populateListView(data, true));
-        }, 500);
+                problemListView.getSelectionModel().clearSelection();
+                mProblemSetHandler.changeDifficulty(Integer.parseInt(difficultyTextField.getText().trim()), data -> populateListView(data, true));
+            }, 500);
+        }, null);
     }
 
     @FXML
@@ -355,53 +345,51 @@ public class Controller {
 
     /**
      * Method that download questions and handle UI as well.
-     * calls: {@link #_downloadQues(List, AppThreader.EventListener)}
+     * calls: {@link #_downloadQues(List, AppThreader.EventCallback)}
      */
     @FXML
     protected void downloadQuestions() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        final List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
-        if (list.isEmpty()) return;
+        NetworkClient.withNetwork(__ -> {
+            final List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
+            if (list.isEmpty()) return;
 
-        prevSubBtn.setDisable(true);
-        problemListView.setDisable(true);
-        quesDownloadBtn.setDisable(true);
-        applyRateBtn.setDisable(true);
-        downloadedBtn.setDisable(true);
+            prevSubBtn.setDisable(true);
+            problemListView.setDisable(true);
+            quesDownloadBtn.setDisable(true);
+            applyRateBtn.setDisable(true);
+            downloadedBtn.setDisable(true);
 
-        wasPrevBtnDisabled = prevPageBtn.isDisabled();
-        prevPageBtn.setDisable(true);
+            wasPrevBtnDisabled = prevPageBtn.isDisabled();
+            prevPageBtn.setDisable(true);
 
-        wasNextBtnDisabled = nextPageBtn.isDisabled();
-        nextPageBtn.setDisable(true);
-        downloadProgress.setVisible(true);
-        _downloadQues(list, data -> Platform.runLater(() -> {
-            prevSubBtn.setDisable(false);
-            problemListView.setDisable(false);
-            applyRateBtn.setDisable(false);
-            downloadedBtn.setDisable(false);
+            wasNextBtnDisabled = nextPageBtn.isDisabled();
+            nextPageBtn.setDisable(true);
+            downloadProgress.setVisible(true);
+            _downloadQues(list, data -> Platform.runLater(() -> {
+                prevSubBtn.setDisable(false);
+                problemListView.setDisable(false);
+                applyRateBtn.setDisable(false);
+                downloadedBtn.setDisable(false);
 
-            if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
-            if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
-            downloadProgress.setVisible(false);
-            if (data != 0) {
-                Alert dialog = new Alert(Alert.AlertType.ERROR);
-                dialog.setTitle("Network Error");
-                dialog.setHeaderText(null);
-                dialog.setContentText("Couldn't download all questions\nFailed " + data + " questions.");
-                dialog.initOwner(Launcher.get().mStage);
-                dialog.showAndWait();
-            }
-        }));
+                if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
+                if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
+                downloadProgress.setVisible(false);
+                if (data != 0) {
+                    Alert dialog = new Alert(Alert.AlertType.ERROR);
+                    dialog.setTitle("Network Error");
+                    dialog.setHeaderText(null);
+                    dialog.setContentText("Couldn't download all questions\nFailed " + data + " questions.");
+                    dialog.initOwner(Launcher.get().mStage);
+                    dialog.showAndWait();
+                }
+            }));
+        }, null);
     }
 
     /**
      * Main method to download questions and save them.
      */
-    private void _downloadQues(final List<ProblemParser.Problem> list, AppThreader.EventListener<Integer> listener) {
+    private void _downloadQues(final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
         new Thread(() -> {
             JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
             double counter = 0;
@@ -460,11 +448,7 @@ public class Controller {
      *                   else it will reset to "Page 1"
      */
     private void populateListView(List<ProblemParser.Problem> list, boolean diffChange) {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        Platform.runLater(() -> {
+        NetworkClient.withNetwork(__ -> {
             problemRetProgress.setVisible(false);
             prevPageBtn.setDisable(mProblemSetHandler.getPage() == 1);
             boolean updated = isListUpdated(list, problemListView.getItems());
@@ -473,7 +457,7 @@ public class Controller {
 
             problemListView.getItems().setAll(list);
             loadPageIndicator.setVisible(false);
-        });
+        }, null);
     }
 
     /**
@@ -507,18 +491,16 @@ public class Controller {
             quesDownloadBtn.setDisable(true);
             return;
         }
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        problemRetProgress.setVisible(true);
-        mShowingDownloaded = false;
-        downloadedBtn.setText("Downloaded Questions");
-        AppThreader.delay(() -> {
-            mProblemSetHandler.get(data -> populateListView(data, false));
-            problemRetProgress.setVisible(false);
-            quesDownloadBtn.setDisable(false);
-        }, 250);
+        NetworkClient.withNetwork(__ -> {
+            problemRetProgress.setVisible(true);
+            mShowingDownloaded = false;
+            downloadedBtn.setText("Downloaded Questions");
+            AppThreader.delay(() -> {
+                mProblemSetHandler.get(data -> populateListView(data, false));
+                problemRetProgress.setVisible(false);
+                quesDownloadBtn.setDisable(false);
+            }, 250);
+        }, null);
     }
 
     // ----------------- PROBLEM VIEW PAGE ----------------- //
@@ -586,23 +568,20 @@ public class Controller {
     @FXML
     protected void submitCode() {
         if (mProblem == null) return;
-        if (NetworkClient.isNetworkNotConnected()) {
-            SubmissionQueue.get().queue(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem), this::showSubmitDialog);
-            return;
-        }
-
-        Alert alert = new Alert(Alert.AlertType.NONE, "Uploading ...");
-        alert.setTitle("Submitting");
-        alert.getButtonTypes().addAll(ButtonType.OK);
-        alert.getDialogPane().lookupButton(ButtonType.OK).setVisible(false);
-        alert.initOwner(Launcher.get().mStage);
-        alert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::consume);
-        alert.setOnShown(e -> Codeforces.submitCode(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem),
-                data -> Platform.runLater(() -> {
-                    alert.close();
-                    showSubmitDialog(data);
-                })));
-        alert.show();
+        NetworkClient.withNetwork(__ -> {
+            Alert alert = new Alert(Alert.AlertType.NONE, "Uploading ...");
+            alert.setTitle("Submitting");
+            alert.getButtonTypes().addAll(ButtonType.OK);
+            alert.getDialogPane().lookupButton(ButtonType.OK).setVisible(false);
+            alert.initOwner(Launcher.get().mStage);
+            alert.getDialogPane().getScene().getWindow().setOnCloseRequest(Event::consume);
+            alert.setOnShown(e -> Codeforces.submitCode(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem),
+                    data -> Platform.runLater(() -> {
+                        alert.close();
+                        showSubmitDialog(data);
+                    })));
+            alert.show();
+        }, __ -> SubmissionQueue.get().queue(new Codeforces.Submission(langSelector.getSelectionModel().getSelectedItem(), mCompilation.getSourceCode(), mProblem), this::showSubmitDialog));
     }
 
     private void showSubmitDialog(SubmissionQueue.PostResult data) {
@@ -643,7 +622,10 @@ public class Controller {
             String html = ProblemParser.trimHTML(ProblemParser.getQuestion(Codeforces.HOST + pr.url, pr.code));
             webView.getEngine().loadContent(html);
             mCompilation.setDoc(html);
+
+            String selectedItem = langSelector.getSelectionModel().getSelectedItem();
             langSelector.setItems(FXCollections.observableArrayList(mCompilerManager.getLanguageList()));
+            langSelector.setValue(selectedItem);
         });
     }
 
@@ -660,12 +642,10 @@ public class Controller {
 
     @FXML
     protected void goToPrevSub() {
-        if (NetworkClient.isNetworkNotConnected()) {
-            showNetworkErrDialog();
-            return;
-        }
-        prevSubPane.toFront();
-        Codeforces.getPreviousSubmission(data -> Platform.runLater(() -> prevSubListView.getItems().setAll(data)));
+        NetworkClient.withNetwork(__ -> {
+            prevSubPane.toFront();
+            Codeforces.getPreviousSubmission(data -> Platform.runLater(() -> prevSubListView.getItems().setAll(data)));
+        }, null);
     }
 
     @FXML

@@ -63,7 +63,7 @@ public class SubmissionQueue {
      * Creates a timer task and runs at interval of 2 sec.
      * {@link #mWorking} is used to execute only one task at any time.
      */
-    public void queue(Codeforces.Submission submission, AppThreader.EventListener<PostResult> listener) {
+    public void queue(Codeforces.Submission submission, AppThreader.EventCallback<PostResult> listener) {
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override

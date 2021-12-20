@@ -48,7 +48,7 @@ public class Codeforces {
      * @param handle   codeforces handle
      * @param password password for the handle
      */
-    public static void login(String handle, String password, AppThreader.EventListener<String> listener) {
+    public static void login(String handle, String password, AppThreader.EventCallback<String> listener) {
         NetworkClient.get().clearData();
         String url = HOST + "/enter";
         NetworkClient.get().ReqGet(url, body -> {
@@ -82,7 +82,7 @@ public class Codeforces {
     /**
      * Function to log out from codeforces
      */
-    public static void logout(AppThreader.EventListener<Boolean> listener) {
+    public static void logout(AppThreader.EventCallback<Boolean> listener) {
         if (LOG_OUT_UID.equals(AppData.NULL_STR)) {
             listener.onEvent(false);
             return;
@@ -144,7 +144,7 @@ public class Codeforces {
     /**
      * @param listener Provides {@link List<PreviousSubmission>} by fetching history from profile
      */
-    public static void getPreviousSubmission(AppThreader.EventListener<List<PreviousSubmission>> listener) {
+    public static void getPreviousSubmission(AppThreader.EventCallback<List<PreviousSubmission>> listener) {
         NetworkClient.get().ReqGet("https://codeforces.com/problemset/status?my=on", data -> {
             List<PreviousSubmission> arr = new ArrayList<>();
             Elements submissions = data.select("table.status-frame-datatable").select("tr");
@@ -191,7 +191,7 @@ public class Codeforces {
     /**
      * Method to submit the problem
      */
-    public static void submitCode(Submission submission, AppThreader.EventListener<SubmissionQueue.PostResult> listener) {
+    public static void submitCode(Submission submission, AppThreader.EventCallback<SubmissionQueue.PostResult> listener) {
         NetworkClient.get().ReqGet(HOST + submission.pr.url + "?csrf_token=" + NetworkClient.get().getParams().get("csrf_token"), data -> {
             FormElement formElement = (FormElement) data.select("form.submitForm").first();
             if (formElement == null) {

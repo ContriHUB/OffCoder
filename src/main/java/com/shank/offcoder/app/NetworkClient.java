@@ -14,7 +14,10 @@
 
 package com.shank.offcoder.app;
 
+import com.shank.offcoder.Launcher;
 import com.shank.offcoder.cf.Codeforces;
+import com.shank.offcoder.controllers.Controller;
+import javafx.application.Platform;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -81,11 +84,33 @@ public class NetworkClient {
     }
 
     /**
+     * Method that checks if network is connected using {@link #isNetworkNotConnected()}.
+     * <p>
+     * {@link com.shank.offcoder.app.AppThreader.EventCallback#onEvent(Object)} will be called
+     * only when network is connected; else {@link Controller#showNetworkErrDialog()}
+     * is called.
+     *
+     * @param onConnected           Block of code to execute when connected.
+     * @param networkFailedListener Block of code to execute when failed to connected.
+     */
+    public static void withNetwork(AppThreader.EventCallback<Void> onConnected, AppThreader.EventCallback<Void> networkFailedListener) {
+        // Checked in a separate thread to prevent "Not responding" on UI
+        new Thread(() -> {
+            if (isNetworkNotConnected()) {
+                if (networkFailedListener != null) Platform.runLater(() -> networkFailedListener.onEvent(null));
+                ((Controller) Launcher.get().mFxmlLoader.getController()).showNetworkErrDialog();
+            } else {
+                Platform.runLater(() -> onConnected.onEvent(null));
+            }
+        }).start();
+    }
+
+    /**
      * Execute GET on given
      *
      * @param URL URL for GET
      */
-    public void ReqGet(String URL, AppThreader.EventListener<Document> listener) {
+    public void ReqGet(String URL, AppThreader.EventCallback<Document> listener) {
         new Thread(() -> {
             Document errDoc = Jsoup.parse("<html> <body> <p id=\"OffError\">Error</p> </body> </html>");
             try {

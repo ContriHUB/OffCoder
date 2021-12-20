@@ -29,7 +29,7 @@ public class AppThreader {
      *
      * @param <T> Type of data to retrieve when called
      */
-    public interface EventListener<T> {
+    public interface EventCallback<T> {
         void onEvent(T data);
     }
 

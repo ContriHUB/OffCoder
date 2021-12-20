@@ -78,24 +78,24 @@ public class ProblemParser {
     /**
      * Default initial list
      */
-    public void get(AppThreader.EventListener<List<Problem>> listener) {getProblemList(listener);}
+    public void get(AppThreader.EventCallback<List<Problem>> listener) {getProblemList(listener);}
 
     /**
      * List with changed difficulty
      */
-    public void changeDifficulty(int difficulty, AppThreader.EventListener<List<Problem>> listener) {
+    public void changeDifficulty(int difficulty, AppThreader.EventCallback<List<Problem>> listener) {
         maxDifficulty = Math.min(difficulty, 3500);
         minDifficulty = maxDifficulty == 800 ? 0 : maxDifficulty - 99;
         page = 1;
         getProblemList(listener);
     }
 
-    public void nextPage(AppThreader.EventListener<List<Problem>> listener) {
+    public void nextPage(AppThreader.EventCallback<List<Problem>> listener) {
         ++page;
         getProblemList(listener);
     }
 
-    public void prevPage(AppThreader.EventListener<List<Problem>> listener) {
+    public void prevPage(AppThreader.EventCallback<List<Problem>> listener) {
         if (page >= 2) --page;
         getProblemList(listener);
     }
@@ -113,7 +113,7 @@ public class ProblemParser {
     /**
      * Function that parses the HTML to get list of problems
      */
-    private void getProblemList(AppThreader.EventListener<List<Problem>> listener) {
+    private void getProblemList(AppThreader.EventCallback<List<Problem>> listener) {
         NetworkClient.get().ReqGet(getURL(), body -> {
             List<Problem> arr = new ArrayList<>();
 
