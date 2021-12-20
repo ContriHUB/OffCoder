@@ -66,7 +66,8 @@ public class ProblemCell extends ListCell<ProblemParser.Problem> {
         problemCode.setText(item.code);
         problemName.setText(item.name);
         problemDiff.setText(item.rating);
-        anchorPane.setStyle(item.accepted ? isSelected() ? "" : "-fx-background-color: #0BDA51" : "");
+        anchorPane.setStyle("-fx-background-radius: 8px;" +
+                (item.accepted ? isSelected() ? "" : "-fx-background-color: #0BDA51" : ""));
         setGraphic(anchorPane);
 
         setOnMouseClicked(e -> {
