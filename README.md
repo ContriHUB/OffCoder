@@ -1,5 +1,7 @@
 # OffCoder
 
+#### By: Shashank Verma (20204184 - Beese0.25)
+
 ### Get started
 ```
 git clone https://github.com/Beesechurgers/OffCoder.git
@@ -18,5 +20,3 @@ git clone https://github.com/Beesechurgers/OffCoder.git
 <img src="readme_res/personalized_list.png" width="800" height="400"> &nbsp;
 <img src="readme_res/add_personalized_list.png" width="800" height="400"> &nbsp;
 </details>
-
-By: Shashank Verma (20204184 - Beese0.25)
