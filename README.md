@@ -6,7 +6,7 @@
 ```
 git clone https://github.com/Beesechurgers/OffCoder.git
 ```
-- Import project in Intellij you're good to go
+- Import project in Intellij and you're good to go
 
 ## Screenshots of App
 <details>
