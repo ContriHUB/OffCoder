@@ -44,15 +44,15 @@ public class Launcher extends Application {
     @Override
     public void start(Stage stage) throws IOException {
         mStage = stage;
-        centerWindow(800, 400);
+        centerWindow(1000, 600);
 
         // Load UI
         mFxmlLoader = new FXMLLoader(Launcher.class.getResource("hello-view.fxml"));
-        Scene scene = new Scene(mFxmlLoader.load(), 800, 400);
+        Scene scene = new Scene(mFxmlLoader.load(), 1000, 600);
         mStage.setTitle("OffCoder");
         mStage.setScene(scene);
-        mStage.setMinWidth(800);
-        mStage.setMinHeight(400);
+        mStage.setMinWidth(1000);
+        mStage.setMinHeight(600);
         limitWindowSize();
         mStage.show();
 
@@ -69,11 +69,11 @@ public class Launcher extends Application {
      * - used in login page
      */
     public void limitWindowSize() {
-        mStage.setHeight(400);
-        mStage.setWidth(800);
-        mStage.setMaxWidth(800);
-        mStage.setMaxHeight(400);
-        centerWindow(800, 400);
+        mStage.setHeight(600);
+        mStage.setWidth(1000);
+        mStage.setMaxWidth(1000);
+        mStage.setMaxHeight(600);
+        centerWindow(1000, 600);
     }
 
     /**
