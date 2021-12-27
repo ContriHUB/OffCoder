@@ -58,7 +58,7 @@ public class CompilerManager {
     private void auditCompilers() {
         mLang.clear();
         auditCompilers(getCommandWithShell(new String[]{"javac --version"}),
-                () -> mLang.add("Java 11.0.5"));
+                () -> mLang.add("Java 11.0.6"));
 
         auditCompilers(getCommandWithShell(new String[]{"gcc --version"}),
                 () -> mLang.add("GNU GCC C11 5.1.0"));
@@ -69,10 +69,10 @@ public class CompilerManager {
         });
 
         auditCompilers(getCommandWithShell(new String[]{"python --version"}),
-                () -> mLang.add("Python 2.7.15"));
+                () -> mLang.add("Python 2.7.18"));
 
         auditCompilers(getCommandWithShell(new String[]{"python3 --version"}),
-                () -> mLang.add("Python 3.7.2"));
+                () -> mLang.add("Python 3.8.10"));
     }
 
     /**

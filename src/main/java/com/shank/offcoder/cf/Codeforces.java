@@ -181,9 +181,9 @@ public class Codeforces {
         mLangID.put("GNU GCC C11 5.1.0", ".c");
         mLangID.put("GNU G++14 6.4.0", ".cpp");
         mLangID.put("GNU G++17 7.3.0", ".cpp");
-        mLangID.put("Java 11.0.5", ".java");
-        mLangID.put("Python 2.7.15", ".py");
-        mLangID.put("Python 3.7.2", ".py");
+        mLangID.put("Java 11.0.6", ".java");
+        mLangID.put("Python 2.7.18", ".py");
+        mLangID.put("Python 3.8.10", ".py");
     }
 
     public static String getLangExt(String lang) {return mLangID.getOrDefault(lang, "");}

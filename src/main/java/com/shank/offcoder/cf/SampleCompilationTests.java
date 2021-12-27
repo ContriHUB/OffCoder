@@ -92,43 +92,60 @@ public class SampleCompilationTests {
         File compileCode = writeTempCode();
         if (compileCode == null) return;
 
-        String[] cmd = mCompilerManager.getCommandWithShell(getCommand(compileCode, lang));
-        System.out.println(Arrays.toString(cmd));
-
         alert = new Alert(Alert.AlertType.NONE, "Compiling");
         alert.setTitle("Compiling");
         alert.getButtonTypes().addAll(ButtonType.OK);
         alert.getDialogPane().lookupButton(ButtonType.OK).setVisible(false);
         alert.initOwner(Launcher.get().mStage);
-        alert.setOnShown(event -> CommandLine.runCommand(new CommandLine.ProcessListener() {
-            @Override
-            public void onCompleted(int exitCode, String output) {
-                if (exitCode == 0) {
-                    alert.setTitle("Running tests");
-                    alert.setContentText("Running tests");
-                    System.out.println("Cmd: completed output : " + output);
-                    mFailed.clear();
-                    runTests(getTestCases(), 0);
-                }
-            }
+        alert.setOnShown(event -> {
+            if (lang.contains("GNU")) {
+                String[] cmd = mCompilerManager.getCommandWithShell(getCommand(compileCode, lang));
+                System.out.println(Arrays.toString(cmd));
 
-            @Override
-            public void onError(String err) {
-                Platform.runLater(() -> {
-                    if (alert != null) {
-                        alert.close();
-                        alert = null;
+                CommandLine.runCommand(new CommandLine.ProcessListener() {
+                    @Override
+                    public void onCompleted(int exitCode, String output) {
+                        if (exitCode == 0) {
+                            alert.setTitle("Running tests");
+                            alert.setContentText("Running tests");
+                            System.out.println("Cmd: completed output : " + output);
+                            mFailed.clear();
+                            runTests(getTestCases(), new String[]{"data/temp.exe", "<", "data/input.txt"}, 0);
+                        }
                     }
-                    Alert failedDialog;
-                    failedDialog = new Alert(Alert.AlertType.ERROR);
-                    failedDialog.setTitle("Compilation Error");
-                    failedDialog.setContentText(err);
-                    failedDialog.initOwner(Launcher.get().mStage);
-                    failedDialog.showAndWait();
-                });
-                System.out.println("Cmd: err : " + err);
+
+                    @Override
+                    public void onError(String err) {
+                        Platform.runLater(() -> {
+                            if (alert != null) {
+                                alert.close();
+                                alert = null;
+                            }
+                            Alert failedDialog;
+                            failedDialog = new Alert(Alert.AlertType.ERROR);
+                            failedDialog.setTitle("Compilation Error");
+                            failedDialog.setContentText(err);
+                            failedDialog.initOwner(Launcher.get().mStage);
+                            failedDialog.showAndWait();
+                        });
+                        System.out.println("Cmd: err : " + err);
+                    }
+                }, cmd, false);
+            } else {
+                alert.setTitle("Running tests");
+                alert.setContentText("Running tests");
+
+                String exe;
+                if (lang.contains("Python 2")) {
+                    exe = "python";
+                } else if (lang.contains("Python 3")) {
+                    exe = "python3";
+                } else {
+                    exe = "java";
+                }
+                runTests(getTestCases(), new String[]{exe, "data/temp" + mExt, "<", "data/input.txt"}, 0);
             }
-        }, cmd, false));
+        });
         alert.show();
     }
 
@@ -137,7 +154,7 @@ public class SampleCompilationTests {
     /**
      * A recursive function to run tests
      */
-    private void runTests(List<SampleTests> list, int idx) {
+    private void runTests(List<SampleTests> list, String[] exe, int idx) {
         if (idx == list.size()) {
             Platform.runLater(() -> {
                 if (alert != null) {
@@ -179,13 +196,13 @@ public class SampleCompilationTests {
                         mFailed.add("Test " + (idx + 1) + " failed:\nExpected: " + expOutput + " - Got: " + output);
                         System.out.println("Failed: Expected: " + expOutput + "; Got: " + output);
                     }
-                    runTests(list, idx + 1);
+                    runTests(list, exe, idx + 1);
                 }
             }
 
             @Override
             public void onError(String err) {System.out.println("Exec: err : " + err);}
-        }, mCompilerManager.getCommandWithShell(new String[]{"data\\temp.exe", "<", "data\\input.txt"}), true);
+        }, mCompilerManager.getCommandWithShell(exe), true);
     }
 
     /**
@@ -248,7 +265,7 @@ public class SampleCompilationTests {
      */
     private String getExt(File file) {
         String name = file.getName();
-        int index = name.indexOf(".", name.length() - 4);
+        int index = name.indexOf(".", name.length() - 5);
         return name.substring(index);
     }
 

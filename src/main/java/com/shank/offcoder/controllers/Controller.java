@@ -549,7 +549,7 @@ public class Controller {
     protected void selectFile() {
         FileChooser chooser = new FileChooser();
         chooser.setTitle("Select source code file");
-        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Source File", "*.cpp", "*.c", "*.py"));
+        chooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Source File", "*.cpp", "*.c", "*.py", "*.java"));
         File sourceCodeFile = chooser.showOpenDialog(Launcher.get().mStage);
         if (sourceCodeFile != null && mCompilation.setSourceFile(sourceCodeFile)) {
             selectedFile.setText(sourceCodeFile.getName());
