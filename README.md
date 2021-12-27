@@ -16,7 +16,7 @@ git clone https://github.com/Beesechurgers/OffCoder.git
 <img src="readme_res/sample_ques.png" width="800" height="400"> &nbsp;
 <img src="readme_res/test_case_pass.png" width="800" height="400"> &nbsp;
 <img src="readme_res/prev_submission.png" width="800" height="400"> &nbsp;
-<img src="readme_res/download_ques.png" width="800" height="400"> &nbsp;
+<img src="readme_res/downloaded_ques.png" width="800" height="400"> &nbsp;
 <img src="readme_res/personalized_list.png" width="800" height="400"> &nbsp;
 <img src="readme_res/add_personalized_list.png" width="800" height="400"> &nbsp;
 </details>
