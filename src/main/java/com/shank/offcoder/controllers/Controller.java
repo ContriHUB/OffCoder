@@ -18,17 +18,23 @@ import com.shank.offcoder.Launcher;
 import com.shank.offcoder.app.AppData;
 import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
+import com.shank.offcoder.app.PersonalizedListManager;
 import com.shank.offcoder.cf.*;
 import com.shank.offcoder.cli.CompilerManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -58,7 +64,7 @@ public class Controller {
     private ProgressIndicator loginProgress;
 
     @FXML
-    private AnchorPane welcomePane;
+    private AnchorPane welcomePane, personalizedListPane;
 
     @FXML
     private BorderPane loginPane;
@@ -103,12 +109,9 @@ public class Controller {
             quesDownloadBtn.setText("Download " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
             addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
         });
-        problemListView.setOnMouseExited(event -> {
-            problemListView.getSelectionModel().clearSelection();
-            addToListBtn.setDisable(true);
-            quesDownloadBtn.setDisable(true);
-            quesDownloadBtn.setText("Download Question");
-        });
+        listProblemListView.setCellFactory(param -> new ProblemCell());
+        listProblemListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        listNameListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         quesDownloadBtn.setDisable(true);
 
         difficultyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
@@ -358,6 +361,26 @@ public class Controller {
 
             loadWebPage(pr);
         }, null);
+    }
+
+    @FXML
+    protected void addQuesToList() {
+        List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
+
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(Launcher.class.getResource("personalized_list_dialog_view.fxml"));
+
+            Scene scene = new Scene(fxmlLoader.load(), 500, 250);
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setScene(scene);
+
+            PersonalizedListDialogController dialogController = fxmlLoader.getController();
+            dialogController.passList(list);
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -639,5 +662,42 @@ public class Controller {
         prevSubListView.getSelectionModel().clearSelection();
         prevSubListView.getItems().clear();
         welcomePane.toFront();
+    }
+
+    // -------------------- PERSONALIZED LISTS --------------------- //
+
+    @FXML
+    private ListView<String> listNameListView;
+
+    @FXML
+    private ListView<ProblemParser.Problem> listProblemListView;
+
+    @FXML
+    protected void backHomePage() {
+        welcomePane.toFront();
+    }
+
+    @FXML
+    protected void showPersonalizedList() {
+        List<String> list = PersonalizedListManager.getListsNames();
+        if (list.isEmpty()) {
+            Alert dialog = new Alert(Alert.AlertType.ERROR);
+            dialog.setTitle("Message");
+            dialog.setHeaderText(null);
+            dialog.setContentText("You don't have any list");
+            dialog.initOwner(Launcher.get().mStage);
+            dialog.showAndWait();
+            return;
+        }
+        listNameListView.setItems(FXCollections.observableList(list));
+        listNameListView.setOnMouseClicked(event -> {
+            if (event.getButton().equals(MouseButton.PRIMARY)) {
+                listProblemListView.setItems(FXCollections.observableList(PersonalizedListManager.getProblemList(listNameListView.getSelectionModel().getSelectedItem())));
+            }
+        });
+        listNameListView.getSelectionModel().selectFirst();
+
+        listProblemListView.setItems(FXCollections.observableList(PersonalizedListManager.getProblemList(list.get(0))));
+        personalizedListPane.toFront();
     }
 }

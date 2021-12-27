@@ -27,6 +27,23 @@
         <StackPane prefHeight="800.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
+                <AnchorPane fx:id="personalizedListPane" prefHeight="600.0" prefWidth="1000.0"
+                            style="-fx-background-color: #fff;">
+                    <children>
+                        <Button layoutX="869.0" layoutY="551.0" mnemonicParsing="false" onAction="#backHomePage"
+                                prefHeight="29.0" prefWidth="109.0"
+                                style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
+                                text="Back" textFill="#1a73e8" AnchorPane.bottomAnchor="20.0"
+                                AnchorPane.rightAnchor="22.0"/>
+                        <ListView fx:id="listNameListView" layoutX="732.0" layoutY="24.0" prefHeight="513.0"
+                                  prefWidth="246.0" style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="63.0"
+                                  AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="24.0"/>
+                        <ListView fx:id="listProblemListView" layoutX="22.0" layoutY="24.0" prefHeight="513.0"
+                                  prefWidth="692.0" style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="63.0"
+                                  AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="286.0"
+                                  AnchorPane.topAnchor="24.0"/>
+                    </children>
+                </AnchorPane>
                 <AnchorPane fx:id="prevSubPane" prefHeight="200.0" prefWidth="200.0"
                             style="-fx-background-color: #fff;">
                     <children>
@@ -222,7 +239,8 @@
                                         text="Search" textFill="WHITE" AnchorPane.leftAnchor="7.0"
                                         AnchorPane.topAnchor="169.0"/>
                                 <Button fx:id="personalizedListBtn" layoutX="7.0" layoutY="313.0"
-                                        mnemonicParsing="false" prefHeight="63.0" prefWidth="109.0"
+                                        mnemonicParsing="false" onAction="#showPersonalizedList" prefHeight="63.0"
+                                        prefWidth="109.0"
                                         style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
                                         text="Personalized Lists" textAlignment="CENTER" textFill="WHITE"
                                         wrapText="true" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="313.0"/>
@@ -268,7 +286,8 @@
                                     </image>
                                 </ImageView>
                                 <Button fx:id="addToListBtn" disable="true" layoutX="128.0" layoutY="313.0"
-                                        mnemonicParsing="false" prefHeight="63.0" prefWidth="109.0"
+                                        mnemonicParsing="false" onAction="#addQuesToList" prefHeight="63.0"
+                                        prefWidth="109.0"
                                         style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
                                         text="Add to List" textAlignment="CENTER" textFill="WHITE" wrapText="true"
                                         AnchorPane.leftAnchor="128.0" AnchorPane.topAnchor="313.0"/>

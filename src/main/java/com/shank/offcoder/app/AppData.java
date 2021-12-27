@@ -48,6 +48,9 @@ public class AppData {
     // Key for saving downloaded problems
     public static final String DOWNLOADED_QUES = "downloaded_ques";
 
+    // Key for saving personalized lists of questions
+    public static final String PERSONALIZED_LIST_KEY = "personalized_lists";
+
     // Keys for data of each downloaded question
     public static final String P_RATING_KEY = "rating";
     public static final String P_CODE_KEY = "code";
@@ -113,6 +116,7 @@ public class AppData {
         writeData(HANDLE_KEY, NULL_STR);
         writeData(PASS_KEY, NULL_STR);
         writeData(DOWNLOADED_QUES, new JSONArray());
+        writeData(PERSONALIZED_LIST_KEY, new JSONArray());
     }
 
     // -----

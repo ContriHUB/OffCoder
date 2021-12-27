@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2021, Shashank Verma <shashank.verma2002@gmail.com>(shank03)
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  -->
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane maxHeight="250.0" maxWidth="500.0" minHeight="250.0" minWidth="500.0" prefHeight="250.0" prefWidth="500.0"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.shank.offcoder.controllers.PersonalizedListDialogController">
+    <children>
+        <Label alignment="CENTER" layoutX="94.0" layoutY="14.0" prefHeight="17.0" prefWidth="302.0" text="Add to List"
+               textAlignment="CENTER" AnchorPane.topAnchor="14.0">
+            <font>
+                <Font size="18.0"/>
+            </font>
+        </Label>
+        <TextField fx:id="newListField" layoutX="94.0" layoutY="150.0" prefHeight="36.0" prefWidth="207.0"
+                   promptText="Create new list" style="-fx-background-radius: 8px;" AnchorPane.leftAnchor="94.0"
+                   AnchorPane.topAnchor="150.0"/>
+        <ChoiceBox fx:id="listChoiceBox" layoutX="94.0" layoutY="82.0" prefHeight="36.0" prefWidth="207.0"
+                   style="-fx-background-radius: 8px;" AnchorPane.leftAnchor="94.0" AnchorPane.topAnchor="82.0"/>
+        <Button fx:id="addBtn" layoutX="325.0" layoutY="82.0" mnemonicParsing="false" onAction="#addToList"
+                prefHeight="36.0" prefWidth="86.0"
+                style="-fx-background-color: #1a73e8; -fx-background-radius: 8px; -fx-cursor: hand;" text="Add"
+                textFill="WHITE" AnchorPane.rightAnchor="97.0" AnchorPane.topAnchor="82.0"/>
+        <Button layoutX="325.0" layoutY="150.0" mnemonicParsing="false" onAction="#createList" prefHeight="36.0"
+                prefWidth="86.0" style="-fx-background-color: #1a73e8; -fx-background-radius: 8px; -fx-cursor: hand;"
+                text="Create" textFill="WHITE" AnchorPane.rightAnchor="97.0" AnchorPane.topAnchor="150.0"/>
+    </children>
+</AnchorPane>
