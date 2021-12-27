@@ -68,7 +68,7 @@ public class CompilerManager {
             mLang.add("GNU G++17 7.3.0");
         });
 
-        auditCompilers(getCommandWithShell(new String[]{"python --version"}),
+        auditCompilers(getCommandWithShell(new String[]{"python2 --version"}),
                 () -> mLang.add("Python 2.7.18"));
 
         auditCompilers(getCommandWithShell(new String[]{"python3 --version"}),
@@ -87,10 +87,8 @@ public class CompilerManager {
         CommandLine.runCommand(new CommandLine.ProcessListener() {
             @Override
             public void onCompleted(int exitCode, String output) {
-                if (exitCode == 0) {
-                    System.out.println("auditCompiler: " + Arrays.toString(command) + "; exitCode = " + exitCode);
-                    compilerCheck.onResult();
-                }
+                System.out.println("auditCompiler: " + Arrays.toString(command) + "; exitCode = " + exitCode);
+                if (exitCode == 0) compilerCheck.onResult();
             }
 
             @Override

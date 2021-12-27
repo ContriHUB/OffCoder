@@ -137,7 +137,7 @@ public class SampleCompilationTests {
 
                 String exe;
                 if (lang.contains("Python 2")) {
-                    exe = "python";
+                    exe = "python2";
                 } else if (lang.contains("Python 3")) {
                     exe = "python3";
                 } else {
