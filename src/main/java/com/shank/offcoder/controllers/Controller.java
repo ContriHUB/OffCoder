@@ -34,10 +34,7 @@ import org.json.JSONObject;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class Controller {
 
@@ -298,6 +295,9 @@ public class Controller {
     @FXML
     public ProgressBar downloadProgress;
 
+    @FXML
+    private TextField codeTextField;
+
     /**
      * Method to update the "Queue" label on home page
      */
@@ -333,6 +333,23 @@ public class Controller {
             return;
         }
         mProblemSetHandler.get(data -> populateListView(data, false));
+    }
+
+    /**
+     * This function will load question through problem code
+     */
+    @FXML
+    protected void searchProblemCode() {
+        NetworkClient.withNetwork(__ -> {
+            String problemCode = codeTextField.getText().trim();
+            if (problemCode.isEmpty()) return;
+
+            problemCode = problemCode.toUpperCase(Locale.ROOT).replace("/", "");
+            String url = "/problemset/problem/" + problemCode.substring(0, problemCode.length() - 1) + "/" + problemCode.charAt(problemCode.length() - 1);
+            ProblemParser.Problem pr = new ProblemParser.Problem(problemCode, "", url, "", false);
+
+            loadWebPage(pr);
+        }, null);
     }
 
     @FXML
