@@ -18,7 +18,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <AnchorPane maxHeight="250.0" maxWidth="500.0" minHeight="250.0" minWidth="500.0" prefHeight="250.0" prefWidth="500.0"
-            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            style="-fx-background-color: #fff;" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.shank.offcoder.controllers.PersonalizedListDialogController">
     <children>
         <Label alignment="CENTER" layoutX="94.0" layoutY="14.0" prefHeight="17.0" prefWidth="302.0" text="Add to List"
