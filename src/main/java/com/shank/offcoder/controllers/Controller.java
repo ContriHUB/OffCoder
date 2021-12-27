@@ -18,10 +18,7 @@ import com.shank.offcoder.Launcher;
 import com.shank.offcoder.app.AppData;
 import com.shank.offcoder.app.AppThreader;
 import com.shank.offcoder.app.NetworkClient;
-import com.shank.offcoder.cf.Codeforces;
-import com.shank.offcoder.cf.ProblemParser;
-import com.shank.offcoder.cf.SampleCompilationTests;
-import com.shank.offcoder.cf.SubmissionQueue;
+import com.shank.offcoder.cf.*;
 import com.shank.offcoder.cli.CompilerManager;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -34,7 +31,6 @@ import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.jsoup.Jsoup;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -106,7 +102,7 @@ public class Controller {
             List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
             quesDownloadBtn.setDisable(list.isEmpty());
 
-            if (!list.isEmpty()) quesDownloadBtn.setDisable(areQuestionsDownloaded(list));
+            if (!list.isEmpty()) quesDownloadBtn.setDisable(DownloadManager.areQuestionsDownloaded(list));
             quesDownloadBtn.setText("Download " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
         });
         quesDownloadBtn.setDisable(true);
@@ -300,7 +296,7 @@ public class Controller {
     private ProgressIndicator loadPageIndicator;
 
     @FXML
-    private ProgressBar downloadProgress;
+    public ProgressBar downloadProgress;
 
     /**
      * Method to update the "Queue" label on home page
@@ -330,6 +326,16 @@ public class Controller {
     }
 
     @FXML
+    protected void onBrowseBtnClicked() {
+        downloadedBtn.setDisable(true);
+        if (mShowingDownloaded) {
+            filterDownloaded();
+            return;
+        }
+        mProblemSetHandler.get(data -> populateListView(data, false));
+    }
+
+    @FXML
     protected void nextPage() {
         loadPageIndicator.setVisible(true);
         AppThreader.delay(() -> mProblemSetHandler.nextPage(data -> populateListView(data, false)), 250);
@@ -345,7 +351,7 @@ public class Controller {
 
     /**
      * Method that download questions and handle UI as well.
-     * calls: {@link #_downloadQues(List, AppThreader.EventCallback)}
+     * calls: {@link DownloadManager#downloadQuestion(Controller, List, AppThreader.EventCallback)}
      */
     @FXML
     protected void downloadQuestions() {
@@ -365,7 +371,7 @@ public class Controller {
             wasNextBtnDisabled = nextPageBtn.isDisabled();
             nextPageBtn.setDisable(true);
             downloadProgress.setVisible(true);
-            _downloadQues(list, data -> Platform.runLater(() -> {
+            DownloadManager.downloadQuestion(this, list, data -> Platform.runLater(() -> {
                 prevSubBtn.setDisable(false);
                 problemListView.setDisable(false);
                 applyRateBtn.setDisable(false);
@@ -374,6 +380,7 @@ public class Controller {
                 if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
                 if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
                 downloadProgress.setVisible(false);
+                problemListView.refresh();
                 if (data != 0) {
                     Alert dialog = new Alert(Alert.AlertType.ERROR);
                     dialog.setTitle("Network Error");
@@ -384,60 +391,6 @@ public class Controller {
                 }
             }));
         }, null);
-    }
-
-    /**
-     * Main method to download questions and save them.
-     */
-    private void _downloadQues(final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
-        new Thread(() -> {
-            JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
-            double counter = 0;
-            int failedCount = 0;
-            for (ProblemParser.Problem p : list) {
-                ++counter;
-                downloadProgress.setProgress(counter / list.size());
-                if (arr.toString().contains(p.code)) continue;
-
-                String html = ProblemParser.getQuestion(Codeforces.HOST + p.url, null);
-                if (ProblemParser.hasError(Jsoup.parse(html))) {
-                    failedCount++;
-                    continue;
-                }
-
-                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating));
-            }
-            AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
-            listener.onEvent(failedCount);
-        }).start();
-    }
-
-    private boolean isQuestionDownloaded(String code) {
-        JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
-        if (arr.isEmpty()) return false;
-
-        for (Object obj : arr) {
-            JSONObject jObj = (JSONObject) obj;
-            if (jObj.getString(AppData.P_CODE_KEY).equals(code)) return true;
-        }
-        return false;
-    }
-
-    private boolean areQuestionsDownloaded(List<ProblemParser.Problem> list) {
-        JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
-        if (arr.isEmpty()) return false;
-
-        int count = 0;
-        for (ProblemParser.Problem p : list) {
-            for (Object obj : arr) {
-                JSONObject jObj = (JSONObject) obj;
-                if (jObj.getString(AppData.P_CODE_KEY).equals(p.code)) {
-                    count++;
-                    break;
-                }
-            }
-        }
-        return count == list.size();
     }
 
     /**
@@ -608,7 +561,7 @@ public class Controller {
         submitBtn.setDisable(true);
         selectedFile.setText("<No file selected>");
 
-        boolean downloaded = isQuestionDownloaded(pr.code);
+        boolean downloaded = DownloadManager.isQuestionDownloaded(pr.code);
         if (!downloaded) {
             if (NetworkClient.isNetworkNotConnected()) {
                 ((Controller) Launcher.get().mFxmlLoader.getController()).showNetworkErrDialog();
