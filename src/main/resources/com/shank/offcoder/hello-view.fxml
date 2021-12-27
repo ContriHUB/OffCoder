@@ -209,19 +209,20 @@
                                         style="-fx-background-color: #fff; -fx-cursor: hand; -fx-background-radius: 8px;"
                                         text="Log out" textFill="#1a73e8" AnchorPane.leftAnchor="9.0"
                                         AnchorPane.topAnchor="44.0"/>
-                                <Button layoutX="7.0" layoutY="241.0" mnemonicParsing="false"
-                                        onAction="#onBrowseBtnClicked" prefHeight="63.0" prefWidth="231.0"
+                                <Button fx:id="browseQuesBtn" contentDisplay="CENTER" layoutX="7.0" layoutY="241.0"
+                                        mnemonicParsing="false" onAction="#onBrowseBtnClicked" prefHeight="63.0"
+                                        prefWidth="231.0"
                                         style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
                                         text="Browse Questions" textFill="WHITE" AnchorPane.leftAnchor="7.0"
                                         AnchorPane.topAnchor="241.0"/>
-                                <Button alignment="BOTTOM_RIGHT" graphicTextGap="6.0" layoutX="7.0" layoutY="169.0"
-                                        mnemonicParsing="false" onAction="#searchProblemCode" prefHeight="63.0"
-                                        prefWidth="231.0"
+                                <Button fx:id="codeSearchBtn" alignment="BOTTOM_RIGHT" graphicTextGap="6.0"
+                                        layoutX="7.0" layoutY="169.0" mnemonicParsing="false"
+                                        onAction="#searchProblemCode" prefHeight="63.0" prefWidth="231.0"
                                         style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
                                         text="Search" textFill="WHITE" AnchorPane.leftAnchor="7.0"
                                         AnchorPane.topAnchor="169.0"/>
-                                <Button layoutX="7.0" layoutY="313.0" mnemonicParsing="false" prefHeight="63.0"
-                                        prefWidth="109.0"
+                                <Button fx:id="personalizedListBtn" layoutX="7.0" layoutY="313.0"
+                                        mnemonicParsing="false" prefHeight="63.0" prefWidth="109.0"
                                         style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
                                         text="Personalized Lists" textAlignment="CENTER" textFill="WHITE"
                                         wrapText="true" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="313.0"/>
@@ -266,8 +267,8 @@
                                         <Image url="@outline_view_list_white_24dp.png"/>
                                     </image>
                                 </ImageView>
-                                <Button disable="true" layoutX="128.0" layoutY="313.0" mnemonicParsing="false"
-                                        prefHeight="63.0" prefWidth="109.0"
+                                <Button fx:id="addToListBtn" disable="true" layoutX="128.0" layoutY="313.0"
+                                        mnemonicParsing="false" prefHeight="63.0" prefWidth="109.0"
                                         style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
                                         text="Add to List" textAlignment="CENTER" textFill="WHITE" wrapText="true"
                                         AnchorPane.leftAnchor="128.0" AnchorPane.topAnchor="313.0"/>

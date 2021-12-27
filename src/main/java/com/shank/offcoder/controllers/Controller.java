@@ -101,6 +101,13 @@ public class Controller {
 
             if (!list.isEmpty()) quesDownloadBtn.setDisable(DownloadManager.areQuestionsDownloaded(list));
             quesDownloadBtn.setText("Download " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
+            addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
+        });
+        problemListView.setOnMouseExited(event -> {
+            problemListView.getSelectionModel().clearSelection();
+            addToListBtn.setDisable(true);
+            quesDownloadBtn.setDisable(true);
+            quesDownloadBtn.setText("Download Question");
         });
         quesDownloadBtn.setDisable(true);
 
@@ -284,7 +291,8 @@ public class Controller {
     private Label pageNoLabel;
 
     @FXML
-    private Button prevPageBtn, nextPageBtn, quesDownloadBtn, downloadedBtn;
+    private Button prevPageBtn, nextPageBtn, quesDownloadBtn, downloadedBtn,
+            personalizedListBtn, browseQuesBtn, codeSearchBtn, addToListBtn;
 
     @FXML
     private Label queueLabel;
@@ -381,6 +389,10 @@ public class Controller {
             quesDownloadBtn.setDisable(true);
             applyRateBtn.setDisable(true);
             downloadedBtn.setDisable(true);
+            personalizedListBtn.setDisable(true);
+            browseQuesBtn.setDisable(true);
+            codeSearchBtn.setDisable(true);
+            addToListBtn.setDisable(true);
 
             wasPrevBtnDisabled = prevPageBtn.isDisabled();
             prevPageBtn.setDisable(true);
@@ -393,6 +405,10 @@ public class Controller {
                 problemListView.setDisable(false);
                 applyRateBtn.setDisable(false);
                 downloadedBtn.setDisable(false);
+                personalizedListBtn.setDisable(false);
+                browseQuesBtn.setDisable(false);
+                codeSearchBtn.setDisable(false);
+                addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
 
                 if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
                 if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
