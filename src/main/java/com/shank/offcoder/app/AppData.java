@@ -28,29 +28,19 @@ import java.nio.charset.StandardCharsets;
  */
 public class AppData {
 
-    // Singleton instance
-    private static volatile AppData _instance = null;
-
-    private static final String APP_DATA_FILE = "cf_coder.dat";
     public static final String NULL_STR = "&^";
-
-    // Keys used in JSON
-
     // Key for handle
     public static final String HANDLE_KEY = "handle";
-
     // Key for password (stored in encoded Base64)
     public static final String PASS_KEY = "password";
 
+    // Keys used in JSON
     // Key for whether to automatically login on launch
     public static final String AUTO_LOGIN_KEY = "auto_login";
-
     // Key for saving downloaded problems
     public static final String DOWNLOADED_QUES = "downloaded_ques";
-
     // Key for saving personalized lists of questions
     public static final String PERSONALIZED_LIST_KEY = "personalized_lists";
-
     // Keys for data of each downloaded question
     public static final String P_RATING_KEY = "rating";
     public static final String P_CODE_KEY = "code";
@@ -58,7 +48,9 @@ public class AppData {
     public static final String P_HTML_KEY = "html";
     public static final String P_NAME_KEY = "name";
     public static final String P_ACCEPTED_KEY = "accepted";
-
+    private static final String APP_DATA_FILE = "cf_coder.dat";
+    // Singleton instance
+    private static volatile AppData _instance = null;
     // Main json to hold all the data
     private static JSONObject mData = null;
 

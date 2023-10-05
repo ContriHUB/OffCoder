@@ -23,15 +23,6 @@ public class CommandLine {
     public static final int TIME_OUT_EXIT = 47732;
 
     /**
-     * Interface to listen program execution
-     */
-    public interface ProcessListener {
-        void onCompleted(int exitCode, String output);
-
-        void onError(String err);
-    }
-
-    /**
      * Method to execute command
      * <p>
      * Executes a shell command at runtime which creates a {@link Process}.
@@ -81,5 +72,14 @@ public class CommandLine {
         } catch (Exception e) {
             return "";
         }
+    }
+
+    /**
+     * Interface to listen program execution
+     */
+    public interface ProcessListener {
+        void onCompleted(int exitCode, String output);
+
+        void onError(String err);
     }
 }

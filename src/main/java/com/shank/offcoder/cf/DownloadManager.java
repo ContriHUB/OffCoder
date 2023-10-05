@@ -25,7 +25,8 @@ import java.util.List;
 
 public class DownloadManager {
 
-    private DownloadManager() {}
+    private DownloadManager() {
+    }
 
     /**
      * Method to download the questions.

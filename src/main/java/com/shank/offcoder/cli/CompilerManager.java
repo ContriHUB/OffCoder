@@ -26,20 +26,8 @@ import java.util.Locale;
  */
 public class CompilerManager {
 
-    public enum OSType {LINUX, WINDOWS}
-
     // Singleton instance
     private static volatile CompilerManager _instance = null;
-
-    public static CompilerManager getInstance() {
-        if (_instance == null) _instance = new CompilerManager();
-        return _instance;
-    }
-
-    private interface CompilerCheck {
-        void onResult();
-    }
-
     private final OSType osType;
     private final List<String> mLang;
 
@@ -48,6 +36,11 @@ public class CompilerManager {
         this.mLang = new ArrayList<>();
 
         auditCompilers();
+    }
+
+    public static CompilerManager getInstance() {
+        if (_instance == null) _instance = new CompilerManager();
+        return _instance;
     }
 
     /**
@@ -92,7 +85,8 @@ public class CompilerManager {
             }
 
             @Override
-            public void onError(String err) {}
+            public void onError(String err) {
+            }
         }, command, false);
     }
 
@@ -126,5 +120,13 @@ public class CompilerManager {
         return cmd;
     }
 
-    public List<String> getLanguageList() {return mLang;}
+    public List<String> getLanguageList() {
+        return mLang;
+    }
+
+    public enum OSType {LINUX, WINDOWS}
+
+    private interface CompilerCheck {
+        void onResult();
+    }
 }

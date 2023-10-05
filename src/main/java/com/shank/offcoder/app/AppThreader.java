@@ -25,15 +25,6 @@ import java.util.TimerTask;
 public class AppThreader {
 
     /**
-     * Interface for simple callable block
-     *
-     * @param <T> Type of data to retrieve when called
-     */
-    public interface EventCallback<T> {
-        void onEvent(T data);
-    }
-
-    /**
      * A function to delay the execution
      *
      * @param process Code to execute of Void type
@@ -46,5 +37,14 @@ public class AppThreader {
                 Platform.runLater(process);
             }
         }, delay);
+    }
+
+    /**
+     * Interface for simple callable block
+     *
+     * @param <T> Type of data to retrieve when called
+     */
+    public interface EventCallback<T> {
+        void onEvent(T data);
     }
 }

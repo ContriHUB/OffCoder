@@ -31,42 +31,17 @@ import java.util.Map;
  */
 public class NetworkClient {
 
+    // Singleton instance
+    private static volatile NetworkClient _instance = null;
     // Cookies for persisting session
     private final Map<String, String> mCookies = new HashMap<>(), mParams = new HashMap<>();
 
-    // Singleton instance
-    private static volatile NetworkClient _instance = null;
+    private NetworkClient() {
+    }
 
     public static NetworkClient get() {
         if (_instance == null) _instance = new NetworkClient();
         return _instance;
-    }
-
-    private NetworkClient() {}
-
-    /**
-     * Initiate login parameters required by GET request of codeforces
-     */
-    public void setParams(String csrf, String ftaa, String handle, String password) {
-        mParams.put("csrf_token", csrf);
-        mParams.put("action", "enter");
-        mParams.put("ftaa", ftaa);
-        mParams.put("bfaa", "f1b3f18c715565b589b7823cda7448ce");
-        mParams.put("handleOrEmail", handle);
-        mParams.put("password", password);
-        mParams.put("_tta", "176");
-        mParams.put("remember", "on");
-    }
-
-    public Map<String, String> getCookies() {return mCookies;}
-
-    public void updateCookies(Map<String, String> _nCookies) {mCookies.putAll(_nCookies);}
-
-    public Map<String, String> getParams() {return mParams;}
-
-    public void clearData() {
-        mCookies.clear();
-        mParams.clear();
     }
 
     /**
@@ -103,6 +78,37 @@ public class NetworkClient {
                 Platform.runLater(() -> onConnected.onEvent(null));
             }
         }).start();
+    }
+
+    /**
+     * Initiate login parameters required by GET request of codeforces
+     */
+    public void setParams(String csrf, String ftaa, String handle, String password) {
+        mParams.put("csrf_token", csrf);
+        mParams.put("action", "enter");
+        mParams.put("ftaa", ftaa);
+        mParams.put("bfaa", "f1b3f18c715565b589b7823cda7448ce");
+        mParams.put("handleOrEmail", handle);
+        mParams.put("password", password);
+        mParams.put("_tta", "176");
+        mParams.put("remember", "on");
+    }
+
+    public Map<String, String> getCookies() {
+        return mCookies;
+    }
+
+    public void updateCookies(Map<String, String> _nCookies) {
+        mCookies.putAll(_nCookies);
+    }
+
+    public Map<String, String> getParams() {
+        return mParams;
+    }
+
+    public void clearData() {
+        mCookies.clear();
+        mParams.clear();
     }
 
     /**

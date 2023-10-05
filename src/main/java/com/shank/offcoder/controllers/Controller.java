@@ -45,41 +45,70 @@ import java.util.*;
 public class Controller {
 
     private final ProblemParser mProblemSetHandler = new ProblemParser();
+    private final CompilerManager mCompilerManager = CompilerManager.getInstance();
+    @FXML
+    public ProgressBar downloadProgress;
     private SampleCompilationTests mCompilation = new SampleCompilationTests();
     private ProblemParser.Problem mProblem = null;
-    private final CompilerManager mCompilerManager = CompilerManager.getInstance();
-
     private boolean mStarted = false, mShowingDownloaded = false;
-
     @FXML
     private TextField handleField, difficultyTextField;
-
     @FXML
     private PasswordField passwordField;
-
     @FXML
     private CheckBox rememberCheck;
-
     @FXML
     private ProgressIndicator loginProgress;
-
     @FXML
     private AnchorPane welcomePane, personalizedListPane;
-
     @FXML
     private BorderPane loginPane;
-
     @FXML
     private Label userWelcome, splashText;
-
     @FXML
     private ListView<ProblemParser.Problem> problemListView;
-
     @FXML
     private ProgressIndicator problemRetProgress;
-
     @FXML
     private Button retryBtn;
+
+    // ----------------- LOGIN / LOGOUT ----------------- //
+    @FXML
+    private Button applyRateBtn;
+    @FXML
+    private Label pageNoLabel;
+    @FXML
+    private Button prevPageBtn, nextPageBtn, quesDownloadBtn, downloadedBtn,
+            personalizedListBtn, browseQuesBtn, codeSearchBtn, addToListBtn;
+    @FXML
+    private Label queueLabel;
+    @FXML
+    private ProgressIndicator loadPageIndicator;
+    @FXML
+    private TextField codeTextField;
+    private boolean wasPrevBtnDisabled, wasNextBtnDisabled;
+
+    // ----------------- PROBLEM LIST VIEW ----------------- //
+    @FXML
+    private AnchorPane problemPane;
+    @FXML
+    private WebView webView;
+    @FXML
+    private Button compileBtn, submitBtn;
+    @FXML
+    private Label acceptedLabel, selectedFile;
+    @FXML
+    private ChoiceBox<String> langSelector;
+    @FXML
+    private ListView<Codeforces.PreviousSubmission> prevSubListView;
+    @FXML
+    private AnchorPane prevSubPane;
+    @FXML
+    private Button prevSubBtn;
+    @FXML
+    private ListView<String> listNameListView;
+    @FXML
+    private ListView<ProblemParser.Problem> listProblemListView;
 
     /**
      * Main UI method to initialize views
@@ -129,11 +158,6 @@ public class Controller {
             submitBtn.setDisable(!loadedExt.equals(expectedExt));
         });
     }
-
-    // ----------------- LOGIN / LOGOUT ----------------- //
-
-    @FXML
-    private Button applyRateBtn;
 
     /**
      * Function to log in user from Login Page
@@ -288,33 +312,14 @@ public class Controller {
         });
     }
 
-    // ----------------- PROBLEM LIST VIEW ----------------- //
-
-    @FXML
-    private Label pageNoLabel;
-
-    @FXML
-    private Button prevPageBtn, nextPageBtn, quesDownloadBtn, downloadedBtn,
-            personalizedListBtn, browseQuesBtn, codeSearchBtn, addToListBtn;
-
-    @FXML
-    private Label queueLabel;
-
-    @FXML
-    private ProgressIndicator loadPageIndicator;
-
-    @FXML
-    public ProgressBar downloadProgress;
-
-    @FXML
-    private TextField codeTextField;
-
     /**
      * Method to update the "Queue" label on home page
      */
     public void updateQueueLab(String updated) {
         queueLabel.setText(updated);
     }
+
+    // ----------------- PROBLEM VIEW PAGE ----------------- //
 
     /**
      * Method to fetch problems according to rating (difficulty)
@@ -394,8 +399,6 @@ public class Controller {
         loadPageIndicator.setVisible(true);
         AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(data, false)), 250);
     }
-
-    private boolean wasPrevBtnDisabled, wasNextBtnDisabled;
 
     /**
      * Method that download questions and handle UI as well.
@@ -512,23 +515,6 @@ public class Controller {
         }, null);
     }
 
-    // ----------------- PROBLEM VIEW PAGE ----------------- //
-
-    @FXML
-    private AnchorPane problemPane;
-
-    @FXML
-    private WebView webView;
-
-    @FXML
-    private Button compileBtn, submitBtn;
-
-    @FXML
-    private Label acceptedLabel, selectedFile;
-
-    @FXML
-    private ChoiceBox<String> langSelector;
-
     /**
      * Method to go back to problem list view from question view
      */
@@ -540,6 +526,8 @@ public class Controller {
         acceptedLabel.setVisible(false);
         webView.getEngine().load("about:blank");
     }
+
+    // ----------------- PREVIOUS SUBMISSION ----------------- //
 
     /**
      * Method to select file from system
@@ -565,7 +553,9 @@ public class Controller {
      * give verdict on sample test cases
      */
     @FXML
-    protected void compileTest() {mCompilation.compile(langSelector.getSelectionModel().getSelectedItem());}
+    protected void compileTest() {
+        mCompilation.compile(langSelector.getSelectionModel().getSelectedItem());
+    }
 
     /**
      * Method to submit code.
@@ -638,16 +628,7 @@ public class Controller {
         });
     }
 
-    // ----------------- PREVIOUS SUBMISSION ----------------- //
-
-    @FXML
-    private ListView<Codeforces.PreviousSubmission> prevSubListView;
-
-    @FXML
-    private AnchorPane prevSubPane;
-
-    @FXML
-    private Button prevSubBtn;
+    // -------------------- PERSONALIZED LISTS --------------------- //
 
     @FXML
     protected void goToPrevSub() {
@@ -663,14 +644,6 @@ public class Controller {
         prevSubListView.getItems().clear();
         welcomePane.toFront();
     }
-
-    // -------------------- PERSONALIZED LISTS --------------------- //
-
-    @FXML
-    private ListView<String> listNameListView;
-
-    @FXML
-    private ListView<ProblemParser.Problem> listProblemListView;
 
     @FXML
     protected void backHomePage() {

@@ -32,19 +32,16 @@ import java.util.List;
 public class PersonalizedListDialogController {
 
     private List<ProblemParser.Problem> list;
+    @FXML
+    private Button addBtn;
+    @FXML
+    private TextField newListField;
+    @FXML
+    private ChoiceBox<String> listChoiceBox;
 
     public void passList(List<ProblemParser.Problem> list) {
         this.list = list;
     }
-
-    @FXML
-    private Button addBtn;
-
-    @FXML
-    private TextField newListField;
-
-    @FXML
-    private ChoiceBox<String> listChoiceBox;
 
     @FXML
     private void initialize() {

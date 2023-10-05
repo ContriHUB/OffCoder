@@ -28,15 +28,23 @@ import java.util.Base64;
 
 public class Launcher extends Application {
 
+    // Singleton instance of application
+    private static Launcher _instance = null;
     public Stage mStage = null;
     public FXMLLoader mFxmlLoader = null;
 
-    // Singleton instance of application
-    private static Launcher _instance = null;
+    public Launcher() {
+        _instance = this;
+    }
 
-    public Launcher() {_instance = this;}
+    public static Launcher get() {
+        return _instance;
+    }
 
-    public static Launcher get() {return _instance;}
+    // MAIN LAUNCHER
+    public static void main(String[] args) {
+        launch();
+    }
 
     /**
      * Method that starts main window
@@ -93,7 +101,4 @@ public class Launcher extends Application {
         mStage.setX((screenBounds.getWidth() - width) / 2);
         mStage.setY((screenBounds.getHeight() - height) / 2);
     }
-
-    // MAIN LAUNCHER
-    public static void main(String[] args) {launch();}
 }

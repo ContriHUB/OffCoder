@@ -31,30 +31,17 @@ import java.util.TimerTask;
  */
 public class SubmissionQueue {
 
+    // Singleton instanced to persist `mWorking`
+    private static volatile SubmissionQueue _instance = null;
     private boolean mWorking = false;
     private int numQueued = 0;
 
-    // Singleton instanced to persist `mWorking`
-    private static volatile SubmissionQueue _instance = null;
+    private SubmissionQueue() {
+    }
 
     public static SubmissionQueue get() {
         if (_instance == null) _instance = new SubmissionQueue();
         return _instance;
-    }
-
-    private SubmissionQueue() {}
-
-    /**
-     * Class for storing result from submitting code
-     */
-    public static class PostResult {
-        public boolean submitted;
-        public String code;
-
-        public PostResult(boolean submitted, String code) {
-            this.submitted = submitted;
-            this.code = code;
-        }
     }
 
     /**
@@ -94,5 +81,18 @@ public class SubmissionQueue {
         dialog.setContentText("Submission will be executed when connect to network.");
         dialog.initOwner(Launcher.get().mStage);
         dialog.showAndWait();
+    }
+
+    /**
+     * Class for storing result from submitting code
+     */
+    public static class PostResult {
+        public boolean submitted;
+        public String code;
+
+        public PostResult(boolean submitted, String code) {
+            this.submitted = submitted;
+            this.code = code;
+        }
     }
 }

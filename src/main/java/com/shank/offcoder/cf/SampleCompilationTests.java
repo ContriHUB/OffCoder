@@ -41,33 +41,22 @@ import java.util.List;
  */
 public class SampleCompilationTests {
 
-    private String mSourceCode = AppData.NULL_STR, mExt = AppData.NULL_STR, mDoc = AppData.NULL_STR;
-    private Alert alert;
     private final CompilerManager mCompilerManager = CompilerManager.getInstance();
     private final List<String> mFailed = new ArrayList<>();
+    private String mSourceCode = AppData.NULL_STR, mExt = AppData.NULL_STR, mDoc = AppData.NULL_STR;
+    private Alert alert;
 
-    /**
-     * Class to store each sample test
-     */
-    public static class SampleTests {
-        public String input, output;
-
-        public SampleTests() {}
-
-        @Override
-        public String toString() {
-            return "SampleTests{" +
-                    "input='" + input + '\'' +
-                    ", output='" + output + '\'' +
-                    '}';
-        }
+    public void setDoc(String html) {
+        mDoc = html;
     }
 
-    public void setDoc(String html) {mDoc = html;}
+    public String getExt() {
+        return mExt;
+    }
 
-    public String getExt() {return mExt;}
-
-    public String getSourceCode() {return mSourceCode;}
+    public String getSourceCode() {
+        return mSourceCode;
+    }
 
     public boolean setSourceFile(File sourceFile) {
         try (BufferedReader br = new BufferedReader(new FileReader(sourceFile))) {
@@ -149,7 +138,9 @@ public class SampleCompilationTests {
         alert.show();
     }
 
-    public boolean readyToCompile() {return !mSourceCode.equals(AppData.NULL_STR) && !mDoc.equals(AppData.NULL_STR);}
+    public boolean readyToCompile() {
+        return !mSourceCode.equals(AppData.NULL_STR) && !mDoc.equals(AppData.NULL_STR);
+    }
 
     /**
      * A recursive function to run tests
@@ -201,7 +192,9 @@ public class SampleCompilationTests {
             }
 
             @Override
-            public void onError(String err) {System.out.println("Exec: err : " + err);}
+            public void onError(String err) {
+                System.out.println("Exec: err : " + err);
+            }
         }, mCompilerManager.getCommandWithShell(exe), true);
     }
 
@@ -308,5 +301,23 @@ public class SampleCompilationTests {
             ++idx;
         }
         return arr;
+    }
+
+    /**
+     * Class to store each sample test
+     */
+    public static class SampleTests {
+        public String input, output;
+
+        public SampleTests() {
+        }
+
+        @Override
+        public String toString() {
+            return "SampleTests{" +
+                    "input='" + input + '\'' +
+                    ", output='" + output + '\'' +
+                    '}';
+        }
     }
 }

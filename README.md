@@ -13,8 +13,9 @@
 
 ### Get started
 ```
-git clone https://github.com/Beesechurgers/OffCoder.git
+git clone https://github.com/ContriHUB/OffCoder.git
 ```
+- Requires Java 17 ([JDK 17](https://www.oracle.com/in/java/technologies/downloads/#java17))
 - Import project in Intellij and you're good to go
 
 ## Screenshots of App

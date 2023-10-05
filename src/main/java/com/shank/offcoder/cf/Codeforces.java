@@ -32,15 +32,28 @@ import java.util.*;
  */
 public class Codeforces {
 
-    private Codeforces() {}
-
     public static final String HOST = "https://codeforces.com";
     private static final String CHAR_DAT = "abcdefghijklmnopqrstuvwxyz0123456789";
-
+    /**
+     * Store the mapping of key being language and value exit
+     */
+    private static final Map<String, String> mLangID = new HashMap<>();
     // UID needed for logout
     private static String LOG_OUT_UID = AppData.NULL_STR;
 
     // --------- LOGIN/LOGOUT SPECIFIC CODE --------- //
+
+    static {
+        mLangID.put("GNU GCC C11 5.1.0", ".c");
+        mLangID.put("GNU G++14 6.4.0", ".cpp");
+        mLangID.put("GNU G++17 7.3.0", ".cpp");
+        mLangID.put("Java 11.0.6", ".java");
+        mLangID.put("Python 2.7.18", ".py");
+        mLangID.put("Python 3.8.10", ".py");
+    }
+
+    private Codeforces() {
+    }
 
     /**
      * Function to log in on codeforces
@@ -106,6 +119,8 @@ public class Codeforces {
         return body.substring(index + 10, end);
     }
 
+    // --------- SUBMISSION SPECIFIC CODE --------- //
+
     private static String findLogOutUID(String body) {
         int index = body.indexOf("/logout");
         if (index == -1) return AppData.NULL_STR;
@@ -119,25 +134,6 @@ public class Codeforces {
             return ele != null && ele.val().equals("Error");
         } catch (Exception e) {
             return false;
-        }
-    }
-
-    // --------- SUBMISSION SPECIFIC CODE --------- //
-
-    /**
-     * Class for storing the submission history
-     */
-    public static class PreviousSubmission {
-        public String date, sub_time, problemName, lang, verdict, time, mem;
-
-        public PreviousSubmission(String date, String sub_time, String problemName, String lang, String verdict, String time, String mem) {
-            this.date = date;
-            this.sub_time = sub_time;
-            this.problemName = problemName;
-            this.lang = lang;
-            this.verdict = verdict;
-            this.time = time;
-            this.mem = mem;
         }
     }
 
@@ -158,35 +154,9 @@ public class Codeforces {
         });
     }
 
-    /**
-     * Class for storing values needed to submit a submission
-     */
-    public static class Submission {
-        public String lang, sourceCode;
-        public ProblemParser.Problem pr;
-
-        public Submission(String lang, String sourceCode, ProblemParser.Problem pr) {
-            this.lang = lang;
-            this.sourceCode = sourceCode;
-            this.pr = pr;
-        }
+    public static String getLangExt(String lang) {
+        return mLangID.getOrDefault(lang, "");
     }
-
-    /**
-     * Store the mapping of key being language and value exit
-     */
-    private static final Map<String, String> mLangID = new HashMap<>();
-
-    static {
-        mLangID.put("GNU GCC C11 5.1.0", ".c");
-        mLangID.put("GNU G++14 6.4.0", ".cpp");
-        mLangID.put("GNU G++17 7.3.0", ".cpp");
-        mLangID.put("Java 11.0.6", ".java");
-        mLangID.put("Python 2.7.18", ".py");
-        mLangID.put("Python 3.8.10", ".py");
-    }
-
-    public static String getLangExt(String lang) {return mLangID.getOrDefault(lang, "");}
 
     /**
      * Method to submit the problem
@@ -221,5 +191,36 @@ public class Codeforces {
                 Platform.runLater(() -> listener.onEvent(new SubmissionQueue.PostResult(false, submission.pr.code)));
             }
         });
+    }
+
+    /**
+     * Class for storing the submission history
+     */
+    public static class PreviousSubmission {
+        public String date, sub_time, problemName, lang, verdict, time, mem;
+
+        public PreviousSubmission(String date, String sub_time, String problemName, String lang, String verdict, String time, String mem) {
+            this.date = date;
+            this.sub_time = sub_time;
+            this.problemName = problemName;
+            this.lang = lang;
+            this.verdict = verdict;
+            this.time = time;
+            this.mem = mem;
+        }
+    }
+
+    /**
+     * Class for storing values needed to submit a submission
+     */
+    public static class Submission {
+        public String lang, sourceCode;
+        public ProblemParser.Problem pr;
+
+        public Submission(String lang, String sourceCode, ProblemParser.Problem pr) {
+            this.lang = lang;
+            this.sourceCode = sourceCode;
+            this.pr = pr;
+        }
     }
 }

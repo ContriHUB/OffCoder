@@ -26,7 +26,8 @@ import java.util.List;
  */
 public class PersonalizedListManager {
 
-    private PersonalizedListManager() {}
+    private PersonalizedListManager() {
+    }
 
     /**
      * @return List of personalized lists created by user
