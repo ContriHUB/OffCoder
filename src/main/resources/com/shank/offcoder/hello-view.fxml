@@ -37,10 +37,10 @@
                                 AnchorPane.rightAnchor="22.0"/>
                         <ListView fx:id="listNameListView" layoutX="732.0" layoutY="24.0" prefHeight="513.0"
                                   prefWidth="246.0" style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="63.0"
-                                  AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="24.0"/>
+                                  AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="24.0"/>
                         <ListView fx:id="listProblemListView" layoutX="22.0" layoutY="24.0" prefHeight="513.0"
                                   prefWidth="692.0" style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="63.0"
-                                  AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="286.0"
+                                  AnchorPane.leftAnchor="286.0" AnchorPane.rightAnchor="22.0"
                                   AnchorPane.topAnchor="24.0"/>
                     </children>
                 </AnchorPane>
