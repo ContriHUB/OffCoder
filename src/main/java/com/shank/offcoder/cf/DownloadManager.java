@@ -24,7 +24,7 @@ import org.jsoup.Jsoup;
 import java.util.List;
 
 public class DownloadManager {
-    private static final int pageLimit = 25; // Threshold for number of downloaded questions displayed per page.
+    private static final int PAGE_LIMIT = 25; // Threshold for number of downloaded questions displayed per page.
 
     private DownloadManager() {
     }
@@ -55,7 +55,7 @@ public class DownloadManager {
                     continue;
                 }
                 currentDownloadLength++;
-                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating).put(AppData.P_PAGE_KEY, (currentDownloadLength / pageLimit + 1)));
+                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating).put(AppData.P_PAGE_KEY, (currentDownloadLength / PAGE_LIMIT + 1)));
             }
             AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
             listener.onEvent(failedCount);
