@@ -109,8 +109,9 @@ public class Controller {
     private ListView<String> listNameListView;
     @FXML
     private ListView<ProblemParser.Problem> listProblemListView;
-    private int download_page;
-    private int download_number;
+    private int downloadPage;
+    private int downloadNumber;
+
     /**
      * Main UI method to initialize views
      * with their default settings.
@@ -118,7 +119,7 @@ public class Controller {
     @FXML
     private void initialize() {
         if (!AppData.get().<Boolean>getData(AppData.AUTO_LOGIN_KEY, false)) loginPane.toFront();
-        download_page = 1;
+        downloadPage = 1;
         problemRetProgress.setVisible(false);
         loadPageIndicator.setVisible(false);
         loginProgress.setVisible(false);
@@ -230,12 +231,11 @@ public class Controller {
                     dialog.showAndWait();
                     passwordField.setText("");
                 } else {
-                    if(AppData.get().getData("download_number", 0)==0){
+                    if (AppData.get().getData("download_number", 0) == 0) {
                         AppData app = AppData.get();
-                        app.writeData("download_number",0);
-                    }
-                    else{
-                        download_number = AppData.get().getData("download_number",0);
+                        app.writeData("download_number", 0);
+                    } else {
+                        downloadNumber = AppData.get().getData("download_number", 0);
                     }
                     handleField.setText("");
                     passwordField.setText("");
@@ -301,7 +301,7 @@ public class Controller {
                     problemListView.getItems().clear();
                     mProblemSetHandler.reset();
                     AppData.get().clearData();
-                    AppData.get().writeData("download_number",0);
+                    AppData.get().writeData("download_number", 0);
                     Launcher.get().limitWindowSize();
                     loginPane.toFront();
                 });
@@ -400,28 +400,30 @@ public class Controller {
     @FXML
     protected void nextPage() {
         loadPageIndicator.setVisible(true);
-        if(!mShowingDownloaded)
+        if (!mShowingDownloaded)
             AppThreader.delay(() -> mProblemSetHandler.nextPage(data -> populateListView(data, false)), 250);
-        else{
-            download_page++;
-            AppThreader.delay(() -> mProblemSetHandler.nextPage(data -> populateListView(makeDownloadList(),false)),250);
+        else {
+            downloadPage++;
+            AppThreader.delay(() -> mProblemSetHandler.nextPage(data -> populateListView(makeDownloadList(), false)), 250);
         }
     }
 
     @FXML
     protected void prevPage() {
         loadPageIndicator.setVisible(true);
-        if(!mShowingDownloaded)
+        if (!mShowingDownloaded)
             AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(data, false)), 250);
-        else{
-            if(download_page>=2) {--download_page;}
-            AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(makeDownloadList(),false)),250);
+        else {
+            if (downloadPage >= 2) {
+                --downloadPage;
+            }
+            AppThreader.delay(() -> mProblemSetHandler.prevPage(data -> populateListView(makeDownloadList(), false)), 250);
         }
     }
 
     /**
      * Method that download questions and handle UI as well.
-     * calls: {@link DownloadManager#downloadQuestion(Integer,Controller, List, AppThreader.EventCallback)}
+     * calls: {@link DownloadManager#downloadQuestion(Integer, Controller, List, AppThreader.EventCallback)}
      */
     @FXML
     protected void downloadQuestions() {
@@ -445,8 +447,8 @@ public class Controller {
             wasNextBtnDisabled = nextPageBtn.isDisabled();
             nextPageBtn.setDisable(true);
             downloadProgress.setVisible(true);
-            DownloadManager.downloadQuestion(download_number,this, list, data -> Platform.runLater(() -> {
-                download_number+=list.size();
+            DownloadManager.downloadQuestion(downloadNumber, this, list, data -> Platform.runLater(() -> {
+                downloadNumber += list.size();
                 prevSubBtn.setDisable(false);
                 problemListView.setDisable(false);
                 applyRateBtn.setDisable(false);
@@ -464,12 +466,12 @@ public class Controller {
                     dialog.setTitle("Network Error");
                     dialog.setHeaderText(null);
                     dialog.setContentText("Couldn't download all questions\nFailed " + data + " questions.");
-                    download_number-=data;
+                    downloadNumber -= data;
                     dialog.initOwner(Launcher.get().mStage);
                     dialog.showAndWait();
                 }
                 AppData app = AppData.get();
-                app.writeData("download_number",download_number);
+                app.writeData("download_number", downloadNumber);
             }));
         }, null);
     }
@@ -484,14 +486,13 @@ public class Controller {
     private void populateListView(List<ProblemParser.Problem> list, boolean diffChange) {
         NetworkClient.withNetwork(__ -> {
             problemRetProgress.setVisible(false);
-            prevPageBtn.setDisable((!mShowingDownloaded)?mProblemSetHandler.getPage() == 1:download_page==1);
+            prevPageBtn.setDisable((!mShowingDownloaded) ? mProblemSetHandler.getPage() == 1 : downloadPage == 1);
             boolean updated = isListUpdated(list, problemListView.getItems());
             nextPageBtn.setDisable(!updated && !diffChange);
             int page;
-            if(mShowingDownloaded){
-                page = download_page;
-            }
-            else{
+            if (mShowingDownloaded) {
+                page = downloadPage;
+            } else {
                 page = mProblemSetHandler.getPage();
             }
             pageNoLabel.setText("Page: " + (updated || diffChange ? page : mProblemSetHandler.revertPage()));
@@ -519,7 +520,7 @@ public class Controller {
     @FXML
     protected void filterDownloaded() {
         if (!mShowingDownloaded) {
-            download_page = 1;
+            downloadPage = 1;
             mShowingDownloaded = true;
             downloadedBtn.setText("Question Lists");
             List<ProblemParser.Problem> list = makeDownloadList();
@@ -540,12 +541,12 @@ public class Controller {
         }, null);
     }
 
-    protected List<ProblemParser.Problem> makeDownloadList(){
+    protected List<ProblemParser.Problem> makeDownloadList() {
         JSONArray probArr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
         List<ProblemParser.Problem> list = new ArrayList<>();
         for (Object obj : probArr) {
             JSONObject jObj = (JSONObject) obj;
-            if(jObj.getInt("page")==download_page)
+            if (jObj.getInt("page") == downloadPage)
                 list.add(new ProblemParser.Problem(jObj.getString(AppData.P_CODE_KEY), jObj.getString(AppData.P_NAME_KEY), jObj.getString(AppData.P_URL_KEY), jObj.getString(AppData.P_RATING_KEY), jObj.getBoolean(AppData.P_ACCEPTED_KEY)));
         }
         return list;

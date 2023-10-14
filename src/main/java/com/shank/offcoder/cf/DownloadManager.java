@@ -34,10 +34,10 @@ public class DownloadManager {
      * @param controller The controller to access UI elements
      * @param listener   Callback when download is complete
      */
-    public static void downloadQuestion(Integer download_number, Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
+    public static void downloadQuestion(Integer downloadNumber, Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
         new Thread(() -> {
             JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
-            int current_download_length = download_number;
+            int currentDownloadLength = downloadNumber;
             double counter = 0;
             int failedCount = 0;
             for (ProblemParser.Problem p : list) {
@@ -52,8 +52,8 @@ public class DownloadManager {
                     failedCount++;
                     continue;
                 }
-                current_download_length++;
-                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating).put("page",(current_download_length/25 +1)));
+                currentDownloadLength++;
+                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating).put("page", (currentDownloadLength / 25 + 1)));
             }
             AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
             listener.onEvent(failedCount);
