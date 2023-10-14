@@ -24,7 +24,6 @@ import org.jsoup.Jsoup;
 import java.util.List;
 
 public class DownloadManager {
-    static int download_page;
     private DownloadManager() {
     }
 

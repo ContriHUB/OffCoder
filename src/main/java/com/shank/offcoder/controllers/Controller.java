@@ -301,6 +301,7 @@ public class Controller {
                     problemListView.getItems().clear();
                     mProblemSetHandler.reset();
                     AppData.get().clearData();
+                    AppData.get().writeData("download_number",0);
                     Launcher.get().limitWindowSize();
                     loginPane.toFront();
                 });
@@ -446,7 +447,6 @@ public class Controller {
             downloadProgress.setVisible(true);
             DownloadManager.downloadQuestion(download_number,this, list, data -> Platform.runLater(() -> {
                 download_number+=list.size();
-                System.out.println(download_number);
                 prevSubBtn.setDisable(false);
                 problemListView.setDisable(false);
                 applyRateBtn.setDisable(false);
@@ -487,7 +487,7 @@ public class Controller {
             prevPageBtn.setDisable((!mShowingDownloaded)?mProblemSetHandler.getPage() == 1:download_page==1);
             boolean updated = isListUpdated(list, problemListView.getItems());
             nextPageBtn.setDisable(!updated && !diffChange);
-            int page = 0;
+            int page;
             if(mShowingDownloaded){
                 page = download_page;
             }
