@@ -24,7 +24,7 @@ import org.jsoup.Jsoup;
 import java.util.List;
 
 public class DownloadManager {
-
+    static int download_page;
     private DownloadManager() {
     }
 
@@ -35,9 +35,10 @@ public class DownloadManager {
      * @param controller The controller to access UI elements
      * @param listener   Callback when download is complete
      */
-    public static void downloadQuestion(Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
+    public static void downloadQuestion(Integer download_number, Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
         new Thread(() -> {
             JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+            int current_download_length = download_number;
             double counter = 0;
             int failedCount = 0;
             for (ProblemParser.Problem p : list) {
@@ -52,8 +53,8 @@ public class DownloadManager {
                     failedCount++;
                     continue;
                 }
-
-                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating));
+                current_download_length++;
+                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating).put("page",(current_download_length/25 +1)));
             }
             AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
             listener.onEvent(failedCount);
