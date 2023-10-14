@@ -231,11 +231,11 @@ public class Controller {
                     dialog.showAndWait();
                     passwordField.setText("");
                 } else {
-                    if (AppData.get().getData("download_number", 0) == 0) {
+                    if (AppData.get().getData("AppData.DOWNLOADED_NUM", 0) == 0) {
                         AppData app = AppData.get();
-                        app.writeData("download_number", 0);
+                        app.writeData("AppData.DOWNLOADED_NUM", 0);
                     } else {
-                        downloadNumber = AppData.get().getData("download_number", 0);
+                        downloadNumber = AppData.get().getData("AppData.DOWNLOADED_NUM", 0);
                     }
                     handleField.setText("");
                     passwordField.setText("");
@@ -301,7 +301,7 @@ public class Controller {
                     problemListView.getItems().clear();
                     mProblemSetHandler.reset();
                     AppData.get().clearData();
-                    AppData.get().writeData("download_number", 0);
+                    AppData.get().writeData("AppData.DOWNLOADED_NUM", 0);
                     Launcher.get().limitWindowSize();
                     loginPane.toFront();
                 });
@@ -471,7 +471,7 @@ public class Controller {
                     dialog.showAndWait();
                 }
                 AppData app = AppData.get();
-                app.writeData("download_number", downloadNumber);
+                app.writeData(AppData.DOWNLOADED_NUM, downloadNumber);
             }));
         }, null);
     }
