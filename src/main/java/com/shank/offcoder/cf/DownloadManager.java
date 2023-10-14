@@ -24,6 +24,7 @@ import org.jsoup.Jsoup;
 import java.util.List;
 
 public class DownloadManager {
+    private static final int PAGE_LIMIT = 25; // Threshold for number of downloaded questions displayed per page.
 
     private DownloadManager() {
     }
@@ -35,9 +36,10 @@ public class DownloadManager {
      * @param controller The controller to access UI elements
      * @param listener   Callback when download is complete
      */
-    public static void downloadQuestion(Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
+    public static void downloadQuestion(Integer downloadNumber, Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
         new Thread(() -> {
             JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+            int currentDownloadLength = downloadNumber;
             double counter = 0;
             int failedCount = 0;
             for (ProblemParser.Problem p : list) {
@@ -52,8 +54,8 @@ public class DownloadManager {
                     failedCount++;
                     continue;
                 }
-
-                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating));
+                currentDownloadLength++;
+                arr.put(new JSONObject().put(AppData.P_HTML_KEY, html).put(AppData.P_CODE_KEY, p.code).put(AppData.P_NAME_KEY, p.name).put(AppData.P_URL_KEY, p.url).put(AppData.P_ACCEPTED_KEY, p.accepted).put(AppData.P_RATING_KEY, p.rating).put(AppData.P_PAGE_KEY, (currentDownloadLength / PAGE_LIMIT + 1)));
             }
             AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
             listener.onEvent(failedCount);

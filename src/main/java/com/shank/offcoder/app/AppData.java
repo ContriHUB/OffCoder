@@ -41,6 +41,7 @@ public class AppData {
     public static final String DOWNLOADED_QUES = "downloaded_ques";
     // Key for saving personalized lists of questions
     public static final String PERSONALIZED_LIST_KEY = "personalized_lists";
+    public static final String DOWNLOADED_NUM = "downloaded_number";
     // Keys for data of each downloaded question
     public static final String P_RATING_KEY = "rating";
     public static final String P_CODE_KEY = "code";
@@ -48,6 +49,7 @@ public class AppData {
     public static final String P_HTML_KEY = "html";
     public static final String P_NAME_KEY = "name";
     public static final String P_ACCEPTED_KEY = "accepted";
+    public static final String P_PAGE_KEY = "page";
     private static final String APP_DATA_FILE = "cf_coder.dat";
     // Singleton instance
     private static volatile AppData _instance = null;
