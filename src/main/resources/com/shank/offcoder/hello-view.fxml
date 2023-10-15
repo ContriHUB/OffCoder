@@ -127,7 +127,7 @@
                 </AnchorPane>
                 <AnchorPane fx:id="welcomePane" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #16161d;">
                     <children>
-                        <ListView fx:id="problemListView" layoutX="14.0" layoutY="16.0" prefHeight="572.0" prefWidth="715.0" style="-fx-background-color: #3b3c36; -fx-text-fill: black;" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="271.0" AnchorPane.topAnchor="16.0" />
+                        <ListView fx:id="problemListView" layoutX="14.0" layoutY="16.0" opacity="0.59" prefHeight="572.0" prefWidth="715.0" style="-fx-background-color: #3b3c36; -fx-text-fill: black;" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="271.0" AnchorPane.topAnchor="16.0" />
                         <Button fx:id="prevPageBtn" disable="true" layoutX="751.0" layoutY="554.0" mnemonicParsing="false" onAction="#prevPage" prefHeight="38.0" prefWidth="66.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand; -fx-text-fill: white;" text="Prev" textFill="#1a73e8" AnchorPane.bottomAnchor="8.0" AnchorPane.rightAnchor="183.0" />
                         <Button fx:id="nextPageBtn" layoutX="716.0" layoutY="361.0" mnemonicParsing="false" onAction="#nextPage" prefHeight="38.0" prefWidth="66.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand; -fx-text-fill: white;" text="Next" textFill="#1a73e8" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="18.0" />
                         <Label fx:id="pageNoLabel" layoutX="832.0" layoutY="563.0" style="-fx-text-fill: white;" text="Page: 1" AnchorPane.bottomAnchor="17.0" AnchorPane.rightAnchor="123.0">

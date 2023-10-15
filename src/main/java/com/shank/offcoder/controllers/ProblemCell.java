@@ -56,7 +56,9 @@ public class ProblemCell extends ListCell<ProblemParser.Problem> {
         problemDiff.setStyle("-fx-background-color:  #3b3c36; -fx-text-fill: white;");
 
         anchorPane = new AnchorPane(problemCode, problemName, acceptedImage, problemDiff, downloadImage);
-        anchorPane.setStyle("-fx-background-color:  #3b3c36; -fx-text-fill: white; -fx-cursor: hand;");
+        anchorPane.setStyle("-fx-background-color: black; -fx-text-fill: white; -fx-cursor: hand;");
+        setGraphic(anchorPane);
+
         AnchorPane.setLeftAnchor(problemCode, 20.0);
         AnchorPane.setTopAnchor(problemCode, 0.0);
 
@@ -99,6 +101,7 @@ public class ProblemCell extends ListCell<ProblemParser.Problem> {
         problemDiff.setTextFill(Color.web("#000000"));
 
         anchorPane.setStyle("-fx-background-color:  #3b3c36" );
+
         setGraphic(anchorPane);
 
         setOnMouseClicked(e -> {
