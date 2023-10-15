@@ -15,318 +15,177 @@
   -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
-<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="1000.0"
-            prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.controllers.Controller">
+
+<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.shank.offcoder.controllers.Controller">
     <children>
-        <StackPane prefHeight="800.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <StackPane prefHeight="800.0" prefWidth="1000.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <children>
-                <AnchorPane fx:id="personalizedListPane" prefHeight="600.0" prefWidth="1000.0"
-                            style="-fx-background-color: #fff;">
+                <AnchorPane fx:id="prevSubPane" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #16161d;">
                     <children>
-                        <Button layoutX="869.0" layoutY="551.0" mnemonicParsing="false" onAction="#backHomePage"
-                                prefHeight="29.0" prefWidth="109.0"
-                                style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
-                                text="Back" textFill="#1a73e8" AnchorPane.bottomAnchor="20.0"
-                                AnchorPane.rightAnchor="22.0"/>
-                        <ListView fx:id="listNameListView" layoutX="732.0" layoutY="24.0" prefHeight="513.0"
-                                  prefWidth="246.0" style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="63.0"
-                                  AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="24.0"/>
-                        <ListView fx:id="listProblemListView" layoutX="22.0" layoutY="24.0" prefHeight="513.0"
-                                  prefWidth="692.0" style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="63.0"
-                                  AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="286.0"
-                                  AnchorPane.topAnchor="24.0"/>
-                    </children>
-                </AnchorPane>
-                <AnchorPane fx:id="prevSubPane" prefHeight="200.0" prefWidth="200.0"
-                            style="-fx-background-color: #fff;">
-                    <children>
-                        <Label layoutX="14.0" layoutY="14.0" text="Previous Submissions">
+                        <Label layoutX="14.0" layoutY="14.0" style="-fx-text-fill: white;" text="Previous Submissions">
                             <font>
-                                <Font size="15.0"/>
+                                <Font size="15.0" />
                             </font>
                         </Label>
-                        <ListView fx:id="prevSubListView" layoutX="14.0" layoutY="41.0" prefHeight="344.0"
-                                  prefWidth="771.0" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="14.0"
-                                  AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="41.0"/>
-                        <Button layoutX="732.0" layoutY="12.0" mnemonicParsing="false" onAction="#goBackPrevSub"
-                                prefHeight="25.0" prefWidth="52.0" text="Back" AnchorPane.rightAnchor="16.0"
-                                AnchorPane.topAnchor="12.0"/>
-                    </children>
-                </AnchorPane>
-                <AnchorPane fx:id="problemPane" prefHeight="600.0" prefWidth="1000.0"
-                            style="-fx-background-color: #fff;">
-                    <children>
-                        <WebView fx:id="webView" layoutX="14.0" layoutY="14.0" prefHeight="572.0" prefWidth="787.0"
-                                 AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0"
-                                 AnchorPane.rightAnchor="199.0" AnchorPane.topAnchor="14.0"/>
-                        <Button layoutX="734.0" layoutY="360.0" mnemonicParsing="false" onAction="#webBtnGoBack"
-                                prefHeight="27.0" prefWidth="169.0"
-                                style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
-                                text="Back" textFill="#1a73e8" AnchorPane.bottomAnchor="14.0"
-                                AnchorPane.rightAnchor="14.0">
-                            <font>
-                                <Font name="System Bold" size="12.0"/>
-                            </font>
-                        </Button>
-                        <Label fx:id="acceptedLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="675.0"
-                               layoutY="14.0" prefHeight="25.0" prefWidth="169.0" text="Already Accepted"
-                               textFill="#0bda51" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
-                            <font>
-                                <Font name="System Bold" size="13.0"/>
-                            </font>
-                        </Label>
-                        <ChoiceBox fx:id="langSelector" layoutX="675.0" layoutY="78.0" prefHeight="27.0"
-                                   prefWidth="169.0"
-                                   style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px;"
-                                   AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="78.0"/>
-                        <Label fx:id="selectedFile" alignment="CENTER" layoutX="644.0" layoutY="116.0" prefHeight="17.0"
-                               prefWidth="169.0" text="&lt;No file selected&gt;" textAlignment="CENTER"
-                               AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="116.0"/>
-                        <Button layoutX="644.0" layoutY="139.0" mnemonicParsing="false" onAction="#selectFile"
-                                prefHeight="25.0" prefWidth="169.0"
-                                style="-fx-background-color: #1a73e8; -fx-background-radius: 8px; -fx-cursor: hand;"
-                                text="Select File" textFill="WHITE" AnchorPane.rightAnchor="14.0"
-                                AnchorPane.topAnchor="139.0"/>
-                        <Button fx:id="submitBtn" layoutX="675.0" layoutY="231.0" mnemonicParsing="false"
-                                onAction="#submitCode" prefHeight="25.0" prefWidth="169.0"
-                                style="-fx-background-color: #1a73e8; -fx-background-radius: 8px; -fx-cursor: hand;"
-                                text="Submit" textFill="WHITE" AnchorPane.rightAnchor="14.0"
-                                AnchorPane.topAnchor="230.0"/>
-                        <Label alignment="CENTER" layoutX="644.0" layoutY="56.0" prefHeight="17.0" prefWidth="169.0"
-                               text="Language" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="56.0"/>
-                        <Button fx:id="compileBtn" layoutX="675.0" layoutY="200.0" mnemonicParsing="false"
-                                onAction="#compileTest" prefHeight="27.0" prefWidth="169.0"
-                                style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
-                                text="Compile &amp; Test" textFill="#1a73e8" AnchorPane.rightAnchor="14.0"
-                                AnchorPane.topAnchor="200.0"/>
+                        <ListView fx:id="prevSubListView" layoutX="14.0" layoutY="54.0" prefHeight="531.0" prefWidth="971.0" style="-fx-background-color: #3b3c36;" AnchorPane.bottomAnchor="15.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="15.0" AnchorPane.topAnchor="54.0" />
+                        <Button layoutX="732.0" layoutY="12.0" mnemonicParsing="false" onAction="#goBackPrevSub" prefHeight="29.0" prefWidth="54.0" style="-fx-background-color: #3b3c36;" text="Back" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="12.0" />
                     </children>
                 </AnchorPane>
                 <BorderPane fx:id="loginPane" prefHeight="600.0" prefWidth="1000.0">
                     <left>
-                        <AnchorPane prefHeight="400.0" prefWidth="287.0" style="-fx-background-color: #1A73E8;"
-                                    BorderPane.alignment="CENTER">
+                        <AnchorPane prefHeight="400.0" prefWidth="287.0" style="-fx-background-color: #3b3c36;" BorderPane.alignment="CENTER">
                             <children>
-                                <Label layoutX="114.0" layoutY="183.0" text="Login" textFill="WHITE"
-                                       AnchorPane.bottomAnchor="182.0" AnchorPane.leftAnchor="114.0"
-                                       AnchorPane.rightAnchor="114.0" AnchorPane.topAnchor="183.0">
+                                <Label layoutX="114.0" layoutY="183.0" style="-fx-text-fill: white;" text="Login" textFill="WHITE" AnchorPane.bottomAnchor="182.0" AnchorPane.leftAnchor="114.0" AnchorPane.rightAnchor="114.0" AnchorPane.topAnchor="183.0">
                                     <font>
-                                        <Font size="24.0"/>
+                                        <Font size="24.0" />
                                     </font>
                                 </Label>
                             </children>
                         </AnchorPane>
                     </left>
                     <center>
-                        <AnchorPane minHeight="400.0" minWidth="513.0" prefHeight="200.0" prefWidth="200.0"
-                                    style="-fx-background-color: #fff;" BorderPane.alignment="CENTER">
+                        <AnchorPane minHeight="400.0" minWidth="513.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #282C35;" BorderPane.alignment="CENTER">
                             <children>
-                                <AnchorPane layoutX="14.0" layoutY="14.0" maxHeight="1.7976931348623157E308"
-                                            maxWidth="1.7976931348623157E308" minHeight="373.0" minWidth="487.0"
-                                            prefHeight="373.0" prefWidth="487.0" AnchorPane.bottomAnchor="13.0"
-                                            AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="12.0"
-                                            AnchorPane.topAnchor="14.0">
+                                <AnchorPane layoutX="14.0" layoutY="14.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="373.0" minWidth="487.0" prefHeight="373.0" prefWidth="487.0" style="-fx-background-color: #36454f;" AnchorPane.bottomAnchor="13.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="12.0" AnchorPane.topAnchor="14.0">
                                     <children>
-                                        <TextField fx:id="handleField" layoutX="93.0" layoutY="172.0" maxWidth="502.0"
-                                                   prefHeight="63.0" prefWidth="502.0" promptText="Handle"
-                                                   style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="338.0"
-                                                   AnchorPane.leftAnchor="93.0" AnchorPane.rightAnchor="92.0">
+                                        <TextField fx:id="handleField" layoutX="93.0" layoutY="172.0" maxWidth="502.0" prefHeight="63.0" prefWidth="502.0" promptText="Handle" style="-fx-text-fill: white; -fx-background-color: #3b3c36;" AnchorPane.bottomAnchor="338.0" AnchorPane.leftAnchor="93.0" AnchorPane.rightAnchor="92.0">
                                             <font>
-                                                <Font size="18.0"/>
+                                                <Font size="18.0" />
                                             </font>
                                         </TextField>
-                                        <PasswordField fx:id="passwordField" layoutX="93.0" layoutY="253.0"
-                                                       maxHeight="63.0" maxWidth="502.0" minHeight="34.0"
-                                                       minWidth="302.0" prefHeight="63.0" prefWidth="502.0"
-                                                       promptText="Password" style="-fx-background-radius: 8px;"
-                                                       AnchorPane.bottomAnchor="257.0" AnchorPane.leftAnchor="93.0"
-                                                       AnchorPane.rightAnchor="92.0">
+                                        <PasswordField fx:id="passwordField" layoutX="93.0" layoutY="253.0" maxHeight="63.0" maxWidth="502.0" minHeight="34.0" minWidth="302.0" prefHeight="63.0" prefWidth="502.0" promptText="Password" style="-fx-text-fill: white; -fx-background-color: #3b3c36;" AnchorPane.bottomAnchor="257.0" AnchorPane.leftAnchor="93.0" AnchorPane.rightAnchor="92.0">
                                             <font>
-                                                <Font size="18.0"/>
+                                                <Font size="18.0" />
                                             </font>
                                         </PasswordField>
-                                        <CheckBox fx:id="rememberCheck" layoutX="273.0" layoutY="341.0"
-                                                  mnemonicParsing="false" text="Remember me"
-                                                  AnchorPane.bottomAnchor="215.0" AnchorPane.leftAnchor="273.0"/>
-                                        <Button layoutX="183.0" layoutY="388.0" mnemonicParsing="false"
-                                                onAction="#loginUser" prefHeight="51.0" prefWidth="321.0"
-                                                style="-fx-background-color: #1A73E8; -fx-cursor: hand; -fx-background-radius: 8px;"
-                                                text="Login" textFill="WHITE" AnchorPane.bottomAnchor="134.0"
-                                                AnchorPane.leftAnchor="183.0" AnchorPane.rightAnchor="183.0">
+                                        <CheckBox fx:id="rememberCheck" layoutX="273.0" layoutY="341.0" mnemonicParsing="false" style="-fx-text-fill: white;" text="Remember me" AnchorPane.bottomAnchor="215.0" AnchorPane.leftAnchor="273.0" />
+                                        <Button layoutX="183.0" layoutY="388.0" mnemonicParsing="false" onAction="#loginUser" prefHeight="51.0" prefWidth="321.0" style="-fx-background-color: #551a8b; -fx-cursor: hand;" text="Login" textFill="WHITE" AnchorPane.bottomAnchor="134.0" AnchorPane.leftAnchor="183.0" AnchorPane.rightAnchor="183.0">
                                             <font>
-                                                <Font name="System Bold" size="14.0"/>
+                                                <Font name="System Bold" size="14.0" />
                                             </font>
                                         </Button>
-                                        <ProgressIndicator fx:id="loginProgress" layoutX="234.0" layoutY="454.0"
-                                                           prefHeight="25.0" prefWidth="19.0"
-                                                           AnchorPane.bottomAnchor="94.0" AnchorPane.leftAnchor="234.0"
-                                                           AnchorPane.rightAnchor="234.0"/>
+                                        <ProgressIndicator fx:id="loginProgress" layoutX="234.0" layoutY="454.0" prefHeight="25.0" prefWidth="19.0" AnchorPane.bottomAnchor="94.0" AnchorPane.leftAnchor="234.0" AnchorPane.rightAnchor="234.0" />
                                     </children>
                                 </AnchorPane>
                             </children>
                         </AnchorPane>
                     </center>
                 </BorderPane>
-                <AnchorPane fx:id="welcomePane" minHeight="600.0" minWidth="1000.0" prefHeight="600.0"
-                            prefWidth="1000.0" style="-fx-background-color: #fff;">
+                <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #16161d;">
                     <children>
-                        <ListView fx:id="problemListView" layoutX="14.0" layoutY="16.0" prefHeight="572.0"
-                                  prefWidth="715.0" style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="12.0"
-                                  AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="271.0"
-                                  AnchorPane.topAnchor="16.0"/>
-                        <Button fx:id="prevPageBtn" disable="true" layoutX="751.0" layoutY="559.0"
-                                mnemonicParsing="false" onAction="#prevPage" prefHeight="25.0" prefWidth="66.0"
-                                style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
-                                text="Prev" textFill="#1a73e8" AnchorPane.bottomAnchor="14.0"
-                                AnchorPane.rightAnchor="183.0"/>
-                        <Button fx:id="nextPageBtn" layoutX="716.0" layoutY="361.0" mnemonicParsing="false"
-                                onAction="#nextPage" prefHeight="25.0" prefWidth="66.0"
-                                style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
-                                text="Next" textFill="#1a73e8" AnchorPane.bottomAnchor="14.0"
-                                AnchorPane.rightAnchor="18.0"/>
-                        <Label fx:id="pageNoLabel" layoutX="832.0" layoutY="563.0" text="Page: 1"
-                               AnchorPane.bottomAnchor="17.0" AnchorPane.rightAnchor="123.0">
+                        <Label fx:id="splashText" alignment="CENTER" contentDisplay="CENTER" layoutX="32.0" layoutY="275.0" prefHeight="51.0" prefWidth="938.0" style="-fx-text-fill: white;" text="Loading ..." textAlignment="CENTER" AnchorPane.topAnchor="275.0">
                             <font>
-                                <Font size="14.0"/>
+                                <Font size="24.0" />
                             </font>
                         </Label>
-                        <ProgressIndicator fx:id="loadPageIndicator" layoutX="886.0" layoutY="563.0" prefHeight="20.0"
-                                           prefWidth="19.0" style="-fx-background-color: #fff;"
-                                           AnchorPane.bottomAnchor="17.0" AnchorPane.rightAnchor="95.0"/>
-                        <Button fx:id="quesDownloadBtn" layoutX="609.0" layoutY="308.0" mnemonicParsing="false"
-                                onAction="#downloadQuestions" prefHeight="63.0" prefWidth="118.0"
-                                style="-fx-background-color: #1a73e8; -fx-background-radius: 8px; -fx-cursor: hand;"
-                                text="Download Question" textAlignment="CENTER" textFill="WHITE" wrapText="true"
-                                AnchorPane.bottomAnchor="67.0" AnchorPane.rightAnchor="131.0"/>
-                        <ProgressBar fx:id="downloadProgress" layoutX="609.0" layoutY="327.0" prefHeight="11.0"
-                                     prefWidth="231.0" progress="0.45" style="-fx-background-radius: 8px;"
-                                     AnchorPane.bottomAnchor="48.0" AnchorPane.rightAnchor="18.0"/>
-                        <AnchorPane layoutX="743.0" layoutY="14.0" prefHeight="425.0" prefWidth="246.0"
-                                    style="-fx-background-color: #1a73e8; -fx-background-radius: 8px;"
-                                    AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="14.0">
+                        <Button fx:id="retryBtn" layoutX="365.0" layoutY="477.0" mnemonicParsing="false" onAction="#reAttemptLogin" prefHeight="69.0" prefWidth="271.0" style="-fx-background-color: #3d0c02;" text="Retry" AnchorPane.bottomAnchor="98.0" AnchorPane.leftAnchor="365.0" AnchorPane.rightAnchor="364.0" />
+                    </children>
+                </AnchorPane>
+                <AnchorPane fx:id="personalizedListPane" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #16161d;">
+                    <children>
+                        <Button layoutX="869.0" layoutY="551.0" mnemonicParsing="false" onAction="#backHomePage" prefHeight="29.0" prefWidth="109.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Back" textFill="#1a73e8" AnchorPane.bottomAnchor="20.0" AnchorPane.rightAnchor="22.0" />
+                        <ListView fx:id="listNameListView" layoutX="732.0" layoutY="24.0" prefHeight="513.0" prefWidth="246.0" style="-fx-background-color: #3b3c36;" AnchorPane.bottomAnchor="63.0" AnchorPane.rightAnchor="22.0" AnchorPane.topAnchor="24.0" />
+                        <ListView fx:id="listProblemListView" layoutX="22.0" layoutY="24.0" prefHeight="513.0" prefWidth="692.0" style="-fx-background-color: #3b3c36;" AnchorPane.bottomAnchor="63.0" AnchorPane.leftAnchor="22.0" AnchorPane.rightAnchor="286.0" AnchorPane.topAnchor="24.0" />
+                    </children>
+                </AnchorPane>
+                <AnchorPane fx:id="problemPane" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #16161d;">
+                    <children>
+                        <WebView fx:id="webView" layoutX="14.0" layoutY="14.0" prefHeight="572.0" prefWidth="787.0" style="-fx-background-color: #3b3c36;" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="199.0" AnchorPane.topAnchor="14.0" />
+                        <Button layoutX="734.0" layoutY="360.0" mnemonicParsing="false" onAction="#webBtnGoBack" prefHeight="38.0" prefWidth="169.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Back" textFill="#1a73e8" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0">
+                            <font>
+                                <Font name="System Bold" size="12.0" />
+                            </font>
+                        </Button>
+                        <Label fx:id="acceptedLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="675.0" layoutY="14.0" prefHeight="25.0" prefWidth="169.0" style="-fx-text-fill: white;" text="Already Accepted" textFill="#0bda51" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                            <font>
+                                <Font name="System Bold" size="13.0" />
+                            </font>
+                        </Label>
+                        <ChoiceBox fx:id="langSelector" layoutX="675.0" layoutY="78.0" prefHeight="27.0" prefWidth="169.0" style="-fx-background-color: #3b3c36; -fx-text-fill: white;" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="78.0" />
+                        <Label fx:id="selectedFile" alignment="CENTER" layoutX="644.0" layoutY="116.0" prefHeight="17.0" prefWidth="169.0" style="-fx-text-fill: white;" text="&lt;No file selected&gt;" textAlignment="CENTER" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="116.0" />
+                        <Button layoutX="644.0" layoutY="139.0" mnemonicParsing="false" onAction="#selectFile" prefHeight="29.0" prefWidth="169.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Select File" textFill="WHITE" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="139.0" />
+                        <Button fx:id="submitBtn" layoutX="817.0" layoutY="271.0" mnemonicParsing="false" onAction="#submitCode" prefHeight="38.0" prefWidth="169.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Submit" textFill="WHITE" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="271.0" />
+                        <Label alignment="CENTER" layoutX="644.0" layoutY="56.0" prefHeight="17.0" prefWidth="169.0" style="-fx-text-fill: white;" text="Language" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="56.0" />
+                        <Button fx:id="compileBtn" layoutX="675.0" layoutY="200.0" mnemonicParsing="false" onAction="#compileTest" prefHeight="38.0" prefWidth="169.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Compile &amp; Test" textFill="#1a73e8" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="200.0" />
+                    </children>
+                </AnchorPane>
+                <AnchorPane fx:id="welcomePane" minHeight="600.0" minWidth="1000.0" prefHeight="600.0" prefWidth="1000.0" style="-fx-background-color: #16161d;">
+                    <children>
+                        <ListView fx:id="problemListView" layoutX="14.0" layoutY="16.0" prefHeight="572.0" prefWidth="715.0" style="-fx-background-color: #3b3c36; -fx-text-fill: black;" AnchorPane.bottomAnchor="12.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="271.0" AnchorPane.topAnchor="16.0" />
+                        <Button fx:id="prevPageBtn" disable="true" layoutX="751.0" layoutY="554.0" mnemonicParsing="false" onAction="#prevPage" prefHeight="38.0" prefWidth="66.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand; -fx-text-fill: white;" text="Prev" textFill="#1a73e8" AnchorPane.bottomAnchor="8.0" AnchorPane.rightAnchor="183.0" />
+                        <Button fx:id="nextPageBtn" layoutX="716.0" layoutY="361.0" mnemonicParsing="false" onAction="#nextPage" prefHeight="38.0" prefWidth="66.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand; -fx-text-fill: white;" text="Next" textFill="#1a73e8" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="18.0" />
+                        <Label fx:id="pageNoLabel" layoutX="832.0" layoutY="563.0" style="-fx-text-fill: white;" text="Page: 1" AnchorPane.bottomAnchor="17.0" AnchorPane.rightAnchor="123.0">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                        </Label>
+                        <ProgressIndicator fx:id="loadPageIndicator" layoutX="886.0" layoutY="563.0" prefHeight="20.0" prefWidth="19.0" style="-fx-background-color: #3b3c36;" AnchorPane.bottomAnchor="17.0" AnchorPane.rightAnchor="95.0" />
+                        <Button fx:id="quesDownloadBtn" layoutX="751.0" layoutY="465.0" mnemonicParsing="false" onAction="#downloadQuestions" prefHeight="63.0" prefWidth="118.0" style="-fx-background-color: #282C35; -fx-cursor: hand; -fx-text-fill: white;" text="Download Question" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.bottomAnchor="72.0" AnchorPane.rightAnchor="131.0" />
+                        <ProgressBar fx:id="downloadProgress" layoutX="751.0" layoutY="535.0" prefHeight="11.0" prefWidth="231.0" progress="0.45" style="-fx-background-color: #3b3c36;" AnchorPane.bottomAnchor="54.0" AnchorPane.rightAnchor="18.0" />
+                        <AnchorPane layoutX="743.0" layoutY="14.0" prefHeight="436.0" prefWidth="246.0" style="-fx-background-color: #282C35;" AnchorPane.rightAnchor="11.0" AnchorPane.topAnchor="14.0">
                             <children>
-                                <Label fx:id="userWelcome" layoutX="9.0" layoutY="6.0" prefHeight="21.0"
-                                       prefWidth="231.0" text="Welcome" textFill="WHITE" AnchorPane.leftAnchor="9.0"
-                                       AnchorPane.topAnchor="6.0">
+                                <Label fx:id="userWelcome" layoutX="9.0" layoutY="6.0" prefHeight="21.0" prefWidth="231.0" style="-fx-text-fill: white;" text="Welcome" textFill="WHITE" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="6.0">
                                     <opaqueInsets>
-                                        <Insets/>
+                                        <Insets />
                                     </opaqueInsets>
                                     <font>
-                                        <Font name="System Bold" size="15.0"/>
+                                        <Font name="System Bold" size="15.0" />
                                     </font>
                                 </Label>
-                                <Button layoutX="9.0" layoutY="44.0" mnemonicParsing="false" onAction="#logoutUser"
-                                        prefHeight="29.0" prefWidth="71.0"
-                                        style="-fx-background-color: #fff; -fx-cursor: hand; -fx-background-radius: 8px;"
-                                        text="Log out" textFill="#1a73e8" AnchorPane.leftAnchor="9.0"
-                                        AnchorPane.topAnchor="44.0"/>
-                                <Button fx:id="browseQuesBtn" contentDisplay="CENTER" layoutX="7.0" layoutY="241.0"
-                                        mnemonicParsing="false" onAction="#onBrowseBtnClicked" prefHeight="63.0"
-                                        prefWidth="231.0"
-                                        style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
-                                        text="Browse Questions" textFill="WHITE" AnchorPane.leftAnchor="7.0"
-                                        AnchorPane.topAnchor="241.0"/>
-                                <Button fx:id="codeSearchBtn" alignment="BOTTOM_RIGHT" graphicTextGap="6.0"
-                                        layoutX="7.0" layoutY="169.0" mnemonicParsing="false"
-                                        onAction="#searchProblemCode" prefHeight="63.0" prefWidth="231.0"
-                                        style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
-                                        text="Search" textFill="WHITE" AnchorPane.leftAnchor="7.0"
-                                        AnchorPane.topAnchor="169.0"/>
-                                <Button fx:id="personalizedListBtn" layoutX="7.0" layoutY="313.0"
-                                        mnemonicParsing="false" onAction="#showPersonalizedList" prefHeight="63.0"
-                                        prefWidth="109.0"
-                                        style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
-                                        text="Personalized Lists" textAlignment="CENTER" textFill="WHITE"
-                                        wrapText="true" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="313.0"/>
-                                <TextField fx:id="difficultyTextField" layoutX="9.0" layoutY="118.0" prefHeight="38.0"
-                                           prefWidth="142.0" style="-fx-background-radius: 8px;" text="800"
-                                           AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="118.0"/>
-                                <Label layoutX="9.0" layoutY="92.0" text="Difficulty" textFill="WHITE"
-                                       AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="92.0">
+                                <Button layoutX="9.0" layoutY="44.0" mnemonicParsing="false" onAction="#logoutUser" prefHeight="29.0" prefWidth="71.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand; -fx-text-fill: white;" text="Log out" textFill="#1a73e8" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="44.0" />
+                                <Button fx:id="browseQuesBtn" contentDisplay="CENTER" layoutX="7.0" layoutY="241.0" mnemonicParsing="false" onAction="#onBrowseBtnClicked" prefHeight="63.0" prefWidth="231.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Browse Questions" textFill="WHITE" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="241.0" />
+                                <Button fx:id="codeSearchBtn" alignment="BOTTOM_RIGHT" graphicTextGap="6.0" layoutX="7.0" layoutY="169.0" mnemonicParsing="false" onAction="#searchProblemCode" prefHeight="63.0" prefWidth="231.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Search" textFill="WHITE" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="169.0" />
+                                <Button fx:id="personalizedListBtn" layoutX="7.0" layoutY="313.0" mnemonicParsing="false" onAction="#showPersonalizedList" prefHeight="63.0" prefWidth="109.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Personalized Lists" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="7.0" AnchorPane.topAnchor="313.0" />
+                                <TextField fx:id="difficultyTextField" layoutX="9.0" layoutY="118.0" prefHeight="38.0" prefWidth="142.0" style="-fx-background-color: #3b3c36;" text="800" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="118.0" />
+                                <Label layoutX="9.0" layoutY="92.0" style="-fx-text-fill: white;" text="Difficulty" textFill="WHITE" AnchorPane.leftAnchor="9.0" AnchorPane.topAnchor="92.0">
                                     <font>
-                                        <Font size="14.0"/>
+                                        <Font size="14.0" />
                                     </font>
                                 </Label>
-                                <Button fx:id="applyRateBtn" layoutX="166.0" layoutY="117.0" mnemonicParsing="false"
-                                        onAction="#applyDifficulty" prefHeight="38.0" prefWidth="66.0"
-                                        style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
-                                        text="Apply" textFill="WHITE" AnchorPane.leftAnchor="166.0"
-                                        AnchorPane.topAnchor="117.0"/>
-                                <Button fx:id="prevSubBtn" layoutX="7.0" layoutY="390.0" mnemonicParsing="false"
-                                        onAction="#goToPrevSub" prefHeight="25.0" prefWidth="231.0"
-                                        style="-fx-background-color: #fff; -fx-background-radius: 8px; -fx-cursor: hand;"
-                                        text="Previous Submissions" textAlignment="CENTER" textFill="#1a73e8"
-                                        wrapText="true"/>
-                                <ImageView fitHeight="38.0" fitWidth="29.0" layoutX="14.0" layoutY="345.0"
-                                           pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="14.0"
-                                           AnchorPane.topAnchor="345.0">
+                                <Button fx:id="applyRateBtn" layoutX="166.0" layoutY="117.0" mnemonicParsing="false" onAction="#applyDifficulty" prefHeight="38.0" prefWidth="66.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand;" text="Apply" textFill="WHITE" AnchorPane.leftAnchor="166.0" AnchorPane.topAnchor="117.0" />
+                                <Button fx:id="prevSubBtn" layoutX="9.0" layoutY="384.0" mnemonicParsing="false" onAction="#goToPrevSub" prefHeight="38.0" prefWidth="231.0" style="-fx-background-color: #3b3c36; -fx-cursor: hand; -fx-text-fill: white;" text="Previous Submissions" textAlignment="CENTER" textFill="#1a73e8" wrapText="true" />
+                                <ImageView fitHeight="38.0" fitWidth="29.0" layoutX="14.0" layoutY="345.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="345.0">
                                     <image>
-                                        <Image url="@browse_ques_icon.png"/>
+                                        <Image url="@browse_ques_icon.png" />
                                     </image>
                                 </ImageView>
-                                <Label fx:id="queueLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="59.0"
-                                       layoutY="46.0" prefHeight="25.0" prefWidth="142.0" text="Queued: 0"
-                                       textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="354.0"
-                                       AnchorPane.rightAnchor="14.0">
+                                <Label fx:id="queueLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="59.0" layoutY="46.0" prefHeight="25.0" prefWidth="142.0" style="-fx-text-fill: white;" text="Queued: 0" textAlignment="CENTER" textFill="WHITE" AnchorPane.bottomAnchor="354.0" AnchorPane.rightAnchor="14.0">
                                     <font>
-                                        <Font size="16.0"/>
+                                        <Font size="16.0" />
                                     </font>
                                 </Label>
-                                <ImageView fitHeight="38.0" fitWidth="29.0" layoutX="30.0" layoutY="258.0"
-                                           pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="30.0"
-                                           AnchorPane.topAnchor="258.0">
+                                <ImageView fitHeight="38.0" fitWidth="29.0" layoutX="30.0" layoutY="258.0" pickOnBounds="true" preserveRatio="true" AnchorPane.leftAnchor="30.0" AnchorPane.topAnchor="258.0">
                                     <image>
-                                        <Image url="@outline_view_list_white_24dp.png"/>
+                                        <Image url="@outline_view_list_white_24dp.png" />
                                     </image>
                                 </ImageView>
-                                <Button fx:id="addToListBtn" disable="true" layoutX="128.0" layoutY="313.0"
-                                        mnemonicParsing="false" onAction="#addQuesToList" prefHeight="63.0"
-                                        prefWidth="109.0"
-                                        style="-fx-background-color: #1a73e8; -fx-border-radius: 8px; -fx-border-color: #fff; -fx-cursor: hand;"
-                                        text="Add to List" textAlignment="CENTER" textFill="WHITE" wrapText="true"
-                                        AnchorPane.leftAnchor="128.0" AnchorPane.topAnchor="313.0"/>
-                                <TextField fx:id="codeTextField" layoutX="14.0" layoutY="175.0" prefHeight="51.0"
-                                           prefWidth="169.0" promptText="Problem Code"
-                                           style="-fx-background-radius: 8px;" AnchorPane.leftAnchor="14.0"
-                                           AnchorPane.topAnchor="175.0"/>
-                                <ImageView fitHeight="27.0" fitWidth="19.0" layoutX="199.0" layoutY="181.0"
-                                           pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="28.0"
-                                           AnchorPane.topAnchor="181.0">
+                                <Button fx:id="addToListBtn" disable="true" layoutX="128.0" layoutY="313.0" mnemonicParsing="false" onAction="#addQuesToList" prefHeight="63.0" prefWidth="109.0" style="-fx-background-color: #3b3c36; -fx-text-fill: white; -fx-cursor: hand;" text="Add to List" textAlignment="CENTER" textFill="WHITE" wrapText="true" AnchorPane.leftAnchor="128.0" AnchorPane.topAnchor="313.0" />
+                                <TextField fx:id="codeTextField" layoutX="14.0" layoutY="175.0" prefHeight="51.0" prefWidth="169.0" promptText="Problem Code" style="-fx-background-radius: 8px;" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="175.0" />
+                                <ImageView fitHeight="27.0" fitWidth="19.0" layoutX="199.0" layoutY="181.0" pickOnBounds="true" preserveRatio="true" AnchorPane.rightAnchor="28.0" AnchorPane.topAnchor="181.0">
                                     <image>
-                                        <Image url="@outline_search_white_24dp.png"/>
+                                        <Image url="@outline_search_white_24dp.png" />
                                     </image>
                                 </ImageView>
                             </children>
                         </AnchorPane>
-                        <ProgressIndicator fx:id="problemRetProgress" layoutX="860.0" layoutY="444.0" prefHeight="21.0"
-                                           prefWidth="19.0" AnchorPane.bottomAnchor="135.0"
-                                           AnchorPane.rightAnchor="121.0"/>
-                        <Button fx:id="downloadedBtn" alignment="CENTER" mnemonicParsing="false"
-                                onAction="#filterDownloaded" prefHeight="63.0" prefWidth="102.0"
-                                style="-fx-background-radius: 8px; -fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
-                                text="Downloaded Questions" textAlignment="CENTER" textFill="#1a73e8" wrapText="true"
-                                AnchorPane.bottomAnchor="68.0" AnchorPane.rightAnchor="22.0"/>
-                    </children>
-                </AnchorPane>
-                <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: #fff;">
-                    <children>
-                        <Label fx:id="splashText" alignment="CENTER" contentDisplay="CENTER" layoutX="32.0"
-                               layoutY="275.0" prefHeight="51.0" prefWidth="938.0" text="Loading ..."
-                               textAlignment="CENTER" AnchorPane.topAnchor="275.0">
-                            <font>
-                                <Font size="24.0"/>
-                            </font>
-                        </Label>
-                        <Button fx:id="retryBtn" layoutX="365.0" layoutY="477.0" mnemonicParsing="false"
-                                onAction="#reAttemptLogin" prefHeight="69.0" prefWidth="271.0" text="Retry"
-                                AnchorPane.bottomAnchor="98.0" AnchorPane.leftAnchor="365.0"
-                                AnchorPane.rightAnchor="364.0"/>
+                        <ProgressIndicator fx:id="problemRetProgress" layoutX="860.0" layoutY="444.0" prefHeight="21.0" prefWidth="19.0" AnchorPane.bottomAnchor="135.0" AnchorPane.rightAnchor="121.0" />
+                        <Button fx:id="downloadedBtn" alignment="CENTER" layoutX="879.0" layoutY="465.0" mnemonicParsing="false" onAction="#filterDownloaded" prefHeight="63.0" prefWidth="102.0" style="-fx-background-color: #282C35; -fx-cursor: hand; -fx-text-fill: white;" text="Downloaded Questions" textAlignment="CENTER" textFill="#1a73e8" wrapText="true" AnchorPane.bottomAnchor="72.0" AnchorPane.rightAnchor="19.0" />
                     </children>
                 </AnchorPane>
             </children>

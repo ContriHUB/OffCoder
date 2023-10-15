@@ -71,6 +71,7 @@ public class ProblemParser {
      */
     public static String trimHTML(String html) {
         Document doc = Jsoup.parse(html);
+
         doc.select("div#header").remove();
         doc.select("div.roundbox.menu-box").remove();
 
@@ -84,6 +85,13 @@ public class ProblemParser {
         }
         doc.select("div.second-level-menu").remove();
         doc.select("div#footer").remove();
+        doc.select("body").attr("style", "background-color: #282828; ");
+        doc.select("p").attr("style", "color: #FAF9F6; ");
+        doc.select("div.header").attr("style", "color: #FAF9F6; ");
+        doc.select("span").attr("style", "color: #FAF9F6; ");
+        doc.select("ul").attr("style", "color: #FAF9F6; ");
+        doc.select("div").attr("style", "color: #FAF9F6; ");
+        doc.select("pre").attr("style", "background-color: #282828; ");
         doc.outputSettings(doc.outputSettings().prettyPrint(false).escapeMode(Entities.EscapeMode.extended).charset("ASCII"));
         return doc.html();
     }
