@@ -22,12 +22,13 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
-public class DownloadManager {
-    private static final int PAGE_LIMIT = 22; // Threshold for number of downloaded questions displayed per page.
+public class QuestionManager {
+    private static final int PAGE_LIMIT = 25; // Threshold for number of downloaded questions displayed per page.
 
-    private DownloadManager() {
+    private QuestionManager() {
     }
 
     /**
@@ -74,21 +75,17 @@ public class DownloadManager {
         new Thread(() -> {
             JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
             ArrayList<Integer> questionIndex = new ArrayList<>();
+            HashSet<String> pCode = new HashSet<>();
+            for (ProblemParser.Problem p : list) {
+                pCode.add(p.code);
+            }
             double counter = 0;
-            int idx = -1;
-            for (Object j : arr) {
-                idx++;
-                boolean flag = false;
-                for (ProblemParser.Problem p : list) {
-                    if (j.toString().contains(p.code)) {
-                        ++counter;
-                        controller.downloadProgress.setProgress(counter / list.size());
-                        flag = true;
-                        break;
-                    }
-                }
-                if (flag) {
-                    questionIndex.add(idx - ((int) counter - 1));
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject item = arr.getJSONObject(i);
+                if (pCode.contains(item.get(AppData.P_CODE_KEY).toString())) {
+                    ++counter;
+                    controller.downloadProgress.setProgress(counter / list.size());
+                    questionIndex.add(i);
                 }
             }
             for (int i : questionIndex) {

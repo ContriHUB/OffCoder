@@ -137,7 +137,7 @@ public class Controller {
             List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
             quesDownloadBtn.setDisable(list.isEmpty());
             deleteDownloadBtn.setDisable(list.isEmpty());
-            if (!list.isEmpty()) quesDownloadBtn.setDisable(DownloadManager.areQuestionsDownloaded(list));
+            if (!list.isEmpty()) quesDownloadBtn.setDisable(QuestionManager.areQuestionsDownloaded(list));
             quesDownloadBtn.setText("Download " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
             deleteDownloadBtn.setText("Delete " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
             addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
@@ -425,9 +425,11 @@ public class Controller {
     }
 
     /**
-     * Method that download questions and handle UI as well.
-     * calls: {@link DownloadManager#downloadQuestion(Integer, Controller, List, AppThreader.EventCallback)}
-     */
+     * Method that handles operations related to downloading, deleting downloads and handle their UI as well.
+     * calls: {@link QuestionManager#downloadQuestion(Integer, Controller, List, AppThreader.EventCallback)}
+     * calls: {@link QuestionManager#deleteQuestion(Controller, List, AppThreader.EventCallback)}
+     **/
+
     @FXML
     protected void downloadQuestions() {
         NetworkClient.withNetwork(__ -> {
@@ -436,7 +438,10 @@ public class Controller {
 
             prevSubBtn.setDisable(true);
             problemListView.setDisable(true);
-            quesDownloadBtn.setDisable(true);
+            if (!mShowingDownloaded)
+                quesDownloadBtn.setDisable(true);
+            else
+                deleteDownloadBtn.setDisable(true);
             applyRateBtn.setDisable(true);
             downloadedBtn.setDisable(true);
             personalizedListBtn.setDisable(true);
@@ -450,80 +455,52 @@ public class Controller {
             wasNextBtnDisabled = nextPageBtn.isDisabled();
             nextPageBtn.setDisable(true);
             downloadProgress.setVisible(true);
-            DownloadManager.downloadQuestion(downloadNumber, this, list, data -> Platform.runLater(() -> {
-                downloadNumber += list.size();
-                prevSubBtn.setDisable(false);
-                problemListView.setDisable(false);
-                applyRateBtn.setDisable(false);
-                downloadedBtn.setDisable(false);
-                personalizedListBtn.setDisable(false);
-                browseQuesBtn.setDisable(false);
-                codeSearchBtn.setDisable(false);
-                addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
-                if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
-                if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
-                downloadProgress.setVisible(false);
-                problemListView.refresh();
-                if (data != 0) {
-                    Alert dialog = new Alert(Alert.AlertType.ERROR);
-                    dialog.setTitle("Network Error");
-                    dialog.setHeaderText(null);
-                    dialog.setContentText("Couldn't download all questions\nFailed " + data + " questions.");
-                    downloadNumber -= data;
-                    dialog.initOwner(Launcher.get().mStage);
-                    dialog.showAndWait();
-                }
-                AppData app = AppData.get();
-                app.writeData(AppData.DOWNLOADED_NUM, downloadNumber);
-            }));
+            if (!mShowingDownloaded) {
+                QuestionManager.downloadQuestion(downloadNumber, this, list, data -> Platform.runLater(() -> {
+                            downloadNumber += list.size();
+                            downloadUI(data);
+                        }
+                ));
+            } else {
+                QuestionManager.deleteQuestion(this, list, data -> Platform.runLater(() -> {
+                    downloadNumber -= list.size();
+                    downloadUI(0);
+                }));
+            }
         }, null);
     }
 
-    /**
-     * Method that deletes downloaded questions and handle UI as well.
-     * calls: {@link DownloadManager#deleteQuestion(Controller, List, AppThreader.EventCallback)}
-     */
     @FXML
-    protected void deleteDownloadedQuestions() {
-        NetworkClient.withNetwork(__ -> {
-            final List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
-            if (list.isEmpty()) return;
-
-            prevSubBtn.setDisable(true);
-            problemListView.setDisable(true);
-            deleteDownloadBtn.setDisable(true);
-            applyRateBtn.setDisable(true);
-            downloadedBtn.setDisable(true);
-            personalizedListBtn.setDisable(true);
-            browseQuesBtn.setDisable(true);
-            codeSearchBtn.setDisable(true);
-            addToListBtn.setDisable(true);
-
-            wasPrevBtnDisabled = prevPageBtn.isDisabled();
-            prevPageBtn.setDisable(true);
-
-            wasNextBtnDisabled = nextPageBtn.isDisabled();
-            nextPageBtn.setDisable(true);
-            downloadProgress.setVisible(true);
-            DownloadManager.deleteQuestion(this, list, data -> Platform.runLater(() -> {
-                downloadNumber -= list.size();
-                prevSubBtn.setDisable(false);
-                problemListView.setDisable(false);
-                applyRateBtn.setDisable(false);
-                downloadedBtn.setDisable(false);
-                personalizedListBtn.setDisable(false);
-                browseQuesBtn.setDisable(false);
-                codeSearchBtn.setDisable(false);
-                addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
-                if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
-                if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
-                downloadProgress.setVisible(false);
-                mShowingDownloaded = false;
-                filterDownloaded();
-                AppData app = AppData.get();
-                app.writeData(AppData.DOWNLOADED_NUM, downloadNumber);
-            }));
-        }, null);
+    protected void downloadUI(int data) {
+        prevSubBtn.setDisable(false);
+        problemListView.setDisable(false);
+        applyRateBtn.setDisable(false);
+        downloadedBtn.setDisable(false);
+        personalizedListBtn.setDisable(false);
+        browseQuesBtn.setDisable(false);
+        codeSearchBtn.setDisable(false);
+        addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
+        if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
+        if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
+        downloadProgress.setVisible(false);
+        if (!mShowingDownloaded) {
+            problemListView.refresh();
+            if (data != 0) {
+                Alert dialog = new Alert(Alert.AlertType.ERROR);
+                dialog.setTitle("Network Error");
+                dialog.setHeaderText(null);
+                dialog.setContentText("Couldn't download all questions\nFailed " + data + " questions.");
+                downloadNumber -= data;
+                dialog.initOwner(Launcher.get().mStage);
+                dialog.showAndWait();
+            }
+            quesDownloadBtn.setText("Download Question");
+        } else {
+            mShowingDownloaded = false;
+            filterDownloaded();
+        }
+        AppData app = AppData.get();
+        app.writeData(AppData.DOWNLOADED_NUM, downloadNumber);
     }
 
     /**
@@ -574,9 +551,9 @@ public class Controller {
             mShowingDownloaded = true;
             downloadedBtn.setText("Question Lists");
             List<ProblemParser.Problem> list = makeDownloadList();
-
             populateListView(list, false);
             quesDownloadBtn.setVisible(false);
+            deleteDownloadBtn.setText("Delete Question");
             deleteDownloadBtn.setVisible(true);
             deleteDownloadBtn.setDisable(true);
             return;
@@ -588,6 +565,7 @@ public class Controller {
             AppThreader.delay(() -> {
                 mProblemSetHandler.get(data -> populateListView(data, false));
                 problemRetProgress.setVisible(false);
+                quesDownloadBtn.setText("Download Question");
                 quesDownloadBtn.setVisible(true);
                 deleteDownloadBtn.setVisible(false);
             }, 250);
@@ -599,7 +577,7 @@ public class Controller {
         List<ProblemParser.Problem> list = new ArrayList<>();
         for (Object obj : probArr) {
             JSONObject jObj = (JSONObject) obj;
-            if (jObj.getInt("page") == downloadPage)
+            if (jObj.getInt(AppData.P_PAGE_KEY) == downloadPage)
                 list.add(new ProblemParser.Problem(jObj.getString(AppData.P_CODE_KEY), jObj.getString(AppData.P_NAME_KEY), jObj.getString(AppData.P_URL_KEY), jObj.getString(AppData.P_RATING_KEY), jObj.getBoolean(AppData.P_ACCEPTED_KEY)));
         }
         return list;
@@ -697,7 +675,7 @@ public class Controller {
         submitBtn.setDisable(true);
         selectedFile.setText("<No file selected>");
 
-        boolean downloaded = DownloadManager.isQuestionDownloaded(pr.code);
+        boolean downloaded = QuestionManager.isQuestionDownloaded(pr.code);
         if (!downloaded) {
             if (NetworkClient.isNetworkNotConnected()) {
                 ((Controller) Launcher.get().mFxmlLoader.getController()).showNetworkErrDialog();

@@ -205,7 +205,7 @@
                                 text="Download Question" textAlignment="CENTER" textFill="WHITE" wrapText="true"
                                 AnchorPane.bottomAnchor="67.0" AnchorPane.rightAnchor="131.0"/>
                         <Button fx:id="deleteDownloadBtn" layoutX="609.0" layoutY="308.0" mnemonicParsing="false"
-                                onAction="#deleteDownloadedQuestions" prefHeight="63.0" prefWidth="118.0"
+                                onAction="#downloadQuestions" prefHeight="63.0" prefWidth="118.0"
                                 style="-fx-background-color: #1a73e8; -fx-background-radius: 8px; -fx-cursor: hand;"
                                 text="Delete Question" textAlignment="CENTER" textFill="WHITE" wrapText="true"
                                 AnchorPane.bottomAnchor="67.0" AnchorPane.rightAnchor="131.0"/>
