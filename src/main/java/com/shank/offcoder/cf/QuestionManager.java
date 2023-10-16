@@ -21,12 +21,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import java.util.HashSet;
 import java.util.List;
 
-public class DownloadManager {
+public class QuestionManager {
     private static final int PAGE_LIMIT = 25; // Threshold for number of downloaded questions displayed per page.
 
-    private DownloadManager() {
+    private QuestionManager() {
     }
 
     /**
@@ -59,6 +60,38 @@ public class DownloadManager {
             }
             AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
             listener.onEvent(failedCount);
+        }).start();
+    }
+
+    /**
+     * Method to delete downloaded questions.
+     *
+     * @param list       List of questions to delete
+     * @param controller The controller to access UI elements
+     * @param listener   Callback when deletion is complete
+     */
+    public static void deleteQuestion(Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
+        new Thread(() -> {
+            JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+            HashSet<String> pCode = new HashSet<>();
+            for (ProblemParser.Problem p : list) {
+                pCode.add(p.code);
+            }
+            double counter = 0;
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject item = arr.getJSONObject(i);
+                if (pCode.contains(item.get(AppData.P_CODE_KEY).toString())) {
+                    ++counter;
+                    controller.downloadProgress.setProgress(counter / list.size());
+                    arr.remove(i);
+                }
+            }
+            for (int i = 1; i <= arr.length(); i++) {
+                JSONObject item = arr.getJSONObject(i - 1);
+                item.put(AppData.P_PAGE_KEY, i / PAGE_LIMIT + 1);
+            }
+            AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
+            listener.onEvent(0);
         }).start();
     }
 
