@@ -111,6 +111,7 @@ public class Controller {
     private ListView<ProblemParser.Problem> listProblemListView;
     private int downloadPage;
     private int downloadNumber;
+    private boolean mShowingPersonalized;
 
     /**
      * Main UI method to initialize views
@@ -143,7 +144,7 @@ public class Controller {
             addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
         });
         listProblemListView.setCellFactory(param -> new ProblemCell());
-        listProblemListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        listProblemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listNameListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         quesDownloadBtn.setDisable(true);
         deleteDownloadBtn.setDisable(true);
@@ -730,6 +731,7 @@ public class Controller {
             dialog.showAndWait();
             return;
         }
+        mShowingPersonalized = true;
         listNameListView.setItems(FXCollections.observableList(list));
         listNameListView.setOnMouseClicked(event -> {
             if (event.getButton().equals(MouseButton.PRIMARY)) {
@@ -740,5 +742,25 @@ public class Controller {
 
         listProblemListView.setItems(FXCollections.observableList(PersonalizedListManager.getProblemList(list.get(0))));
         personalizedListPane.toFront();
+    }
+
+    /**
+     * Method that handles deletion from Personalized List and handle  UI as well.
+     * calls: {@link QuestionManager#deletePersonalizedQuestion(String, List, AppThreader.EventCallback)}
+     **/
+    @FXML
+    protected void deletePersonalized() {
+        if (mShowingPersonalized) {
+            final List<ProblemParser.Problem> list = listProblemListView.getSelectionModel().getSelectedItems();
+            if (list.isEmpty()) return;
+            listProblemListView.setDisable(true);
+            listNameListView.setDisable(true);
+            String listName = listNameListView.getSelectionModel().getSelectedItem();
+            QuestionManager.deletePersonalizedQuestion(listName, list, data -> Platform.runLater(() -> {
+                listProblemListView.setDisable(false);
+                listNameListView.setDisable(false);
+            }));
+            showPersonalizedList();
+        }
     }
 }
