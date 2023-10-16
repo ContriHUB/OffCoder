@@ -78,7 +78,7 @@ public class Controller {
     @FXML
     private Label pageNoLabel;
     @FXML
-    private Button prevPageBtn, nextPageBtn, quesDownloadBtn, downloadedBtn,
+    private Button prevPageBtn, nextPageBtn, quesDownloadBtn, deleteDownloadBtn, downloadedBtn,
             personalizedListBtn, browseQuesBtn, codeSearchBtn, addToListBtn;
     @FXML
     private Label queueLabel;
@@ -123,6 +123,7 @@ public class Controller {
         problemRetProgress.setVisible(false);
         loadPageIndicator.setVisible(false);
         loginProgress.setVisible(false);
+        deleteDownloadBtn.setVisible(false);
         downloadProgress.setVisible(false);
         retryBtn.setVisible(false);
         acceptedLabel.setVisible(false);
@@ -135,15 +136,17 @@ public class Controller {
         problemListView.setOnMouseClicked(event -> {
             List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
             quesDownloadBtn.setDisable(list.isEmpty());
-
+            deleteDownloadBtn.setDisable(list.isEmpty());
             if (!list.isEmpty()) quesDownloadBtn.setDisable(DownloadManager.areQuestionsDownloaded(list));
             quesDownloadBtn.setText("Download " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
+            deleteDownloadBtn.setText("Delete " + list.size() + " Question" + (list.size() > 1 ? "s" : ""));
             addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
         });
         listProblemListView.setCellFactory(param -> new ProblemCell());
         listProblemListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         listNameListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         quesDownloadBtn.setDisable(true);
+        deleteDownloadBtn.setDisable(true);
 
         difficultyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() >= 5) newValue = newValue.substring(0, 4);
@@ -477,6 +480,53 @@ public class Controller {
     }
 
     /**
+     * Method that deletes downloaded questions and handle UI as well.
+     * calls: {@link DownloadManager#deleteQuestion(Controller, List, AppThreader.EventCallback)}
+     */
+    @FXML
+    protected void deleteDownloadedQuestions() {
+        NetworkClient.withNetwork(__ -> {
+            final List<ProblemParser.Problem> list = problemListView.getSelectionModel().getSelectedItems();
+            if (list.isEmpty()) return;
+
+            prevSubBtn.setDisable(true);
+            problemListView.setDisable(true);
+            deleteDownloadBtn.setDisable(true);
+            applyRateBtn.setDisable(true);
+            downloadedBtn.setDisable(true);
+            personalizedListBtn.setDisable(true);
+            browseQuesBtn.setDisable(true);
+            codeSearchBtn.setDisable(true);
+            addToListBtn.setDisable(true);
+
+            wasPrevBtnDisabled = prevPageBtn.isDisabled();
+            prevPageBtn.setDisable(true);
+
+            wasNextBtnDisabled = nextPageBtn.isDisabled();
+            nextPageBtn.setDisable(true);
+            downloadProgress.setVisible(true);
+            DownloadManager.deleteQuestion(this, list, data -> Platform.runLater(() -> {
+                downloadNumber -= list.size();
+                prevSubBtn.setDisable(false);
+                problemListView.setDisable(false);
+                applyRateBtn.setDisable(false);
+                downloadedBtn.setDisable(false);
+                personalizedListBtn.setDisable(false);
+                browseQuesBtn.setDisable(false);
+                codeSearchBtn.setDisable(false);
+                addToListBtn.setDisable(problemListView.getSelectionModel().isEmpty());
+                if (!wasNextBtnDisabled) nextPageBtn.setDisable(false);
+                if (!wasPrevBtnDisabled) prevPageBtn.setDisable(false);
+                downloadProgress.setVisible(false);
+                mShowingDownloaded = false;
+                filterDownloaded();
+                AppData app = AppData.get();
+                app.writeData(AppData.DOWNLOADED_NUM, downloadNumber);
+            }));
+        }, null);
+    }
+
+    /**
      * Method to show the list of problems on UI
      *
      * @param list       The list of problems
@@ -526,7 +576,9 @@ public class Controller {
             List<ProblemParser.Problem> list = makeDownloadList();
 
             populateListView(list, false);
-            quesDownloadBtn.setDisable(true);
+            quesDownloadBtn.setVisible(false);
+            deleteDownloadBtn.setVisible(true);
+            deleteDownloadBtn.setDisable(true);
             return;
         }
         NetworkClient.withNetwork(__ -> {
@@ -536,7 +588,8 @@ public class Controller {
             AppThreader.delay(() -> {
                 mProblemSetHandler.get(data -> populateListView(data, false));
                 problemRetProgress.setVisible(false);
-                quesDownloadBtn.setDisable(false);
+                quesDownloadBtn.setVisible(true);
+                deleteDownloadBtn.setVisible(false);
             }, 250);
         }, null);
     }

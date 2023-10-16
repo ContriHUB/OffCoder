@@ -21,10 +21,11 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DownloadManager {
-    private static final int PAGE_LIMIT = 25; // Threshold for number of downloaded questions displayed per page.
+    private static final int PAGE_LIMIT = 22; // Threshold for number of downloaded questions displayed per page.
 
     private DownloadManager() {
     }
@@ -59,6 +60,47 @@ public class DownloadManager {
             }
             AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
             listener.onEvent(failedCount);
+        }).start();
+    }
+
+    /**
+     * Method to delete downloaded questions.
+     *
+     * @param list       List of questions to delete
+     * @param controller The controller to access UI elements
+     * @param listener   Callback when deletion is complete
+     */
+    public static void deleteQuestion(Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
+        new Thread(() -> {
+            JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
+            ArrayList<Integer> questionIndex = new ArrayList<>();
+            double counter = 0;
+            int idx = -1;
+            for (Object j : arr) {
+                idx++;
+                boolean flag = false;
+                for (ProblemParser.Problem p : list) {
+                    if (j.toString().contains(p.code)) {
+                        ++counter;
+                        controller.downloadProgress.setProgress(counter / list.size());
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag) {
+                    questionIndex.add(idx - ((int) counter - 1));
+                }
+            }
+            for (int i : questionIndex) {
+                arr.remove(i);
+            }
+            int newIndex = 0;
+            for (int i = 1; i <= arr.length(); i++) {
+                JSONObject item = arr.getJSONObject(i - 1);
+                item.put(AppData.P_PAGE_KEY, i / PAGE_LIMIT + 1);
+            }
+            AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
+            listener.onEvent(0);
         }).start();
     }
 
