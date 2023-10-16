@@ -94,7 +94,6 @@ public class DownloadManager {
             for (int i : questionIndex) {
                 arr.remove(i);
             }
-            int newIndex = 0;
             for (int i = 1; i <= arr.length(); i++) {
                 JSONObject item = arr.getJSONObject(i - 1);
                 item.put(AppData.P_PAGE_KEY, i / PAGE_LIMIT + 1);
