@@ -21,7 +21,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -74,7 +73,6 @@ public class QuestionManager {
     public static void deleteQuestion(Controller controller, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
         new Thread(() -> {
             JSONArray arr = AppData.get().getData(AppData.DOWNLOADED_QUES, new JSONArray());
-            ArrayList<Integer> questionIndex = new ArrayList<>();
             HashSet<String> pCode = new HashSet<>();
             for (ProblemParser.Problem p : list) {
                 pCode.add(p.code);
@@ -85,11 +83,8 @@ public class QuestionManager {
                 if (pCode.contains(item.get(AppData.P_CODE_KEY).toString())) {
                     ++counter;
                     controller.downloadProgress.setProgress(counter / list.size());
-                    questionIndex.add(i);
+                    arr.remove(i);
                 }
-            }
-            for (int i : questionIndex) {
-                arr.remove(i);
             }
             for (int i = 1; i <= arr.length(); i++) {
                 JSONObject item = arr.getJSONObject(i - 1);
