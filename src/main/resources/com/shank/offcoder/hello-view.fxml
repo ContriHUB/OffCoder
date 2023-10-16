@@ -35,6 +35,11 @@
                                 style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
                                 text="Back" textFill="#1a73e8" AnchorPane.bottomAnchor="20.0"
                                 AnchorPane.rightAnchor="22.0"/>
+                        <Button layoutX="869.0" layoutY="551.0" mnemonicParsing="false" onAction="#deletePersonalized"
+                                prefHeight="29.0" prefWidth="109.0"
+                                style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
+                                text="Delete Question" textFill="#1a73e8" AnchorPane.bottomAnchor="20.0"
+                                AnchorPane.leftAnchor="22.0"/>
                         <ListView fx:id="listNameListView" layoutX="732.0" layoutY="24.0" prefHeight="513.0"
                                   prefWidth="246.0" style="-fx-background-radius: 8px;" AnchorPane.bottomAnchor="63.0"
                                   AnchorPane.leftAnchor="22.0" AnchorPane.topAnchor="24.0"/>

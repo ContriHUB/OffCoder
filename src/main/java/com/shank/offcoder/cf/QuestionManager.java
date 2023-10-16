@@ -78,12 +78,15 @@ public class QuestionManager {
                 pCode.add(p.code);
             }
             double counter = 0;
-            for (int i = 0; i < arr.length(); i++) {
+            int len = arr.length();
+            for (int i = 0; i < len; i++) {
                 JSONObject item = arr.getJSONObject(i);
                 if (pCode.contains(item.get(AppData.P_CODE_KEY).toString())) {
                     ++counter;
                     controller.downloadProgress.setProgress(counter / list.size());
                     arr.remove(i);
+                    i--;
+                    len = arr.length();
                 }
             }
             for (int i = 1; i <= arr.length(); i++) {
@@ -91,6 +94,40 @@ public class QuestionManager {
                 item.put(AppData.P_PAGE_KEY, i / PAGE_LIMIT + 1);
             }
             AppData.get().writeData(AppData.DOWNLOADED_QUES, arr);
+            listener.onEvent(0);
+        }).start();
+    }
+
+    /**
+     * Method to delete personalized list questions.
+     * @param listName Name of list to delete from
+     * @param list     List of questions to delete
+     * @param listener Callback when deletion is complete
+     */
+    public static void deletePersonalizedQuestion(String listName, final List<ProblemParser.Problem> list, AppThreader.EventCallback<Integer> listener) {
+        new Thread(() -> {
+            JSONArray arr = AppData.get().getData(AppData.PERSONALIZED_LIST_KEY, new JSONArray());
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject item = arr.getJSONObject(i);
+                if (item.getString(AppData.P_NAME_KEY).compareTo(listName) == 0) {
+                    JSONArray itemList = item.getJSONArray("list");
+                    HashSet<String> pCode = new HashSet<>();
+                    for (ProblemParser.Problem p : list) {
+                        pCode.add(p.code);
+                    }
+                    int len = itemList.length();
+                    for (int j = 0; j < len; j++) {
+                        JSONObject ques = itemList.getJSONObject(j);
+                        if (pCode.contains(ques.get(AppData.P_CODE_KEY).toString())) {
+                            itemList.remove(j);
+                            j--;
+                            len = itemList.length();
+                        }
+                    }
+                    break;
+                }
+            }
+            AppData.get().writeData(AppData.PERSONALIZED_LIST_KEY, arr);
             listener.onEvent(0);
         }).start();
     }
