@@ -14,9 +14,12 @@
 
 package com.shank.offcoder.controllers;
 
+import com.shank.offcoder.Launcher;
 import com.shank.offcoder.cf.Codeforces;
+import com.shank.offcoder.cf.ProblemParser;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.AnchorPane;
 
 public class SubmissionCell extends ListCell<Codeforces.PreviousSubmission> {
@@ -72,5 +75,20 @@ public class SubmissionCell extends ListCell<Codeforces.PreviousSubmission> {
         duration.setText(item.time);
         mem.setText(item.mem);
         setGraphic(anchorPane);
+
+        setOnMouseClicked(e -> {
+            if (e.getButton().equals(MouseButton.PRIMARY)) {
+                if (e.getClickCount() == 2) {
+                    String[] codeName = item.problemName.split("-");
+                    String code = codeName[0].trim();
+                    String name = codeName[1].trim();
+                    String url = String.format("/problemset/problem/%s/%c", code.substring(0, code.length() - 1), code.charAt(code.length() - 1));
+                    boolean accepted = true;
+                    ProblemParser.Problem p = new ProblemParser.Problem(code, name, url, "", accepted);
+                    System.out.println("WEB: " + Codeforces.HOST + p.url);
+                    ((Controller) Launcher.get().mFxmlLoader.getController()).loadWebPage(p);
+                }
+            }
+        });
     }
 }
