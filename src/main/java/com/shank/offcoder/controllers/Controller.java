@@ -96,7 +96,7 @@ public class Controller {
     @FXML
     private Button compileBtn, submitBtn;
     @FXML
-    private Label acceptedLabel, selectedFile;
+    private Label acceptedLabel, selectedFile, liveCondition, liveConditionHover;
     @FXML
     private ChoiceBox<String> langSelector;
     @FXML
@@ -130,7 +130,7 @@ public class Controller {
         acceptedLabel.setVisible(false);
         compileBtn.setDisable(true);
         submitBtn.setDisable(true);
-
+        liveConditionHover.setVisible(false);
         prevSubListView.setCellFactory(para -> new SubmissionCell());
         problemListView.setCellFactory(param -> new ProblemCell());
         problemListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -148,7 +148,7 @@ public class Controller {
         listNameListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
         quesDownloadBtn.setDisable(true);
         deleteDownloadBtn.setDisable(true);
-
+        checkSubmissionHover();
         difficultyTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue.length() >= 5) newValue = newValue.substring(0, 4);
             if (!newValue.matches("\\d*")) {
@@ -675,7 +675,7 @@ public class Controller {
         compileBtn.setDisable(true);
         submitBtn.setDisable(true);
         selectedFile.setText("<No file selected>");
-
+        liveCondition.setText("No Live Data");
         boolean downloaded = QuestionManager.isQuestionDownloaded(pr.code);
         if (!downloaded) {
             if (NetworkClient.isNetworkNotConnected()) {
@@ -695,8 +695,67 @@ public class Controller {
             langSelector.setItems(FXCollections.observableArrayList(mCompilerManager.getLanguageList()));
             langSelector.setValue(selectedItem);
         });
+        checkSubmissionStatus(false, pr.code, status -> Platform.runLater(() -> liveCondition.setText(status)));
     }
 
+    private void queryCodeforcesAPI(String submissionId, AppThreader.EventCallback<String> listener) {
+        int contestId = Integer.parseInt(submissionId.substring(0, submissionId.length() - 1));
+        String index = Character.toString(submissionId.charAt(submissionId.length() - 1));
+        String handle = AppData.get().getData(AppData.HANDLE_KEY, null);
+        NetworkClient.get().JsonGet(Codeforces.HOST + "/api/user.status?handle=" + handle + "&from=1&count=10", data -> {
+            String def = "No Live Data";
+            JSONArray jsonArray = data.getJSONArray("result");
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject item = jsonArray.getJSONObject(i);
+                JSONObject problem = item.getJSONObject("problem");
+                if (problem.getInt("contestId") == contestId && problem.getString("index").compareTo(index) == 0) {
+                    def = item.getString("verdict") + "\nTest Cases Passed: " + item.getInt("passedTestCount");
+                    break;
+                }
+            }
+            listener.onEvent(def);
+        });
+
+    }
+
+    @FXML
+    private void checkSubmissionStatus(boolean hover, String submissionId, AppThreader.EventCallback<String> listener) {
+        new Thread(() -> {
+            while (true) {
+                try {
+                    if (mProblem == null) break;
+                    // Query the Codeforces API to get the submission status based on submissionId
+                    // Change String to JSON later.
+                    queryCodeforcesAPI(submissionId, submissionStatus -> {
+                        // Update the UI with the latest submission status
+                        if (submissionStatus.compareTo("TESTING") != 0) {
+                            listener.onEvent(submissionStatus);
+                        }
+                        if (!hover)
+                            Platform.runLater(() -> liveCondition.setText(submissionStatus));
+                        else
+                            Platform.runLater(() -> liveConditionHover.setText(submissionStatus));
+                    });
+                    // Sleep for a while before checking again
+                    Thread.sleep(3000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    @FXML
+    protected void checkSubmissionHover() {
+        problemListView.getSelectionModel().selectedItemProperty().addListener((observable, oldVal, pr) -> {
+            if (pr != null) {
+                checkSubmissionStatus(true, pr.code, status -> Platform.runLater(() -> liveConditionHover.setText(status)));
+                liveConditionHover.setVisible(true);
+            } else {
+                liveConditionHover.setVisible(false);
+            }
+        });
+    }
     // -------------------- PERSONALIZED LISTS --------------------- //
 
     @FXML
