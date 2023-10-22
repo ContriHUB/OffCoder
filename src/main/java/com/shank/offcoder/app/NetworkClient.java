@@ -18,6 +18,7 @@ import com.shank.offcoder.Launcher;
 import com.shank.offcoder.cf.Codeforces;
 import com.shank.offcoder.controllers.Controller;
 import javafx.application.Platform;
+import org.json.JSONObject;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -116,6 +117,29 @@ public class NetworkClient {
      *
      * @param URL URL for GET
      */
+    public void JsonGet(String URL, AppThreader.EventCallback<JSONObject> listener) {
+        new Thread(() -> {
+            JSONObject err = new JSONObject();
+            try {
+                Connection.Response response = Jsoup.connect(URL)
+                        .ignoreContentType(true)
+                        .method(Connection.Method.GET)
+                        .execute();
+                if (response.contentType() != null && response.contentType().startsWith("application/json")) {
+                    // Parse the JSON response
+                    Document doc = response.parse();
+                    String jsonText = doc.body().text();
+                    listener.onEvent(new JSONObject(jsonText));
+                } else {
+                    listener.onEvent(err);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+                listener.onEvent(err);
+            }
+        }).start();
+    }
+
     public void ReqGet(String URL, AppThreader.EventCallback<Document> listener) {
         new Thread(() -> {
             Document errDoc = Jsoup.parse("<html> <body> <p id=\"OffError\">Error</p> </body> </html>");

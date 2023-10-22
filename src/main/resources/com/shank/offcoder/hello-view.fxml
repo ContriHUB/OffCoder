@@ -111,6 +111,22 @@
                                 style="-fx-background-color: #fff; -fx-border-color: #1a73e8; -fx-border-radius: 8px; -fx-cursor: hand;"
                                 text="Compile &amp; Test" textFill="#1a73e8" AnchorPane.rightAnchor="14.0"
                                 AnchorPane.topAnchor="200.0"/>
+                        <Label id="liveStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="675.0"
+                               layoutY="14.0" prefHeight="25.0" prefWidth="169.0" text="Live Status"
+                               textFill="#ffc000" AnchorPane.topAnchor="280.0"
+                               AnchorPane.rightAnchor="14.0">
+                            <font>
+                                <Font name="System Bold" size="13.0"/>
+                            </font>
+                        </Label>
+                        <Label fx:id="liveCondition" alignment="CENTER" contentDisplay="CENTER" layoutX="675.0"
+                               layoutY="14.0" prefHeight="50.0" prefWidth="169.0" text="No Live Data"
+                               textFill="#ce4bd1" AnchorPane.topAnchor="305.0"
+                               AnchorPane.rightAnchor="14.0">
+                            <font>
+                                <Font name="System Bold" size="13.0"/>
+                            </font>
+                        </Label>
                     </children>
                 </AnchorPane>
                 <BorderPane fx:id="loginPane" prefHeight="600.0" prefWidth="1000.0">
@@ -314,6 +330,14 @@
                                 </ImageView>
                             </children>
                         </AnchorPane>
+                        <Label fx:id="liveConditionHover" alignment="CENTER" contentDisplay="CENTER" layoutX="675.0"
+                               layoutY="14.0" prefHeight="50.0" prefWidth="169.0" text="No Live Data"
+                               textFill="#ce4bd1" AnchorPane.bottomAnchor="200.0"
+                               AnchorPane.rightAnchor="45.0">
+                            <font>
+                                <Font name="System Bold" size="13.0"/>
+                            </font>
+                        </Label>
                         <ProgressIndicator fx:id="problemRetProgress" layoutX="860.0" layoutY="444.0" prefHeight="21.0"
                                            prefWidth="19.0" AnchorPane.bottomAnchor="135.0"
                                            AnchorPane.rightAnchor="121.0"/>
