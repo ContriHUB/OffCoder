@@ -79,7 +79,7 @@ public class CompilerManager {
             public void onCompleted(int exitCode, String output) {
                 output = output.trim();
                 System.out.println("auditCompiler: " + Arrays.toString(command) + "; exitCode = " + exitCode + "\n" + output);
-                if (exitCode == 0) compilerCheck.onResult(output);
+                if (exitCode == 0) compilerCheck.onResult(output.split("\n")[0]);
             }
 
             @Override

@@ -701,8 +701,7 @@ public class Controller {
     private void queryCodeforcesAPI(String submissionId, AppThreader.EventCallback<String> listener) {
         int contestId = Integer.parseInt(submissionId.substring(0, submissionId.length() - 1));
         String index = Character.toString(submissionId.charAt(submissionId.length() - 1));
-        String handle = AppData.get().getData(AppData.HANDLE_KEY, null);
-        NetworkClient.get().JsonGet(Codeforces.HOST + "/api/user.status?handle=" + handle + "&from=1&count=10", data -> {
+        NetworkClient.get().JsonGet(Codeforces.HOST + "/api/user.status?my=on&from=1&count=10", data -> {
             String def = "No Live Data";
             JSONArray jsonArray = data.getJSONArray("result");
             for (int i = 0; i < jsonArray.length(); i++) {
