@@ -58,10 +58,10 @@ public class CompilerManager {
 
         auditCompilers(getCommandWithShell(new String[]{"g++ --version"}), mLang::add);
 
-        auditCompilers(getCommandWithShell(new String[]{"py -2 --version"}),
+        auditCompilers(getCommandWithShell(new String[]{"python2 --version"}),
                 mLang::add);
 
-        auditCompilers(getCommandWithShell(new String[]{"py -3 --version"}),
+        auditCompilers(getCommandWithShell(new String[]{"python3 --version"}),
                 mLang::add);
     }
 
