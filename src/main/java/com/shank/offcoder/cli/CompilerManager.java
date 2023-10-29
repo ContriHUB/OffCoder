@@ -51,26 +51,23 @@ public class CompilerManager {
     private void auditCompilers() {
         mLang.clear();
         auditCompilers(getCommandWithShell(new String[]{"javac --version"}),
-                () -> mLang.add("Java 11.0.6"));
+                mLang::add);
 
         auditCompilers(getCommandWithShell(new String[]{"gcc --version"}),
-                () -> mLang.add("GNU GCC C11 5.1.0"));
+                mLang::add);
 
-        auditCompilers(getCommandWithShell(new String[]{"g++ --version"}), () -> {
-            mLang.add("GNU G++14 6.4.0");
-            mLang.add("GNU G++17 7.3.0");
-        });
+        auditCompilers(getCommandWithShell(new String[]{"g++ --version"}), mLang::add);
 
         auditCompilers(getCommandWithShell(new String[]{"python2 --version"}),
-                () -> mLang.add("Python 2.7.18"));
+                mLang::add);
 
         auditCompilers(getCommandWithShell(new String[]{"python3 --version"}),
-                () -> mLang.add("Python 3.8.10"));
+                mLang::add);
     }
 
     /**
      * Method to check if compiler of certain language exists.
-     * If exists, call the {@link CompilerCheck#onResult()},
+     * If exists, call the {@link CompilerCheck#onResult(String)},
      * that will add the language selection in {@link #mLang}.
      *
      * @param command       Command for checking compiler
@@ -80,8 +77,9 @@ public class CompilerManager {
         CommandLine.runCommand(new CommandLine.ProcessListener() {
             @Override
             public void onCompleted(int exitCode, String output) {
-                System.out.println("auditCompiler: " + Arrays.toString(command) + "; exitCode = " + exitCode);
-                if (exitCode == 0) compilerCheck.onResult();
+                output = output.trim();
+                System.out.println("auditCompiler: " + Arrays.toString(command) + "; exitCode = " + exitCode + "\n" + output);
+                if (exitCode == 0) compilerCheck.onResult(output.split("\n")[0]);
             }
 
             @Override
@@ -127,6 +125,6 @@ public class CompilerManager {
     public enum OSType {LINUX, WINDOWS}
 
     private interface CompilerCheck {
-        void onResult();
+        void onResult(String data);
     }
 }
